@@ -1,0 +1,47 @@
+---
+version: 0.0.1
+
+pipelines:
+  remote-version:
+    steps:
+      - ~:
+          when: "'@{package}' == 'ruby'"
+          shell:
+            run: "cap @{server} rvm1:check | grep -E \"^=\" | sed -E \"s|^=. (ruby-)?([^ ]*) .*|\\2|\""
+      - ~:
+          when: "'@{package}' == 'node'"
+          ssh: "@{server}"
+          shell:
+            run: "node --version | sed -E \"s@v(.*)@\\1@\""
+      - ~:
+          when: "'@{package}' == 'minio'"
+          ssh: "@{server}"
+          shell:
+            run: "minio --version | sed -E \"s|minio version (.*)|\\1|\""
+      - ~:
+          when: "'@{package}' == 'elastic'"
+          ssh: "@{server}"
+          shell:
+            run: "sudo /usr/share/elasticsearch/bin/elasticsearch --version | sed -E \"s|Version: (.*), Build: (.*), JVM: (.*)|\\1|\""
+      - ~:
+          when: "'@{package}' == 'mysql'"
+          ssh: "@{server}"
+          shell:
+            run: "mysql -V | sed -E \"s|.*Distrib (.*), .*|\\1|\""
+      - bundler:
+          when: "'@{package}' == 'bundler'"
+          subcommand: version
+          ssh: "@{server}"
+
+  remote-version-check:
+    steps:
+      - remote-version:
+          server: "@{remote}"
+          save: "@{remote}::VERSIONS::@{package}"
+      - env-version:
+          subcommand: "@{package}"
+          save: "ENV::VERSIONS::@{package}"
+      - semver-compare:
+          version1: "#{@{remote}::VERSIONS::@{package}}"
+          version2: "#{ENV::VERSIONS::@{package}}"
+          prefix: "Version consistency (@{package})"

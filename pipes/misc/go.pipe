@@ -1,0 +1,13 @@
+---
+version: 0.0.1
+
+public:
+  go-build:
+    inherit:
+      - build-dir
+      - binary
+      - binary-install-path
+    name: Build `@{binary}` binary
+    shell:
+      run: "go build -ldflags \"@{flags}\" -i -o \"@{binary-install-path}/@{binary}\""
+      dir: "@{build-dir|.}"

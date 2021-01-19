@@ -1,0 +1,46 @@
+---
+version: 0.0.1
+
+pipelines:
+  npm:
+    steps:
+      - ~:
+          when: "'@{subcommand}' =~ 'outdated|upgrade'"
+          shell:
+            run: "npm outdated --parseable"
+          save: NPM_OUTDATED
+          ignore-exit-code: true
+      - ~:
+          when: "'@{subcommand}' =~ 'outdated'"
+          shell:
+            run: "echo \"#{NPM_OUTDATED}\" | sed -E \"s|([^:]*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*)|- pm: npm\\\\\n  path: '\\1'\\\\\n  package: '\\2'\\\\\n  current: '\\3'\\\\\n  wanted: '\\5'\\\\\n  latest: '\\7'\\\\\n|g\""
+          save: NPM_OUTDATED_DEPENDENCIES
+      - ~:
+          when: "'@{subcommand}' == 'upgrade'"
+          shell:
+            run: "echo \"#{NPM_OUTDATED}\" | sed -E \"s|([^:]*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*)|'\\2'@latest|g\""
+          save: NPM_OUTDATED_PACKAGES
+      - ~:
+          when: "'@{subcommand}' == 'upgrade'"
+          shell:
+            run: "echo \"@{ignore | }\" | sed \"s@,@|@g\""
+          save: NPM_IGNORE_PATTERN
+      - ~:
+          when: "'@{subcommand}' == 'upgrade'"
+          shell:
+            run: "echo \"#{NPM_OUTDATED_PACKAGES}\" | grep -v -E \"^'(#{NPM_IGNORE_PATTERN})'@latest$\" | tr '\n' ' '"
+          save: NPM_OUTDATED_INSTALL_LIST
+      - ~:
+          when: "'@{subcommand}' == 'upgrade'"
+          shell:
+            run: "npm i #{NPM_OUTDATED_INSTALL_LIST}"
+          catch: noop
+      - ~:
+          when: "'@{subcommand}' == 'audit'"
+          shell:
+            run: "npm audit --production"
+          save: NPM_AUDIT
+      - ~:
+          when: "'@{subcommand}' == 'audit'"
+          shell:
+            run: "echo \"#{NPM_AUDIT}\" | grep -E \"^found ([0-9]*) vulnerabilit(?:ies|y)\" | sed -E \"s|^found ([0-9]*) vulnerabilities|\\1|\""

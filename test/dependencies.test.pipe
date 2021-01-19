@@ -1,0 +1,33 @@
+version: 0.0.1
+
+import:
+  - ../dependencies.pipe
+
+default:
+  command: install
+
+pipelines:
+  feature-tests:
+    pipe:
+      - test::go-mod::apply-ignores-1:
+          name: Apply ignores (1/1)
+
+  test::go-mod::apply-ignores-1:
+    selectable: false
+    pipe:
+      - print:
+          file: vectors/go-mod-list.0.stdin.txt
+      - go-mod::apply-ignores:
+          ignore-packages:
+            - github.com/envoyproxy/protoc-gen-validate
+            - github.com/codahale/hdrhistogram
+            - go.etcd.io/etcd
+            - github.com/lyft/protoc-gen-validate
+            - sourcegraph.com/sourcegraph/go-diff
+            - github.com/etcd-io/bbolt
+            - go.etcd.io/bbolt
+            - github.com/golang/lint
+            - golang.org/x/exp
+            - golang.org/x/sys
+      - expect:
+          file: results/go-mod-list.0.stdout.txt

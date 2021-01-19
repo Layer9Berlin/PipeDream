@@ -1,0 +1,14 @@
+---
+version: 0.0.1
+
+pipelines:
+  semver-compare:
+    steps:
+      - ~:
+          shell:
+            run: "semver-compare @{version1} @{version2}"
+          store:
+            output: SEMVER_OUTPUT
+      - ~:
+          shell:
+            run: "traffic-light -t \"#{SEMVER_OUTPUT}\" -r \"(major|minor) version conflict\" -a \"patch version conflict\" -p \"@{prefix}: \""

@@ -1,0 +1,65 @@
+---
+version: 0.0.1
+
+default:
+  command: install
+
+public:
+  expect:
+    pipe:
+      - expect::check-all:
+          file: "@{file}"
+          output: "@{output}"
+          output-pattern: "@{output-pattern}"
+          pipe:
+            - expect::check-file:
+                when: "@?{file}"
+            - expect::check-output:
+                when: "@?{output}"
+            - expect::check-output-pattern:
+                when: "@?{output-pattern}"
+      - expect::output-result:
+          test-name: "@{test-name}"
+          pipe:
+            - print:
+                when: "'$!!' == ''"
+                message: "passed"
+            - ~:
+                shell:
+                  args:
+                    green: "^passed$"
+                    prefix: "@{test-name|Test}"
+                  run: "traffic-light"
+
+private:
+  expect::check-file:
+    pipe:
+      - ~:
+          shell:
+            run: "diff -s \"@{file}\" - | head -n 10"
+      - print:
+          when: "\"$!!\" !~ *are identical"
+          message: Output does not match file!
+      - print:
+          when: "\"$!!\" !~ *does not match file!"
+          message: ""
+
+  expect::check-output:
+    io: switch
+    pipe:
+      - print:
+          when: "'$!!' != '@{output}'"
+          message: "output mismatch\nActual:\n$!!\nExpected:\n@{output}\n"
+      - print:
+          when: "'$!!' == '@{output}'"
+          message: ""
+
+  expect::check-output-pattern:
+    io: switch
+    pipe:
+      - print:
+          when: "'$!!' !~ '@{output-pattern}'"
+          message: "output pattern mismatch\nActual:\n$!!\nExpected pattern:\n@{output-pattern}\n"
+      - print:
+          when: "'$!!' !~ '^output pattern mismatch'"
+          message: ""

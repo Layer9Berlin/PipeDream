@@ -1,0 +1,7 @@
+---
+version: 0.0.1
+
+pipelines:
+  env-version:
+    shell:
+      run: "grep -ioE \"L9_@{subcommand}_VERSION=(.*)\" .env | sed -E \"s@[A-Z0-9_]*=(.*)@\\1@\""

@@ -1,0 +1,33 @@
+version: 0.0.1
+
+default:
+  command: install
+
+public:
+  go-mod-test-all:
+    pipe:
+      - go-mod-test::test-ignores
+      - go-mod::convert-all-to-yaml
+
+private:
+  go-mod-test::test-ignores:
+    pipe:
+      - print:
+          message: "github.com/test/test1 v7.2.3\ngithub.com/test/test2 v10.2.0\ngithub.com/test/test1/test v2.0.1 [v5.0.0]\ngithub.com/test/test2 v1.2.0 [v1.3.1]\n"
+      - go-mod::apply-ignores:
+          ignore-packages:
+            - github.com/test/test2
+      - expect:
+          test-name: Test ignores
+          output: "github.com/test/test1 v7.2.3\ngithub.com/test/test1/test v2.0.1 [v5.0.0]\n"
+
+  go-mod::test-convert-all-to-yaml:
+    pipe:
+      - print:
+          message: "github.com/test/test1 v7.2.3\ngithub.com/test/test2 v10.2.0\ngithub.com/test/test1/test v2.0.1 [v5.0.0]\ngithub.com/test/test2 v1.2.0 [v1.3.1]\n"
+      - go-mod::apply-ignores:
+          ignore-packages:
+            - github.com/test/test2
+      - expect:
+          test-name: Test ignores
+          output: "github.com/test/test1 v7.2.3\ngithub.com/test/test1/test v2.0.1 [v5.0.0]\n"

@@ -1,0 +1,7 @@
+---
+version: 0.0.1
+
+pipelines:
+  file-replace:
+    shell:
+      run: "sed -i -E \"s@@{regex}@@{replacement}@\" @{file}"

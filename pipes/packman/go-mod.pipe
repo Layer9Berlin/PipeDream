@@ -1,0 +1,160 @@
+---
+version: 0.0.1
+
+public:
+  go-mod:
+    pipe:
+      - go-mod::list:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+          when: "'@{subcommand}' == 'list'"
+      - go-mod::outdated:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+          when: "'@{subcommand}' == 'outdated'"
+      - go-mod::upgrade:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+          when: "'@{subcommand}' == 'upgrade'"
+
+private:
+  go-mod::list:
+    pipe:
+      - go-mod::list-all:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+      - go-mod::apply-ignores:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+      - go-mod::convert-all-to-yaml
+
+  go-mod::outdated:
+    pipe:
+      - go-mod::list-all:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+      - go-mod::apply-ignores:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+      - go-mod::convert-upgradeable-to-yaml
+      - go-mod::list-available-updates
+
+  go-mod::upgrade:
+    pipe:
+      - go-mod::list-all
+      - go-mod::apply-ignores:
+          inherit:
+            - ignore-packages
+            - ignore-pattern
+      - go-mod::filter-upgradeable
+      - go-mod::compile-install-list
+      - go-mod::install-upgrades
+      - go-mod::outdated
+
+  go-mod::list-all:
+    pipe:
+      shell:
+        run: go list -u -m all
+
+  go-mod::apply-ignores:
+    pipe:
+      - ~:
+          when: "@?{ignore-packages}"
+          shell:
+            run: "grep -v -F \"@{ignore-packages}\""
+          catch: go-mod::catch-grep-error
+      - ~:
+          when: "@?{ignore-pattern}"
+          shell:
+            run: "grep -v -E \"@{ignore-pattern}\""
+          catch: go-mod::catch-grep-error
+
+  go-mod::filter-upgradeable:
+    pipe:
+      - filter:
+          regex: "^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$"
+
+  go-mod::filter-non-upgradeable:
+    pipe:
+      - filter:
+          regex: "^([^ ]*) v?([^ ]*)$"
+
+  go-mod::convert-upgradeable-to-yaml:
+    pipe:
+      - go-mod::filter-upgradeable
+      - ~:
+          shell:
+            run: "sed -E \"s/^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$/- pm: go\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n  latest: '\\3'\\\\\n/g\""
+
+  go-mod::convert-non-upgradeable-to-yaml:
+    pipe:
+      - go-mod::filter-non-upgradeable
+      - ~:
+          shell:
+            run: "sed -E \"s/^([^ ]*) v?([^ ]*)( \\[v)?([^ ]*)\\]?$/- pm: go\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n/g\""
+
+  go-mod::convert-all-to-yaml:
+    pipe:
+      - go-mod::convert-upgradeable-to-yaml
+#          shell:
+#            output: input
+      - go-mod::convert-non-upgradeable-to-yaml
+
+  go-mod::list-available-updates:
+    pipe:
+      - ~:
+          shell:
+            run: "semver-compare --yaml"
+      - ~:
+          shell:
+            args:
+              prefix: Go mod
+              red: major updates available
+              amber: minor updates available
+            run: traffic-light
+
+  go-mod::compile-install-list:
+    pipe:
+      - go-mod::filter-upgradeable
+      - ~:
+          shell:
+            run: "sed -E \"s|^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$|\\1|g\" | tr '\n' ' '"
+
+  go-mod::install-upgrades:
+    pipe:
+      - ~:
+          shell:
+            run: "go get -u $!!"
+          catch: go-mod::catch-upgrade-errors
+
+  go-mod::catch-upgrade-errors:
+    io: merge
+    pipe:
+      - noop:
+          with:
+            pattern: "(?m)^go: downloading .*"
+      - noop:
+          with:
+            pattern: "(?m)^go: .* upgrade => .*"
+      - error:
+          when: "'$!!' != ''"
+          message: "updating dependencies failed: $!!"
+
+  go-mod::catch-grep-error:
+    io: merge
+    pipe:
+      - noop:
+          with:
+            # we can ignore exit status 1, as it may simply indicate a lack of results
+            pattern: "exit status 1"
+      - error:
+          when: "'$!!' != ''"
+          message: "$!!"
+

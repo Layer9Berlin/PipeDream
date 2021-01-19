@@ -1,0 +1,28 @@
+---
+version: 0.0.1
+
+pipelines:
+  rvm:
+    steps:
+      - ~:
+          when: "'@{subcommand}' == 'upgrade'"
+          shell:
+            run: rvm get stable --auto-dotfiles
+      - ~:
+          shell:
+            exec: zsh
+            login: true
+            run: rvm --default --install use ruby
+          when: "'@{subcommand}' == 'upgrade'"
+      - ~:
+          when: "'@{subcommand}' == 'install'"
+          shell:
+            run: rvm install @{version}
+          catch: noop
+      - ~:
+          shell:
+            exec: zsh
+            login: true
+            run: rvm --default use  @{version}
+          when: "'@{subcommand}' == 'install'"
+          catch: noop

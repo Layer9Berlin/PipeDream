@@ -1,0 +1,50 @@
+---
+version: 0.0.1
+
+public:
+  prompt:
+    pipe:
+      - print:
+          message: "@{text|''}"
+          shell:
+            interactive: true
+          when: "@?{text}"
+      - prompt::read-user-input:
+          when: "!(@{yes-to-all|false} && @?{default})"
+          shell:
+            interactive: true
+          pipe:
+            - prompt::with-char-limit:
+                when: "@?{chars}"
+            - prompt::without-char-limit:
+                when: "!@?{chars}"
+      # use default if present and either the output is empty or `yes-to-all` is set
+      - print:
+          when: "('$!!' == '' || @{yes-to-all|false}) && @?{default}"
+          shell:
+            interactive: true
+          message: "@{default}"
+      # if the input was not terminated by a new line, add one
+      - ~:
+          when: "@?{chars}"
+          shell:
+            interactive: true
+            run: "echo \"\""
+
+private:
+  prompt::with-char-limit:
+    pipe:
+      # read user input
+      - run:
+          shell:
+            exec: sh
+            interactive: true
+            run: "read -n @{chars|0} && printf \"$REPLY\""
+
+  prompt::without-char-limit:
+    pipe:
+      - run:
+          shell:
+            exec: sh
+            interactive: true
+            run: "read && printf \"$REPLY\""

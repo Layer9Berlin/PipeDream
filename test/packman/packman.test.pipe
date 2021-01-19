@@ -1,0 +1,12 @@
+version: 0.0.1
+
+import:
+  - go-mod/go-mod.test.pipe
+
+default:
+  command: install
+
+public:
+  test-all:
+    pipe:
+      - go-mod-test-all

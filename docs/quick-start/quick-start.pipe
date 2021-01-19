@@ -1,0 +1,7 @@
+version: 0.0.1
+
+pipelines:
+  - hello-world:
+      steps:
+        - run:
+            command: "echo \"Hello world\""

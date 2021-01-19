@@ -1,0 +1,37 @@
+---
+version: 0.0.1
+
+pipelines:
+  bundler:
+    pipe:
+      - ~:
+          when: "'@{subcommand}' == 'version'"
+          shell:
+            run: 'bundle --version | sed -E "s@Bundler version (.*)@\1@"'
+      - ~:
+          when: "'@{subcommand}' == 'upgrade'"
+          shell:
+            run: "bundle update --all"
+      - ~:
+          when: "'@{subcommand}' == 'outdated'"
+          shell:
+            run: "bundle outdated --parseable --only-explicit"
+          store:
+            output: BUNDLER_OUTDATED
+          ignore-exit-code: true
+      - ~:
+          when: "'@{subcommand}' == 'outdated'"
+          shell:
+            run: "echo \"#{BUNDLER_OUTDATED}\" | sed -E \"s|^([^ ]*) \\(newest (.*), installed (.*)\\)$|- pm: bundler\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n  latest: '\\3'\\\\\n|g\""
+          store:
+            output: BUNDLER_OUTDATED_DEPENDENCIES
+      - ~:
+          when: "'@{subcommand}' == 'audit'"
+          shell:
+            run: "bundle-audit check --update"
+          store:
+            output: BUNDLER_AUDIT
+      - ~:
+          when: "'@{subcommand}' == 'audit'"
+          shell:
+            run: "echo \"#{BUNDLER_AUDIT}\" | grep -io -E \"(No|[0-9]*) vulnerabilities found\" | sed -E \"s/^(No|[0-9]*) vulnerabilities found/\\1/\" | sed -E \"s|^No|0|\""
