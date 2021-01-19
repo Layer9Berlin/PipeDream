@@ -1,0 +1,32 @@
+{
+  "name": "@l9/pipedream",
+  "version": "0.0.1",
+  "description": "PipeDream - Maintainable Script Automation",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "go test src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Layer9Berlin/PipeDream.git"
+  },
+  "keywords": [
+    "pipedream",
+    "script",
+    "automation",
+    "shell",
+    "terminal",
+    "command",
+    "line"
+  ],
+  "author": "Layer9 GmbH",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Layer9Berlin/PipeDream/issues"
+  },
+  "homepage": "https://github.com/Layer9Berlin/PipeDream#readme"
+}
