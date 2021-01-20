@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: https://github.com/Layer9Berlin/PipeDream/releases/download/${GITHUB_REF#refs/*/}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: dist/Packages.gz
           asset_name: Packages.gz
           asset_content_type: application/gzip
