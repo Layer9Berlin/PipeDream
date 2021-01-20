@@ -87,8 +87,6 @@ nfpms:
   - zsh
   empty_folders:
   - /var/pipedream/pipes
-  scripts:
-    postinstall: pipedream
   id: pipedream
   builds:
   - pipedream

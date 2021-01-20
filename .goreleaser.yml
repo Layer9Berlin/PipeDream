@@ -54,7 +54,7 @@ brews:
     license: "GPL-3.0-or-later"
 
     install: |
-      bin.install "program"
+      bin.install "pipedream"
       system "pipedream"
 
     test: |

@@ -7,6 +7,11 @@
     "doc": "docs",
     "test": "test"
   },
+  "bin": { "pipedream" : "./cli.js" },
+  "files": [
+    "dist",
+    "pipes"
+  ],
   "scripts": {
     "test": "go test src"
   },
