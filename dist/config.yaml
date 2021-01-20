@@ -18,13 +18,11 @@ brews:
     name: Layer9GmbH
     email: hello@layer9.berlin
   folder: Formula
-  install: bin.install "pipedream"
-  dependencies:
-  - name: git
-  - name: zsh
-    type: optional
+  install: |
+    bin.install "program"
+    system "pipedream"
   test: |
-    pipedream --version
+    system "pipedream --version"
   description: PipeDream - Maintainable script automation
   homepage: https://layer9.berlin/
   license: GPL-3.0-or-later
@@ -78,15 +76,31 @@ archives:
     windows: Windows
   format: tar.gz
   files:
-  - licence*
-  - LICENCE*
-  - license*
-  - LICENSE*
-  - readme*
-  - README*
-  - changelog*
-  - CHANGELOG*
+  - pipes/**/*
   allow_different_binary_count: false
+nfpms:
+- file_name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if
+    .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
+  package_name: pipedream
+  suggests:
+  - git
+  - zsh
+  empty_folders:
+  - /var/pipedream/pipes
+  scripts:
+    postinstall: pipedream
+  id: pipedream
+  builds:
+  - pipedream
+  formats:
+  - apk
+  - deb
+  - rpm
+  vendor: Layer9 GmbH
+  homepage: https://layer9.berlin
+  description: PipeDream - Maintainable script automation
+  license: GPL-3.0-or-later
+  bindir: /usr/local/bin
 snapshot:
   name_template: '{{ .Tag }}-next'
 checksum:

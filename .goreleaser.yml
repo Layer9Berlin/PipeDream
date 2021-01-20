@@ -82,6 +82,3 @@ nfpms:
 
     empty_folders:
       - /var/pipedream/pipes
-
-    scripts:
-      postinstall: "pipedream"

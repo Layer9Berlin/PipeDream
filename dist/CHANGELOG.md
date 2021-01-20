@@ -1,3 +1,3 @@
 ## Changelog
 
-34e9937 fix: change project name
+95119a6 feat: include built-in pipes dir
