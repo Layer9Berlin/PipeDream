@@ -38,7 +38,7 @@ jobs:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - 
         name: Create Packages file
-        run: dpkg-scanpackages dist | gzip -c > dist/Packages.gz
+        run: dpkg-scanpackages --multiversion --arch dist | gzip -c > dist/Packages.gz
       -
         name: Upload Packages file
         id: upload-release-asset
@@ -46,7 +46,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.goreleaser.outputs.upload_url }}
+          upload_url: https://github.com/Layer9Berlin/PipeDream/releases/download/${GITHUB_REF#refs/*/}
           asset_path: ./Packages.gz
           asset_name: Packages.gz
           asset_content_type: application/gzip
