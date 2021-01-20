@@ -67,6 +67,7 @@ nfpms:
 
     vendor: Layer9 GmbH
     homepage: https://layer9.berlin
+    maintainer: Layer9 GmbH <info@layer9.berlin>
 
     description: PipeDream - Maintainable script automation
 
@@ -83,3 +84,6 @@ nfpms:
 
     empty_folders:
       - /var/pipedream/pipes
+
+    signature:
+      key_file: key.gpg
