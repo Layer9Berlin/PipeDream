@@ -87,12 +87,12 @@ nfpms:
 
     rpm:
       signature:
-        key_file: publish/dist-key-210120
+        key_file: publish/distribution.key.210120
 
     deb:
       signature:
-        key_file: publish/dist-key-210120
+        key_file: publish/distribution.key.210120
 
     apk:
       signature:
-        key_file: publish/dist-key-210120
+        key_file: publish/distribution.key.210120
