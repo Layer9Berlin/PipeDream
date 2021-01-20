@@ -21,19 +21,20 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/run" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/dist/darwin" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/dist/darwin" />
       <recent name="$PROJECT_DIR$/src/run" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/dist" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src/middleware/stack" />
       <recent name="$PROJECT_DIR$/src/middleware" />
       <recent name="$PROJECT_DIR$/src/parsers" />
-      <recent name="$PROJECT_DIR$/src/run" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build pipedream">
