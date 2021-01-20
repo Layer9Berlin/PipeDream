@@ -87,12 +87,12 @@ nfpms:
 
     rpm:
       signature:
-        key_file: key.gpg
+        key_file: distribution.private.key.gpg
 
     deb:
       signature:
-        key_file: key.gpg
+        key_file: distribution.private.key.gpg
 
     apk:
       signature:
-        key_file: key.gpg
+        key_file: distribution.private.key.gpg
