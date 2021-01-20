@@ -1,14 +1,12 @@
 {
   "name": "@l9/pipedream",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "PipeDream - Maintainable Script Automation",
   "main": "index.js",
   "directories": {
     "doc": "docs",
     "test": "test"
   },
-  "postinstall": "go-npm install",
-  "preuninstall": "go-npm uninstall",
   "goBinary": {
     "name": "pipedream",
     "path": "./bin",
@@ -18,7 +16,9 @@
     "include/pipes"
   ],
   "scripts": {
-    "test": "go test src"
+    "test": "go test src",
+    "postinstall": "go-npm install",
+    "preuninstall": "go-npm uninstall"
   },
   "repository": {
     "type": "git",
