@@ -1,3 +1,3 @@
 ## Changelog
 
-695cbbf feat: add homebrew release config
+34e9937 fix: change project name

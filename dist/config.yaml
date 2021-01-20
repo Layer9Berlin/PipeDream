@@ -1,4 +1,4 @@
-project_name: '@l9/pipedream'
+project_name: pipedream
 release:
   github:
     owner: Layer9Berlin
@@ -18,7 +18,7 @@ brews:
     name: Layer9GmbH
     email: hello@layer9.berlin
   folder: Formula
-  install: bin.install "@l9/pipedream"
+  install: bin.install "pipedream"
   dependencies:
   - name: git
   - name: zsh
@@ -30,13 +30,13 @@ brews:
   license: GPL-3.0-or-later
   goarm: "6"
 scoop:
-  name: '@l9/pipedream'
+  name: pipedream
   commit_author:
     name: goreleaserbot
     email: goreleaser@carlosbecker.com
   commit_msg_template: Scoop update for {{ .ProjectName }} version {{ .Tag }}
 builds:
-- id: '@l9/pipedream'
+- id: pipedream
   goos:
   - linux
   - windows
@@ -59,7 +59,7 @@ builds:
   ldflags:
   - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
     -X main.builtBy=goreleaser
-  binary: '@l9/pipedream'
+  binary: pipedream
   env:
   - CGO_ENABLED=0
   lang: go
@@ -67,7 +67,7 @@ builds:
 archives:
 - id: default
   builds:
-  - '@l9/pipedream'
+  - pipedream
   name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
     }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
   replacements:

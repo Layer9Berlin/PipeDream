@@ -51,10 +51,31 @@ brews:
 
     license: "GPL-3.0-or-later"
 
-    dependencies:
-      - name: git
-      - name: zsh
-        type: optional
-
     test: |
-      pipedream --version
+      system "pipedream --version"
+nfpms:
+  -
+    id: pipedream
+    package_name: pipedream
+
+    vendor: Layer9 GmbH
+    homepage: https://layer9.berlin
+
+    description: PipeDream - Maintainable script automation
+
+    license: "GPL-3.0-or-later"
+
+    formats:
+      - apk
+      - deb
+      - rpm
+
+    suggests:
+      - git
+      - zsh
+
+    empty_folders:
+      - /var/pipedream/pipes
+
+    scripts:
+      postinstall: "pipedream"
