@@ -28,3 +28,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PIPEDREAM_RELEASE_ACTION_TOKEN }}
           NFPM_PIPEDREAM_PASSPHRASE: ${{ secrets.PIPEDREAM_RELEASE_GPG_PASSPHRASE }}
+      - 
+        name: Create Packages file
+        run: dpkg-scanpackages -m . | gzip -c > Packages.gz
