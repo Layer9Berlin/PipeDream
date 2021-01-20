@@ -16,7 +16,7 @@ builds:
       - darwin
 archives:
   - files:
-      - include/pipes/**/*
+      - include/**/*
 checksum:
   name_template: 'checksums.txt'
 snapshot:

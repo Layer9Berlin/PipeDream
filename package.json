@@ -13,7 +13,7 @@
     "url": "https://github.com/Layer9Berlin/PipeDream/releases/download/v{{version}}/pipedream_{{version}}_{{platform}}_{{arch}}.tar.gz"
   },
   "files": [
-    "include/pipes"
+    "include"
   ],
   "scripts": {
     "test": "go test src",
