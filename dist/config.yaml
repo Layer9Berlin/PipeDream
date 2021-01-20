@@ -94,3 +94,30 @@ github_urls:
   download: https://github.com
 gitlab_urls:
   download: https://gitlab.com
+brews:
+  -
+    name: pipedream
+
+    tap:
+      owner: Layer9Berlin
+      name: homebrew-tap
+
+    commit_author:
+      name: Layer9GmbH
+      email: hello@layer9.berlin
+
+    folder: Formula
+
+    homepage: "https://layer9.berlin/"
+
+    description: "PipeDream - Maintainable script automation"
+
+    license: "GPL-3.0-or-later"
+
+    dependencies:
+      - name: git
+      - name: zsh
+        type: optional
+
+    test: |
+      pipedream --version

@@ -1,6 +1,6 @@
-280793bee13a7af905af397e7329ce757d2b9f9131724b4e81338d1dba62314d  @l9/pipedream_v0.0.0-next_Linux_arm64.tar.gz
-36eca4fc8e1a7ff56708ad68a3090b0607572e9a4b31bd31ef226ffae4c00d2f  @l9/pipedream_v0.0.0-next_Windows_i386.tar.gz
-41b4c582797129390bacc06a9ed489fa1ee0fcb4803564a8158231934293c36f  @l9/pipedream_v0.0.0-next_Darwin_x86_64.tar.gz
-53adc8814b244d0082e448805e2914556c5e9cd8d818c5da802168c2ed1fe9ca  @l9/pipedream_v0.0.0-next_Windows_x86_64.tar.gz
-f9a44d7b23ff5512448b5cffd9370e41d13450086d1e8cd218dc995b1d222029  @l9/pipedream_v0.0.0-next_Linux_i386.tar.gz
-fa059d8e1e3c3bc9bcdafa7e0bf845f3615d2987cd898029a36c6032fb3af80c  @l9/pipedream_v0.0.0-next_Linux_x86_64.tar.gz
+2ee4a78d6510a36cbc3b4ebc915a46c3d5036f86b915488b27a87a2f8fb202c4  @l9/pipedream_0.0.1+fix_Windows_x86_64.tar.gz
+938fef8446731d0c0c52db8f1e56beaae5e8f560321721d5cc24824386a4851f  @l9/pipedream_0.0.1+fix_Linux_i386.tar.gz
+ad3185b895bad88c310bd791e2aa00fae79d82150ff332d73fd8fa6774782aa8  @l9/pipedream_0.0.1+fix_Linux_x86_64.tar.gz
+bbf5642e7a535f3f942344fed08536ab1374d6ef78ff3a32ebf7956ad5a8944e  @l9/pipedream_0.0.1+fix_Windows_i386.tar.gz
+eb0323e217d0d83b058a19f708889e876a431f31bad22e55ef547c4bbf91f527  @l9/pipedream_0.0.1+fix_Linux_arm64.tar.gz
+f67024707819e24698a0353a5fb57497585d63bebf9ff7408f3588c61ef838b5  @l9/pipedream_0.0.1+fix_Darwin_x86_64.tar.gz
