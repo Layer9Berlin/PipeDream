@@ -38,7 +38,7 @@ jobs:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - 
         name: Create Packages file
-        run: dpkg-scanpackages --multiversion --arch dist | gzip -c > dist/Packages.gz
+        run: dpkg-scanpackages -m dist | gzip -c > dist/Packages.gz
       -
         name: Upload Packages file
         id: upload-release-asset
