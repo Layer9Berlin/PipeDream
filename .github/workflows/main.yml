@@ -19,6 +19,16 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.15
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: false
+          prerelease: false
       -
         name: Import GPG key
         id: import_gpg
