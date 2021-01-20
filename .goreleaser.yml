@@ -84,15 +84,3 @@ nfpms:
 
     empty_folders:
       - /var/pipedream/pipes
-
-    rpm:
-      signature:
-        key_file: publish/distribution.key.210120
-
-    deb:
-      signature:
-        key_file: publish/distribution.key.210120
-
-    apk:
-      signature:
-        key_file: publish/distribution.key.210120
