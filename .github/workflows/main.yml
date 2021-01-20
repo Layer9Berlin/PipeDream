@@ -74,7 +74,6 @@ jobs:
 #          asset_path: dist/Release
 #          asset_name: Release
 #          asset_content_type: text/plain
-      - run: npm version ${GITHUB_REF##*/}
       - uses: actions/setup-node@v1
       - name: Publish
         run: |
