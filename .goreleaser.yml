@@ -2,7 +2,7 @@ before:
   hooks:
     - go mod download
     - go generate ./...
-project_name: "@l9/pipedream"
+project_name: "pipedream"
 release:
   github:
     owner: Layer9Berlin

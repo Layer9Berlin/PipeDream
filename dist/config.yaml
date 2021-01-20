@@ -9,6 +9,26 @@ milestones:
     owner: Layer9Berlin
     name: PipeDream
   name_template: '{{ .Tag }}'
+brews:
+- name: pipedream
+  tap:
+    owner: Layer9Berlin
+    name: homebrew-tap
+  commit_author:
+    name: Layer9GmbH
+    email: hello@layer9.berlin
+  folder: Formula
+  install: bin.install "@l9/pipedream"
+  dependencies:
+  - name: git
+  - name: zsh
+    type: optional
+  test: |
+    pipedream --version
+  description: PipeDream - Maintainable script automation
+  homepage: https://layer9.berlin/
+  license: GPL-3.0-or-later
+  goarm: "6"
 scoop:
   name: '@l9/pipedream'
   commit_author:

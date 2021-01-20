@@ -1,3 +1,3 @@
 ## Changelog
 
-a564974 feat: homebrew installation (WIP)
+695cbbf feat: add homebrew release config
