@@ -52,6 +52,12 @@ func WithParser(parser *parsers.Parser) ExecutionContextOption {
 	}
 }
 
+func WithLogger(logger *logrus.Logger) ExecutionContextOption {
+	return func(executionContext *ExecutionContext) {
+		executionContext.Log = logger
+	}
+}
+
 func WithUserPromptImplementation(implementation func(
 	label string,
 	items []string,

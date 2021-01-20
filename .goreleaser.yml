@@ -2,10 +2,11 @@ before:
   hooks:
     - go mod download
     - go generate ./...
-project_name: @l9/pipedream
-github:
-  owner: Layer9Berlin
-  name: PipeDream
+project_name: "@l9/pipedream"
+release:
+  github:
+    owner: Layer9Berlin
+    name: PipeDream
 builds:
   - env:
       - CGO_ENABLED=0

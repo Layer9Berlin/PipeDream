@@ -1,6 +1,7 @@
 package run
 
 import (
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
 	"os"
@@ -8,6 +9,9 @@ import (
 	"pipedream/src/middleware"
 	"pipedream/src/middleware/middleware_stack"
 )
+
+var Log = logrus.New()
+var Verbosity string
 
 var executionContextFactory = middleware.NewExecutionContext
 var osStdin io.ReadCloser = os.Stdin
@@ -20,6 +24,7 @@ func Cmd(_ *cobra.Command, args []string) {
 		middleware.WithActivityIndicator(logging.NewNestedActivityIndicator()),
 		middleware.WithMiddlewareStack(middleware_stack.SetUpMiddleware()),
 		middleware.WithProjectPath(projectPath),
+		middleware.WithLogger(Log),
 	)
 	err := executionContext.SetUpPipelines(args)
 	if err != nil {
