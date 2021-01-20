@@ -9,7 +9,7 @@
   },
   "bin": { "pipedream" : "./cli.js" },
   "files": [
-    "dist",
+    "publish",
     "pipes"
   ],
   "scripts": {
