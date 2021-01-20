@@ -142,6 +142,7 @@
   </component>
   <component name="UnknownFeatures">
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.md" />
+    <option featureType="com.intellij.fileTypeFactory" implementationName="main.yml" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>

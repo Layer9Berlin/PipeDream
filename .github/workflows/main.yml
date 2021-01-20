@@ -20,14 +20,33 @@ jobs:
         with:
           go-version: 1.15
       -
+        name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v3
+        with:
+          gpg-private-key: ${{ secrets.PIPEDREAM_RELEASE_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.PIPEDREAM_RELEASE_GPG_PASSPHRASE }}
+      -
         name: Run GoReleaser
+        id: goreleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
           args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.PIPEDREAM_RELEASE_ACTION_TOKEN }}
-          NFPM_PIPEDREAM_PASSPHRASE: ${{ secrets.PIPEDREAM_RELEASE_GPG_PASSPHRASE }}
+          GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - 
         name: Create Packages file
-        run: dpkg-scanpackages -m . | gzip -c > Packages.gz
+        run: dpkg-scanpackages dist | gzip -c > dist/Packages.gz
+      -
+        name: Upload Packages file
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.goreleaser.outputs.upload_url }}
+          asset_path: ./Packages.gz
+          asset_name: Packages.gz
+          asset_content_type: application/gzip
