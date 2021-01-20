@@ -85,5 +85,14 @@ nfpms:
     empty_folders:
       - /var/pipedream/pipes
 
-    signature:
-      key_file: key.gpg
+    rpm:
+      signature:
+        key_file: key.gpg
+
+    deb:
+      signature:
+        key_file: key.gpg
+
+    apk:
+      signature:
+        key_file: key.gpg
