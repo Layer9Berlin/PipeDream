@@ -55,7 +55,7 @@ brews:
 
     install: |
       bin.install "pipedream"
-      bin.install Dir["pipes/*"]
+      include.install Dir["pipes/*"]
       system "#{bin}/pipedream"
 
     test: |
