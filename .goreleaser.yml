@@ -14,8 +14,6 @@ builds:
       - linux
       - windows
       - darwin
-    hooks:
-      post: dpkg-scanpackages -m dist | gzip -c > dist/Packages.gz
 archives:
   - files:
       - pipes/**/*

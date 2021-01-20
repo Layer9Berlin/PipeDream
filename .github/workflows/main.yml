@@ -60,17 +60,24 @@ jobs:
           asset_path: dist/Packages.gz
           asset_name: Packages.gz
           asset_content_type: application/gzip
-      -
-        name: Create Release file
-        run: echo "Packages.gz" > dist/Release
-      -
-        name: Upload Release file
-        id: upload-release-file
-        uses: actions/upload-release-asset@v1
+#      -
+#        name: Create Release file
+#        run: echo "Packages.gz" > dist/Release
+#      -
+#        name: Upload Release file
+#        id: upload-release-file
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ steps.create_release.outputs.upload_url }}
+#          asset_path: dist/Release
+#          asset_name: Release
+#          asset_content_type: text/plain
+      - uses: actions/setup-node@v1
+      - name: Publish
+        run: |
+          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+          npm publish
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: dist/Release
-          asset_name: Release
-          asset_content_type: text/plain
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
