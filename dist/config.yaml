@@ -19,7 +19,7 @@ brews:
     email: hello@layer9.berlin
   folder: Formula
   install: |
-    bin.install "program"
+    bin.install "pipedream"
     system "pipedream"
   test: |
     system "pipedream --version"

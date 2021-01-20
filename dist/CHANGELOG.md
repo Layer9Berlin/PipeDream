@@ -1,3 +1,3 @@
 ## Changelog
 
-ef39376 fix: nfpm config (WIP)
+b8714ef fix: brew setup (WIP)

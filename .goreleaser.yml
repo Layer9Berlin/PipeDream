@@ -55,10 +55,13 @@ brews:
 
     install: |
       bin.install "pipedream"
+      bash_completion.install "completions/pipedream.bash" => "pipedream"
+      zsh_completion.install "completions/pipedream.zsh" => "pipedream"
+      fish_completion.install "completions/pipedream.fish"
       system "pipedream"
 
     test: |
-      system "pipedream --version"
+      system "#{bin}/pipedream --version"
 nfpms:
   -
     id: pipedream
