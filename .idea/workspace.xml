@@ -11,6 +11,9 @@
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
   <component name="ProjectId" id="1n3VWJuPfRL0FtrdctiQssat9L8" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -22,6 +25,7 @@
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/dist/darwin" />
+    <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
@@ -30,11 +34,11 @@
       <recent name="$PROJECT_DIR$/src/run" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/include" />
       <recent name="$PROJECT_DIR$/dist" />
       <recent name="$PROJECT_DIR$" />
       <recent name="$PROJECT_DIR$/src/middleware/stack" />
       <recent name="$PROJECT_DIR$/src/middleware" />
-      <recent name="$PROJECT_DIR$/src/parsers" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build pipedream">
@@ -204,10 +208,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611134709398" />
-    <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1611137514521">
+    <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1611164371102">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="541" y="280" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611137514521" />
+    <state x="541" y="280" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611164371102" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup" timestamp="1610619078061">
       <screen x="0" y="25" width="1680" height="947" />
     </state>
