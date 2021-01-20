@@ -1,6 +1,6 @@
 {
   "name": "@l9/pipedream",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "PipeDream - Maintainable Script Automation",
   "main": "index.js",
   "directories": {
@@ -12,7 +12,7 @@
   "goBinary": {
     "name": "pipedream",
     "path": "./bin",
-    "url": "https://github.com/Layer9Berlin/PipeDream/releases/download/v{{version}}/pipedream_{{version}}_Darwin_x86_64.tar.gz"
+    "url": "https://github.com/Layer9Berlin/PipeDream/releases/download/{{version}}/pipedream_{{version}}_Darwin_x86_64.tar.gz"
   },
   "files": [
     "include/pipes"
