@@ -30,8 +30,7 @@ changelog:
       - '^docs:'
       - '^test:'
 brews:
-  -
-    name: pipedream
+  - name: pipedream
 
     tap:
       owner: Layer9Berlin
@@ -57,8 +56,7 @@ brews:
     test: |
       system "#{bin}/pipedream --version"
 nfpms:
-  -
-    id: pipedream
+  - id: pipedream
     package_name: pipedream
 
     vendor: Layer9 GmbH
@@ -81,7 +79,11 @@ nfpms:
     empty_folders:
       - /var/pipedream/pipes
 signs:
-  - artifacts: checksum
-    args: ["--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}"]
-  - artifacts: Packages.gz
+  -
+    artifacts: checksum
+    id: sign_checksums
+    args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
+  -
+    artifacts: Packages.gz
+    id: sign_packages_file
     args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
