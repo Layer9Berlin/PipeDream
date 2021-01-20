@@ -21,6 +21,8 @@ archives:
       windows: Windows
       386: i386
       amd64: x86_64
+    files:
+      - pipes/**/*
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -50,6 +52,10 @@ brews:
     description: "PipeDream - Maintainable script automation"
 
     license: "GPL-3.0-or-later"
+
+    install: |
+      bin.install "program"
+      system "pipedream"
 
     test: |
       system "pipedream --version"
