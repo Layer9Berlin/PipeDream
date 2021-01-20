@@ -83,7 +83,3 @@ signs:
     artifacts: checksum
     id: sign_checksums
     args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
-  -
-    artifacts: Packages.gz
-    id: sign_packages_file
-    args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]
