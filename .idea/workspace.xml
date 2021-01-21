@@ -20,8 +20,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.goreleaser.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.goreleaser.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,10 +241,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1611046538115" />
-    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1611167253503">
+    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1611237856939">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611167253503" />
+    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611237856939" />
     <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1611235498621">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

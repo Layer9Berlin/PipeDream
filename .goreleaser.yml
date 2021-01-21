@@ -49,7 +49,7 @@ brews:
     install: |
       bin.install "pipedream"
       include.install Dir["include/*"]
-      bin.install_symlink #{include}/pipedream_pipes
+      ln_s #{include}/pipedream_pipes, #{bin}", force: true
       system "#{bin}/pipedream"
 
     test: |
