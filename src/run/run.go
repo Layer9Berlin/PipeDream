@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	"os"
+	"path"
 	"path/filepath"
 	"pipedream/src/logging"
 	"pipedream/src/middleware"
@@ -19,8 +20,9 @@ var osStdin io.ReadCloser = os.Stdin
 var osStdout io.WriteCloser = os.Stdout
 
 func Cmd(_ *cobra.Command, args []string) {
-	projectPath, _ := os.Executable()
-	projectPath, _ = filepath.EvalSymlinks(projectPath)
+	executableLocation, _ := os.Executable()
+	executableDir := path.Dir(executableLocation)
+	projectPath, _ := filepath.EvalSymlinks(executableDir)
 	executionContext := executionContextFactory(
 		middleware.WithActivityIndicator(logging.NewNestedActivityIndicator()),
 		middleware.WithMiddlewareStack(middleware_stack.SetUpMiddleware()),

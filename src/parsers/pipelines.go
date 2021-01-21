@@ -2,12 +2,25 @@ package parsers
 
 import (
 	"fmt"
+	"os"
 	"path"
 	"path/filepath"
+	"syscall"
 )
 
 func (parser *Parser) BuiltInPipelineFilePaths(projectPath string) ([]string, error) {
-	resolvedPipesPath, _ := filepath.EvalSymlinks(path.Join(projectPath, "pipedream_pipes"))
+	resolvedPipesPath, err := filepath.EvalSymlinks(path.Join(projectPath, "pipedream_pipes"))
+	if err != nil {
+		if pathErr, ok := err.(*os.PathError); ok {
+			if pathErr.Err == syscall.ENOENT {
+				resolvedPipesPath = "./include/pipedream_pipes"
+			} else {
+				return nil, err
+			}
+		} else {
+			return nil, err
+		}
+	}
 	glob := path.Join(resolvedPipesPath, "**/*.pipe")
 	matches, err := parser.findByGlob(glob)
 	if err != nil {
