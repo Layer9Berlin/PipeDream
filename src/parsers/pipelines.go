@@ -7,7 +7,8 @@ import (
 )
 
 func (parser *Parser) BuiltInPipelineFilePaths(projectPath string) ([]string, error) {
-	glob := path.Join(projectPath, "pipes/**/*.pipe")
+	resolvedPipesPath, _ := filepath.EvalSymlinks(path.Join(projectPath, "pipedream_pipes"))
+	glob := path.Join(resolvedPipesPath, "**/*.pipe")
 	matches, err := parser.findByGlob(glob)
 	if err != nil {
 		return []string{}, fmt.Errorf("failed to glob pipeline files: %v", err)
