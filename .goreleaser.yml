@@ -49,7 +49,7 @@ brews:
     install: |
       bin.install "pipedream"
       include.install Dir["include/*"]
-      system "ln -Ffs #{include}/pipes #{bin}"
+      bin.install_symlink #{include}/pipedream_pipes
       system "#{bin}/pipedream"
 
     test: |
@@ -74,9 +74,6 @@ nfpms:
     suggests:
       - git
       - zsh
-
-    empty_folders:
-      - /var/pipedream/pipes
 signs:
   -
     artifacts: checksum
