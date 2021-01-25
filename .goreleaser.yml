@@ -14,6 +14,24 @@ builds:
       - linux
       - windows
       - darwin
+    ldflags:
+      - -s -w -X src.version.Commit={{.Commit}} -X main.date={{.Date}} -X src.version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }} -X src.version.Version={{ .Env.PIPEDREAM_INSTALL_VERSION }}
+  - id: semver-compare
+    env:
+      - CGO_ENABLED=0
+      goos:
+        - linux
+        - windows
+        - darwin
+    binary: util/semver-compare
+  - id: traffic-light
+    env:
+      - CGO_ENABLED=0
+      goos:
+        - linux
+        - windows
+        - darwin
+    binary: util/traffic-light
 archives:
   - files:
       - include/*
@@ -75,7 +93,6 @@ nfpms:
       - git
       - zsh
 signs:
-  -
-    artifacts: checksum
+  - artifacts: checksum
     id: sign_checksums
     args: [ "--batch", "-u", "{{ .Env.GPG_FINGERPRINT }}", "--output", "${signature}", "--detach-sign", "${artifact}" ]

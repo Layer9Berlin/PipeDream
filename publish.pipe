@@ -1,0 +1,25 @@
+---
+version: 0.0.1
+
+public:
+  publish::all:
+    pipe:
+      - publish::calculate-shasum
+      - publish::increment-version
+
+private:
+  publish::calculate-shasum:
+    pipe:
+      - tarball-shasum:
+          dirs: "cmd include src util"
+          env:
+            save: PIPEDREAM_INSTALL_SHASUM
+
+  publish::increment-version:
+    pipe:
+      - publish::increment-npm-version:
+          shell:
+            run: "npm version $(svu n) --allow-same-version"
+      - publish::push-to-git-repo:
+          shell:
+            run: "git push --tags"

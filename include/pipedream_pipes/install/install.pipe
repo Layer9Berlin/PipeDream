@@ -1,16 +1,7 @@
 ---
 version: 0.0.1
 
-default:
-  command: install
-
 public:
-  install::select-pipeline:
-    select:
-      - install
-      - check-installation
-
-private:
   install:
     description: Install
     each:
@@ -27,6 +18,7 @@ private:
           binary-install-path: $GOPATH/bin
       - install::check-binaries
 
+private:
   install::install-all:
     description: Install PipeDream and related binaries
     inherit:

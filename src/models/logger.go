@@ -177,6 +177,20 @@ func (logger *PipelineRunLogger) PossibleErrorWithExplanation(err error, explana
 	logger.Error(fmt.Errorf(explanation+" %w", err))
 }
 
+func (logger *PipelineRunLogger) StderrOutput(message string, fields ...log_fields.LogEntryField) {
+	logger.logCountError += 1
+	logger.errors = multierror.Append(logger.errors, fmt.Errorf("stderr: %v", message))
+	logEntry := logrus.WithFields(logrus.Fields{
+		"prefix":  "⛔️ ",
+		"message": message,
+	})
+	for _, withField := range fields {
+		logEntry = withField(logEntry)
+	}
+	logEntry.Level = logrus.ErrorLevel
+	logger.logEntries = append(logger.logEntries, logEntry)
+}
+
 func (logger *PipelineRunLogger) Error(err error, fields ...log_fields.LogEntryField) {
 	logger.logCountError += 1
 	logger.errors = multierror.Append(logger.errors, err)

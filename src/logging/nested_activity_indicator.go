@@ -21,12 +21,6 @@ type NestedActivityIndicator struct {
 	visible bool
 }
 
-type ActivityIndicatingSubject interface {
-	fmt.Stringer
-	Wait()
-	Completed() bool
-}
-
 func NewNestedActivityIndicator(options ...mpb.ContainerOption) *NestedActivityIndicator {
 	waitGroup := &sync.WaitGroup{}
 	options = append(options, mpb.WithWaitGroup(waitGroup))
@@ -42,7 +36,7 @@ func NewNestedActivityIndicator(options ...mpb.ContainerOption) *NestedActivityI
 	return &indicator
 }
 
-func defaultOptions(subject ActivityIndicatingSubject, indentation int) []mpb.BarOption {
+func defaultNestedActivityIndicatorOptions(subject ActivityIndicatingSubject, indentation int) []mpb.BarOption {
 	subjectDescription := decor.Any(func(statistics decor.Statistics) string {
 		return subject.String()
 	})
@@ -58,14 +52,14 @@ func defaultOptions(subject ActivityIndicatingSubject, indentation int) []mpb.Ba
 	}
 }
 
-func (activityIndicator *NestedActivityIndicator) AddSpinner(subject ActivityIndicatingSubject, indentation int) {
+func (activityIndicator *NestedActivityIndicator) AddIndicator(subject ActivityIndicatingSubject, indentation int) {
 	if !activityIndicator.visible {
 		return
 	}
 	bar := activityIndicator.progress.AddSpinner(
 		int64(1),
 		mpb.SpinnerOnLeft,
-		defaultOptions(subject, indentation)...,
+		defaultNestedActivityIndicatorOptions(subject, indentation)...,
 	)
 	activityIndicator.bars = append(activityIndicator.bars, bar)
 	activityIndicator.waitGroup.Add(1)

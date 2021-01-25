@@ -45,8 +45,7 @@ private:
           message: ""
 
   expect::check-output:
-    io: switch
-    pipe:
+    each:
       - print:
           when: "'$!!' != '@{output}'"
           message: "output mismatch\nActual:\n$!!\nExpected:\n@{output}\n"
@@ -55,8 +54,7 @@ private:
           message: ""
 
   expect::check-output-pattern:
-    io: switch
-    pipe:
+    each:
       - print:
           when: "'$!!' !~ '@{output-pattern}'"
           message: "output pattern mismatch\nActual:\n$!!\nExpected pattern:\n@{output-pattern}\n"

@@ -22,11 +22,10 @@ func stopProgress(executionContext *ExecutionContext) {
 
 func outputResult(result *models.PipelineRun, writer io.Writer) {
 	_, _ = fmt.Fprintln(writer, "===== RESULT =====")
-	if result == nil {
+	if result == nil || result.Stdout.Len() == 0 {
 		_, _ = fmt.Fprintln(writer, aurora.Gray(12, "no result"))
 		return
-	}
-	if result.Stdout != nil && result.Stdout.Len() > 0 {
+	} else {
 		_, _ = fmt.Fprintln(writer, result.Stdout.String())
 	}
 }
@@ -34,7 +33,12 @@ func outputResult(result *models.PipelineRun, writer io.Writer) {
 func outputLogs(run *models.PipelineRun, writer io.Writer) {
 	_, _ = fmt.Fprintln(writer, "====== LOGS ======")
 	if run != nil && run.Log != nil {
-		_, _ = fmt.Fprintln(writer, run.Log.String())
+		logOutput := run.Log.String()
+		if len(logOutput) > 0 {
+			_, _ = fmt.Fprintln(writer, logOutput)
+		} else {
+			_, _ = io.WriteString(writer, fmt.Sprint(aurora.Gray(12, fmt.Sprintf("no entries at log level %q", run.Log.Level()))))
+		}
 	}
 }
 
@@ -44,4 +48,3 @@ func outputErrors(run *models.PipelineRun, writer io.Writer) {
 		_, _ = fmt.Fprintln(writer, strings.Join(run.Log.AllErrorMessages(), "\n"))
 	}
 }
-

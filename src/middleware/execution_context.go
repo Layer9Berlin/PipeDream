@@ -40,7 +40,7 @@ func WithMiddlewareStack(stack []Middleware) ExecutionContextOption {
 	}
 }
 
-func WithActivityIndicator(activityIndicator *logging.NestedActivityIndicator) ExecutionContextOption {
+func WithActivityIndicator(activityIndicator logging.ActivityIndicator) ExecutionContextOption {
 	return func(executionContext *ExecutionContext) {
 		executionContext.ActivityIndicator = activityIndicator
 	}
@@ -89,7 +89,7 @@ type ExecutionContext struct {
 
 	runs []*models.PipelineRun
 
-	ActivityIndicator *logging.NestedActivityIndicator
+	ActivityIndicator logging.ActivityIndicator
 
 	preCallback       func(*models.PipelineRun)
 	postCallback      func(*models.PipelineRun)
@@ -230,7 +230,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 	}
 	executionContext.runs = append(executionContext.runs, run)
 	if executionContext.ActivityIndicator != nil {
-		executionContext.ActivityIndicator.AddSpinner(run, run.Log.Indentation)
+		executionContext.ActivityIndicator.AddIndicator(run, run.Log.Indentation)
 	}
 	if runOptions.preCallback != nil {
 		runOptions.preCallback(run)
@@ -294,9 +294,9 @@ func (executionContext *ExecutionContext) unwindStack(
 }
 
 func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, writer io.Writer) {
-	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
-
 	startProgress(executionContext, writer)
+
+	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
 	fullRun.Wait()
 	stopProgress(executionContext)

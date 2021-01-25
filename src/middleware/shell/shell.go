@@ -180,6 +180,9 @@ func (shellMiddleware ShellMiddleware) Apply(
 				exitCode := 0
 				run.ExitCode = &exitCode
 			}
+			if run.Stderr.Len() > 0 {
+				run.Log.StderrOutput(run.Stderr.String())
+			}
 			run.LogClosingWaitGroup.Done()
 		}()
 	}

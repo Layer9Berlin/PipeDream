@@ -1,7 +1,7 @@
 version: 0.0.1
 
 import:
-  - ../../installation.pipe
+  - ../../include/pipedream_pipes/install/install.pipe
 
 public:
   test-all:
@@ -100,7 +100,6 @@ private:
     pipe:
       - print:
           message: "@{test-install::tarball-shasum}"
-
 
   install::binary-version-command-output:
     pipe:
