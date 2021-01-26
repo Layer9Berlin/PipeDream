@@ -4,8 +4,14 @@ version: 0.0.1
 public:
   publish::all:
     pipe:
-      - publish::calculate-shasum
-      - publish::increment-version
+      - publish::obtain-git-status:
+          shell:
+            run: git status
+      - print-if-match:
+          pattern: Everything up-to-date
+          message: clean
+          else: dirty
+      - publish::git-status-indicator
 
 private:
   publish::calculate-shasum:
@@ -23,3 +29,29 @@ private:
       - publish::push-to-git-repo:
           shell:
             run: "git push --tags"
+#          catch: publish::catch-git-error
+
+  publish::catch-git-status-error:
+    pipe:
+      - publish::git-status-good-branch:
+          when: "'$!!' == 'Everything up-to-date\n'"
+                  #              pipe:
+                  #                - ~:
+                  #                    print:
+                  #                      message: "clean"
+                  #                - publish::calculate-shasum
+                  #                - publish::increment-version
+          print:
+            message: "clean"
+      - publish::git-status-bad-branch:
+          when: "'$!!' != 'Everything up-to-date\n'"
+          print:
+            message: "dirty"
+
+  publish::git-status-indicator:
+    shell:
+      args:
+        - prefix: "Local git repo status"
+        - text: "$!!"
+        - green: "clean"
+      run: "traffic-light"

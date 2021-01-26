@@ -31,13 +31,11 @@ func outputResult(result *models.PipelineRun, writer io.Writer) {
 }
 
 func outputLogs(run *models.PipelineRun, writer io.Writer) {
-	_, _ = fmt.Fprintln(writer, "====== LOGS ======")
 	if run != nil && run.Log != nil {
 		logOutput := run.Log.String()
 		if len(logOutput) > 0 {
+			_, _ = fmt.Fprintln(writer, "====== LOGS ======")
 			_, _ = fmt.Fprintln(writer, logOutput)
-		} else {
-			_, _ = io.WriteString(writer, fmt.Sprint(aurora.Gray(12, fmt.Sprintf("no entries at log level %q", run.Log.Level()))))
 		}
 	}
 }

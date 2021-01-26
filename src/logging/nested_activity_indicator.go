@@ -38,7 +38,7 @@ func NewNestedActivityIndicator(options ...mpb.ContainerOption) *NestedActivityI
 
 func defaultNestedActivityIndicatorOptions(subject ActivityIndicatingSubject, indentation int) []mpb.BarOption {
 	subjectDescription := decor.Any(func(statistics decor.Statistics) string {
-		return subject.String()
+		return " " + subject.String()
 	})
 	return []mpb.BarOption{
 		mpb.BarFillerOnComplete(fmt.Sprint(aurora.Green("✔"))),

@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
+	"math"
 	"sort"
 	"strings"
 )
@@ -80,7 +81,11 @@ func coloredOutput(entry *logrus.Entry, subject interface{}) string {
 func extractField(entry *logrus.Entry, key string) string {
 	result, ok := entry.Data[key]
 	if ok {
-		return prettyPrint(result)
+		maxLength := 128
+		if entry.Level >= logrus.DebugLevel {
+			maxLength = 1024
+		}
+		return prettyPrint(result, maxLength)
 	}
 	return ""
 }
@@ -90,37 +95,41 @@ func extractFields(entry *logrus.Entry, keys ...string) string {
 	for _, key := range keys {
 		result, ok := entry.Data[key]
 		if ok {
-			fields = append(fields, prettyPrint(result))
+			maxLength := 128
+			if entry.Level <= logrus.ErrorLevel {
+				maxLength = 1024
+			}
+			fields = append(fields, prettyPrint(result, maxLength))
 		}
 	}
 	return strings.Join(fields, " | ")
 }
 
 
-func prettyPrint(info interface{}) string {
+func prettyPrint(info interface{}, maxLength int) string {
 	infoMap, ok := info.(map[string]interface{})
 	if ok {
-		return PrettyPrintMap(infoMap)
+		return PrettyPrintMap(infoMap, maxLength)
 	}
 	infoArray, ok := info.([]string)
 	if ok {
-		return prettyPrintArray(infoArray)
+		return prettyPrintArray(infoArray, maxLength)
 	}
 	infoString := ""
 	if info != nil {
 		infoString = fmt.Sprint(info)
 	}
-	return ShortenString(infoString, 128)
+	return ShortenString(infoString, maxLength)
 }
 
-func prettyPrintArray(arrayToPrint []string) string {
+func prettyPrintArray(arrayToPrint []string, maxLength int) string {
 	for index, item := range arrayToPrint {
-		arrayToPrint[index] = ShortenString(item, 128)
+		arrayToPrint[index] = ShortenString(item, maxLength)
 	}
-	return ShortenString(strings.Join(arrayToPrint, ", "), 128)
+	return ShortenString(strings.Join(arrayToPrint, ", "), maxLength)
 }
 
-func PrettyPrintMap(mapToPrint map[string]interface{}) string {
+func PrettyPrintMap(mapToPrint map[string]interface{}, maxLength int) string {
 	if len(mapToPrint) > 0 {
 		keys := make([]string, 0, len(mapToPrint))
 		for k := range mapToPrint {
@@ -134,7 +143,8 @@ func PrettyPrintMap(mapToPrint map[string]interface{}) string {
 				if len(result) > 2 {
 					result = result + ", "
 				}
-				result = result + fmt.Sprintf("%v: `%v`", ShortenString(key, 32), ShortenString(stringValue, 32))
+				maxComponentLength := int(math.Floor(float64(maxLength - 4) / 2))
+				result = result + fmt.Sprintf("%v: `%v`", ShortenString(key, maxComponentLength), ShortenString(stringValue, maxComponentLength))
 			}
 		}
 		result = result + " }"

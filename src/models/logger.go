@@ -111,6 +111,10 @@ func (logger *PipelineRunLogger) Close() {
 			//		indentation = indentationAsInt
 			//	}
 			//}
+			if logger.baseLogger.Level <= logrus.InfoLevel {
+				// we don't indent at this log level, as there are too few messages to make it worthwhile
+				indentation = 0
+			}
 			logEntry.WithField("indentation", indentation).Log(logEntry.Level)
 		}
 		logger.completed = true
@@ -304,8 +308,14 @@ func (logger *PipelineRunLogger) Reader() io.Reader {
 	pipeReader, pipeWriter := io.Pipe()
 	go func() {
 		logger.Wait()
-		_, _ = pipeWriter.Write(logger.Bytes())
-		_ = pipeWriter.Close()
+		_, err := pipeWriter.Write(logger.Bytes())
+		if err != nil {
+			panic(err)
+		}
+		err = pipeWriter.Close()
+		if err != nil {
+			panic(err)
+		}
 	}()
 	return pipeReader
 }

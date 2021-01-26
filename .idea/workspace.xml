@@ -23,20 +23,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/logging/activity_indicator.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/logging/simple_activity_indicator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.goreleaser.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.goreleaser.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/misc/test.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/installation.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/install.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/print.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/misc/print.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logging/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/logger.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/logging/nested_activity_indicator.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/nested_activity_indicator.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/models/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/version/version.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/install/install.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/install/install.test.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/traffic-light/cmd/root.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/traffic-light/cmd/root.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +66,7 @@
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -104,7 +102,7 @@
       <directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestRun_Cmd_noPipelineFiles in pipedream/src/run" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestRun_Cmd_noPipelineFiles in pipedream/src/run" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$/src/run" />
       <framework value="gotest" />
@@ -184,7 +182,6 @@
         <item itemvalue="Go Test.TestRun_Cmd_userPromptError in pipedream/src/run" />
         <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFile_userSelection in pipedream/src/run" />
         <item itemvalue="Go Test.go test pipedream/src/run" />
-        <item itemvalue="Go Test.TestRun_Cmd_noPipelineFiles in pipedream/src/run" />
       </list>
     </recent_temporary>
   </component>
@@ -208,6 +205,9 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
   </component>
@@ -216,10 +216,10 @@
       <screen x="0" y="25" width="1680" height="947" />
     </state>
     <state x="640" y="336" key="#Go_Modules/0.25.1680.947@0.25.1680.947" timestamp="1610618862086" />
-    <state x="304" y="146" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611592665352">
+    <state x="304" y="146" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611658953460">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="304" y="146" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611592665352" />
+    <state x="304" y="146" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611658953460" />
     <state x="304" y="157" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1680.947@0.25.1680.947" timestamp="1610618907474" />
     <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1611159068865">
       <screen x="0" y="0" width="1680" height="1050" />
@@ -229,58 +229,62 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="1005" y="248" key="#xdebugger.evaluate/0.0.1680.1050@0.0.1680.1050" timestamp="1611235546659" />
-    <state width="1638" height="327" key="GridCell.Tab.0.bottom" timestamp="1611592648159">
+    <state width="1638" height="433" key="GridCell.Tab.0.bottom" timestamp="1611658936170">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="327" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1611592648159" />
+    <state width="1638" height="433" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1611658936170" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
-    <state width="1638" height="327" key="GridCell.Tab.0.center" timestamp="1611592648158">
+    <state width="1638" height="433" key="GridCell.Tab.0.center" timestamp="1611658936169">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="327" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1611592648158" />
+    <state width="1638" height="433" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1611658936169" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
-    <state width="1638" height="327" key="GridCell.Tab.0.left" timestamp="1611592648157">
+    <state width="1638" height="433" key="GridCell.Tab.0.left" timestamp="1611658936169">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="327" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1611592648157" />
+    <state width="1638" height="433" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1611658936169" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
-    <state width="1638" height="327" key="GridCell.Tab.0.right" timestamp="1611592648158">
+    <state width="1638" height="433" key="GridCell.Tab.0.right" timestamp="1611658936170">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="327" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1611592648158" />
+    <state width="1638" height="433" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1611658936170" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
-    <state width="1638" height="364" key="GridCell.Tab.1.bottom" timestamp="1611591939472">
+    <state width="1638" height="364" key="GridCell.Tab.1.bottom" timestamp="1611657061325">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1611591939472" />
-    <state width="1638" height="364" key="GridCell.Tab.1.center" timestamp="1611591939471">
+    <state width="1638" height="364" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1611657061325" />
+    <state width="1638" height="364" key="GridCell.Tab.1.center" timestamp="1611657061325">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1611591939471" />
-    <state width="1638" height="364" key="GridCell.Tab.1.left" timestamp="1611591939470">
+    <state width="1638" height="364" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1611657061325" />
+    <state width="1638" height="364" key="GridCell.Tab.1.left" timestamp="1611657061324">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1611591939470" />
-    <state width="1638" height="364" key="GridCell.Tab.1.right" timestamp="1611591939471">
+    <state width="1638" height="364" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1611657061324" />
+    <state width="1638" height="364" key="GridCell.Tab.1.right" timestamp="1611657061325">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1611591939471" />
-    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1611590344195">
+    <state width="1638" height="364" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1611657061325" />
+    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1611654102172">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1611590344195" />
+    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1611654102172" />
     <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1611238218613">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611238218613" />
-    <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1611590709592">
+    <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1611655542197">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="541" y="280" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611590709592" />
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1611590485197">
+    <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1611655542197" />
+    <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1611654483337">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611590485197" />
+    <state x="541" y="280" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611654483337" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1611651150422">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611651150422" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup/0.25.1680.947@0.25.1680.947" timestamp="1610619078061" />
   </component>
   <component name="XDebuggerManager">

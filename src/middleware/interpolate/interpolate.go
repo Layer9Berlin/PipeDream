@@ -17,8 +17,9 @@ import (
 
 // Value Replacer
 type interpolateMiddlewareArguments struct {
-	Enable bool
-	Quote  string
+	Enable       bool
+	EscapeQuotes string
+	Quote        string
 }
 
 type InterpolateMiddleware struct{}
@@ -37,8 +38,9 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := interpolateMiddlewareArguments{
-		Enable: true,
-		Quote:  "none",
+		Enable:       true,
+		EscapeQuotes: "none",
+		Quote:        "none",
 	}
 	middleware.ParseArguments(&arguments, "interpolate", run)
 
@@ -224,8 +226,9 @@ func (interpolator *Interpolator) interpolateInput(value string) string {
 	if strings.Contains(value, "$!!") {
 		interpolator.NeedCompleteInput = true
 		if interpolator.completeInput != nil {
-			interpolator.Substitutions["$!!"] = string(interpolator.completeInput)
-			return strings.Replace(value, "$!!", string(interpolator.completeInput), -1)
+			replacement := escapeQuotes(string(interpolator.completeInput), interpolator.MiddlewareArguments)
+			interpolator.Substitutions["$!!"] = replacement
+			return strings.Replace(value, "$!!", replacement, -1)
 		}
 	}
 	return value
@@ -319,5 +322,18 @@ func (interpolator *Interpolator) log(logger *models.PipelineRunLogger, interpol
 				log_fields.Middleware(interpolateMiddleware),
 			)
 		}
+	}
+}
+
+func escapeQuotes(message string, arguments interpolateMiddlewareArguments) string {
+	switch arguments.EscapeQuotes {
+	case "all":
+		return strings.Replace(strings.Replace(message, "\"", "\\\"", -1), "'", "\\\"", -1)
+	case "double":
+		return strings.Replace(message, "\"", "\\\"", -1)
+	case "single":
+		return strings.Replace(message, "'", "\\\"", -1)
+	default:
+		return message
 	}
 }

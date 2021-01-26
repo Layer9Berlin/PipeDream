@@ -23,7 +23,7 @@ var rootCmd = &cobra.Command{
 	Short: "Traffic Light Status Indicator",
 	Long:  `Simple status indicator showing some text and a red/amber/green indicator`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if text == "" {
+		if !cmd.PersistentFlags().Lookup("text").Changed {
 			stdInReader := bufio.NewReader(os.Stdin)
 			stdInText, err := ioutil.ReadAll(stdInReader)
 			if err != nil {
@@ -34,8 +34,12 @@ var rootCmd = &cobra.Command{
 		}
 
 		formattedPrefix := ""
-		if prefix != "" && !strings.HasSuffix(strings.Trim(prefix, " "), ":") {
-			formattedPrefix = prefix + ": "
+		if prefix != "" {
+			if strings.HasSuffix(strings.Trim(prefix, " "), ":") {
+				formattedPrefix = prefix
+			} else {
+				formattedPrefix = prefix + ": "
+			}
 		}
 		if redRegex != "" {
 			compiledRedRegex := regexp.MustCompile(redRegex)
@@ -59,7 +63,7 @@ var rootCmd = &cobra.Command{
 			}
 		}
 
-		fmt.Println(aurora.Green("[✔]"), " ", aurora.Gray(18, fmt.Sprint(formattedPrefix, text)))
+		fmt.Println(aurora.Green("[✔]"), aurora.Gray(18, fmt.Sprint(formattedPrefix, text)))
 	},
 }
 

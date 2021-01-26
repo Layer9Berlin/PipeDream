@@ -33,15 +33,19 @@ public:
             - else
 
   print-if-match::match-branch:
+    interpolate:
+      escapeQuotes: all
     pipe:
       - print:
-          when: "@?{message} && @?{pattern} && '$!!' =~ '@{pattern}'"
+          when: '@?{message} && @?{pattern} && "$!!" =~ "@{pattern}"'
           message: "@{message}"
       - print:
-          when: "!@?{message} || !@?{pattern} || '$!!' !~ '@{pattern}'"
+          when: '!@?{message} || !@?{pattern} || "$!!" !~ "@{pattern}"'
           message: ""
 
   print-if-match::no-match-branch:
+    interpolate:
+      escapeQuotes: all
     pipe:
       - print:
           when: "@?{else} && @?{pattern} && '$!!' !~ '@{pattern}'"

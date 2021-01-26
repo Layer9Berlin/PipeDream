@@ -6,6 +6,7 @@ import (
 	"github.com/manifoldco/promptui"
 	"github.com/sirupsen/logrus"
 	"io"
+	"io/ioutil"
 	"pipedream/src/helpers/custom_math"
 	"pipedream/src/logging"
 	"pipedream/src/logging/log_fields"
@@ -202,22 +203,30 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 			)
 			runOptions.parentRun.Log.AddReaderEntry(run.Log.Reader())
 		}
-	} else if run.Log.Level() >= logrus.DebugLevel {
-		indentation := custom_math.MaxInt(run.Log.Indentation-2, 0)
-		initialLogData, _ := logging.CustomFormatter{}.Format(
-			log_fields.EntryWithFields(
-				log_fields.Symbol("🏃"),
-				log_fields.Message("full run"),
-				log_fields.Info(run.String()),
-				log_fields.Color("cyan"),
-				log_fields.Indentation(indentation),
-			))
-		go func() {
-			_, _ = runOptions.logWriter.Write(initialLogData)
-			run.Wait()
-			_, _ = runOptions.logWriter.Write(run.Log.Bytes())
-			_ = runOptions.logWriter.Close()
-		}()
+	} else {
+		if run.Log.Level() >= logrus.DebugLevel {
+			indentation := custom_math.MaxInt(run.Log.Indentation-2, 0)
+			initialLogData, _ := logging.CustomFormatter{}.Format(
+				log_fields.EntryWithFields(
+					log_fields.Symbol("🏃"),
+					log_fields.Message("full run"),
+					log_fields.Info(run.String()),
+					log_fields.Color("cyan"),
+					log_fields.Indentation(indentation),
+				))
+			go func() {
+				_, _ = runOptions.logWriter.Write(initialLogData)
+				run.Wait()
+				_, _ = runOptions.logWriter.Write(run.Log.Bytes())
+				_ = runOptions.logWriter.Close()
+			}()
+		} else {
+			go func() {
+				run.Wait()
+				_, _ = runOptions.logWriter.Write(run.Log.Bytes())
+				_ = runOptions.logWriter.Close()
+			}()
+		}
 	}
 	run.Log.DebugWithFields(
 		log_fields.Message("starting"),
@@ -239,6 +248,48 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 	if runOptions.postCallback != nil {
 		runOptions.postCallback(run)
 	}
+	// copy the stderr output after all other middleware has processed it
+	stderrCopy := run.Stderr.Copy()
+	// don't close the run's log until we are done writing to it
+	run.LogClosingWaitGroup.Add(1)
+	go func() {
+		// read the entire remaining stderr
+		stderr, _ := ioutil.ReadAll(stderrCopy)
+		// if there is any output, log it!
+		if len(stderr) > 0 {
+			run.Log.StderrOutput(string(stderr))
+		}
+		// now the run can complete
+		run.LogClosingWaitGroup.Done()
+	}()
+	run.LogClosingWaitGroup.Add(1)
+	go func() {
+		run.Stdin.Wait()
+		stdin := run.Stdin.String()
+		if len(stdin) > 0 {
+			run.Log.TraceWithFields(
+				log_fields.Message("input"),
+				log_fields.Info(stdin),
+				log_fields.Symbol("↘️️"),
+				log_fields.Color("gray"),
+			)
+		}
+		run.LogClosingWaitGroup.Done()
+	}()
+	run.LogClosingWaitGroup.Add(1)
+	go func() {
+		run.Stdout.Wait()
+		stdout := run.Stdin.String()
+		if len(stdout) > 0 {
+			run.Log.TraceWithFields(
+				log_fields.Message("output"),
+				log_fields.Info(stdout),
+				log_fields.Symbol("↗️"),
+				log_fields.Color("gray"),
+			)
+		}
+		run.LogClosingWaitGroup.Done()
+	}()
 	run.Close()
 	return run
 }
