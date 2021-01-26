@@ -57,11 +57,11 @@ private:
     when: "'$!!' =~ 'clean'"
     interpolate:
       escapeQuotes: all
-    pipe:
+    sync:
       - publish::increment-npm-version:
           shell:
             run: "npm version $(svu n) --allow-same-version"
       - publish::push-to-git-repo:
           shell:
-            run: "git push --tags"
+            run: "git push --follow-tags"
 
