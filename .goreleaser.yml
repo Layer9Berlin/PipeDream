@@ -8,14 +8,34 @@ release:
     owner: Layer9Berlin
     name: PipeDream
 builds:
-  - env:
+  - id: pipedream_brew
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
       - windows
       - darwin
     ldflags:
-      - -s -w -X src.version.Commit={{.Commit}} -X main.date={{.Date}} -X src.version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }} -X src.version.Version={{ .Env.PIPEDREAM_INSTALL_VERSION }}
+      - -s -w
+      - -X pipedream/src/version.Via=brew
+      - -X pipedream/src/version.Version={{.Version}}
+      - -X pipedream/src/version.CommitHash={{ .Commit }}
+      - -X pipedream/src/version.Date={{ .Date }}
+      - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+  - id: pipedream_npm
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags:
+      - -s -w
+      - -X pipedream/src/version.Via=npm
+      - -X pipedream/src/version.Version={{ .Version }}
+      - -X pipedream/src/version.CommitHash={{ .Commit }}
+      - -X pipedream/src/version.Date={{ .Date }}
+      - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: semver-compare
     env:
       - CGO_ENABLED=0
@@ -33,7 +53,12 @@ builds:
         - darwin
     binary: util/traffic-light
 archives:
-  - files:
+  - id: brew_archive
+    builds:
+      - pipedream_brew
+      - semver-compare
+      - traffic-light
+    files:
       - include/*
 checksum:
   name_template: 'checksums.txt'
@@ -47,6 +72,8 @@ changelog:
       - '^test:'
 brews:
   - name: pipedream
+    ids:
+      - brew_archive
 
     tap:
       owner: Layer9Berlin
@@ -74,6 +101,11 @@ brews:
       system "#{bin}/pipedream --version"
 nfpms:
   - id: pipedream
+    builds:
+      - pipedream_npm
+      - semver-compare
+      - traffic-light
+
     package_name: pipedream
 
     vendor: Layer9 GmbH

@@ -92,6 +92,12 @@ func (envMiddleware EnvMiddleware) Apply(
 			run.Log.PossibleError(err)
 			run.LogClosingWaitGroup.Done()
 		}()
+		run.Log.DebugWithFields(
+			log_fields.Symbol("💲"),
+			log_fields.Message(fmt.Sprintf("saving output")),
+			log_fields.Info("$" + *arguments.Save),
+			log_fields.Middleware(envMiddleware),
+		)
 	}
 }
 

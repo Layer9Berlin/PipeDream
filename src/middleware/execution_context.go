@@ -279,7 +279,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 	run.LogClosingWaitGroup.Add(1)
 	go func() {
 		run.Stdout.Wait()
-		stdout := run.Stdin.String()
+		stdout := run.Stdout.String()
 		if len(stdout) > 0 {
 			run.Log.TraceWithFields(
 				log_fields.Message("output"),

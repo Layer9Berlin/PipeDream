@@ -1,0 +1,9 @@
+---
+version: 0.0.1
+
+public:
+  no-pipelines::handle:
+    pipe:
+      - no-pipelines::show-message:
+          print:
+            message: No pipeline files found

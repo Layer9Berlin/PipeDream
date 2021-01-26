@@ -62,7 +62,7 @@ private:
           binary: traffic-light
       - install::verify-checksum:
           binary: p
-          dirs: "cmd pipes pkg util installation.pipe"
+          dirs: "cmd include src util install.pipe"
       - install::verify-checksum:
           binary: semver-compare
           dirs: "util/semver-compare"
@@ -99,17 +99,39 @@ private:
   install::install-pipedream-binary:
     description: Install PipeDream binary
     sync:
+      - install::pipedream-version:
+          shell:
+            run: "svu c"
+      - strings::remove-new-lines:
+          env:
+            save: PIPEDREAM_VERSION
+      - install::pipedream-commit:
+          shell:
+            run: "git rev-parse --short HEAD"
+      - strings::remove-new-lines:
+          env:
+            save: PIPEDREAM_COMMIT_HASH
       - tarball-shasum:
-          dirs: "cmd pipes pkg util installation.pipe"
+          dirs: "cmd include src util install.pipe"
           env:
             save: PIPEDREAM_INSTALL_SHASUM
       - working-dir:
           env:
             save: PIPEDREAM_INSTALL_PROJECT_PATH
+      - install::current-date:
+          shell:
+            run: "date"
+      - strings::remove-new-lines:
+          env:
+            save: PIPEDREAM_DATE
       - go-build:
-          binary: p
+          binary: pipedream
           binary-install-path: "@{binary-install-path}"
-          flags: "-X 'pipedream/cmd.RepoChecksum=$PIPEDREAM_INSTALL_SHASUM' -X 'pipedream/cmd.ProjectPath=$PIPEDREAM_INSTALL_PROJECT_PATH'"
+          flags: "-X 'pipedream/src/version.Version=$PIPEDREAM_VERSION' -X 'pipedream/src/version.CommitHash=$PIPEDREAM_COMMIT_HASH' -X 'pipedream/src/version.RepoChecksum=$PIPEDREAM_INSTALL_SHASUM' -X 'pipedream/src/version.Date=$PIPEDREAM_DATE' -X 'pipedream/src/version.ProjectPath=$PIPEDREAM_INSTALL_PROJECT_PATH'"
+      - install::create-short-symlink:
+          shell:
+            dir: "@{binary-install-path}"
+            run: "ln -sf pipedream p"
       - print:
           message: "[✔] Installed PipeDream utility\n"
 

@@ -1,0 +1,14 @@
+---
+version: 0.0.1
+
+public:
+  fail-if-match:
+    pipe:
+      - print-if-match::match-branch:
+          inherit:
+            - pattern
+            - message
+      - print-if-match::no-match-branch:
+          inherit:
+            - pattern
+            - else

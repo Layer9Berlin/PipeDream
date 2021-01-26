@@ -3,13 +3,23 @@ package version
 import (
 	"fmt"
 	"io"
+	"os"
 )
 
 var Version = "0.0.1"
-var Commit = ""
+var CommitHash = "-"
 var RepoChecksum = "-"
-var Date = ""
+var Date = "-"
+var Via = "compiled from source"
 
 func Cmd(writer io.Writer) {
-	_, _ = writer.Write([]byte(fmt.Sprintf("%v / commit: %v / repo checksum: %v / date: %v", Version, Commit, RepoChecksum, Date)))
+	executableLocation, _ := os.Executable()
+	_, _ = writer.Write([]byte(fmt.Sprintf(
+		`version: %v
+commit: %v
+checksum: %v
+date: %v
+via: %v
+location: %v
+`, Version, CommitHash, RepoChecksum, Date, Via, executableLocation)))
 }

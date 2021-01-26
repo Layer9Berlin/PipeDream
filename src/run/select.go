@@ -51,7 +51,7 @@ func letUserSelectPipelineFileAndPipeline(
 ) (string, string, error) {
 	pipelineFiles := executionContext.PipelineFiles
 	if pipelineFiles == nil || len(pipelineFiles) == 0 {
-		return "", "", fmt.Errorf("no pipeline file found, perhaps you are in the wrong directory")
+		return "default", "", nil
 	}
 
 	pipelineFile, err := letUserSelectPipelineFile(executionContext, 10, input, output)

@@ -46,9 +46,6 @@ func (parser *Parser) UserPipelineFilePaths(args []string) ([]string, error) {
 		if err != nil {
 			return []string{}, fmt.Errorf("failed to glob pipeline files: %v", err)
 		}
-		if len(matches) == 0 {
-			return []string{}, fmt.Errorf("no pipeline files found, please switch directories or provide path argument")
-		}
 		pipelineFilePaths = matches
 	}
 	return pipelineFilePaths, nil

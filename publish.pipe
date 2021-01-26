@@ -12,6 +12,10 @@ public:
           message: clean
           else: dirty
       - publish::git-status-indicator
+      - publish::upload:
+          when: "'$!!' = 'clean'"
+          interpolate:
+            escapeQuotes: all
 
 private:
   publish::calculate-shasum:
@@ -23,12 +27,6 @@ private:
 
   publish::increment-version:
     pipe:
-      - publish::increment-npm-version:
-          shell:
-            run: "npm version $(svu n) --allow-same-version"
-      - publish::push-to-git-repo:
-          shell:
-            run: "git push --tags"
 #          catch: publish::catch-git-error
 
   publish::catch-git-status-error:
@@ -55,3 +53,17 @@ private:
         - text: "$!!"
         - green: "clean"
       run: "traffic-light"
+
+  publish::upload:
+    pipe:
+      - publish::increment-npm-version:
+          shell:
+            run: "npm version $(svu n) --allow-same-version"
+      - publish::push-to-git-repo:
+          shell:
+            run: "git push --tags"
+      - tarball-shasum:
+          dirs: "cmd include src util install.pipe"
+          env:
+            save: PIPEDREAM_INSTALL_SHASUM
+
