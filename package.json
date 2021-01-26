@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "test": "go test src",
-    "postinstall": "go-npm install && ln -Ffs $(npm get prefix)/lib/node_modules/@l9/pipedream/include/pipedream_pipes $(npm bin)",
+    "postinstall": "go-npm install && ln -Ffs $(npm get prefix)/lib/node_modules/@l9/pipedream/include/pipedream_pipes $(npm bin)  && ln -fs $(npm bin)/pipedream $(npm bin)/p",
     "preuninstall": "go-npm uninstall"
   },
   "repository": {

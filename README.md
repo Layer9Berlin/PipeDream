@@ -1,7 +1,7 @@
 ![PipeDream](docs/assets/PipeDream.png)
 
 >## 🚧 Status: alpha 🚧
->#### Early development, feedback wanted
+>#### Early development, expect breaking changes, feedback wanted
 
 # PipeDream
 
@@ -11,9 +11,13 @@ It is an alternative to shell scripts - just as powerful, but more **composable*
 
 ## How it works
 
-Workflows - called pipelines - are defined in yaml files. Using a simple, but extensible syntax, you can call, chain, merge, and split pipelines, invoke shell commands, handle errors, use a key-value store for intermediate results, write tests, create mocks, and much more.
+Pipelines are defined in yaml files. Using a simple, but extensible syntax, you can call, chain, merge, and split pipelines, invoke shell commands, handle errors, use a key-value store for intermediate results, write tests, create mocks, and much more.
 
 ## What it does
+
+
+
+
 
 Shell scripting is an art that takes years to master. Tools like [shellcheck](https://github.com/koalaman/shellcheck) and [bats](https://github.com/bats-core/bats-core) can help you improve the code quality of your scripts, but they don't solve the core problems: 
 - There are many traps for beginners to fall into
@@ -36,38 +40,59 @@ To illustrate its potential, we have used PipeDream to define a **universal depe
 
 ### Installation
 
-From `npm`
+#### From `npm`
 
-```npm i @l9/pipedream```
+```npm i -g @l9/pipedream```
 
-Using `homebrew` (Mac OS)
+#### Using `homebrew` (Mac OS/linux)
 
-```
-brew tap https://github.com/Layer9Berlin/pipedream
-brew install pipedream
-```
+```brew install layer9berlin/tap/pipedream```
 
-Using `apt-get`
-```
-echo "deb https://github.com/Layer9Berlin/pipedream $(lsb_release -cs) main" | sudo tee -a /etc/apt/sources.list
-sudo apt-get update && sudo apt-get upgrade
-sudo apt-get install pipedream
-```
-
-From source (requires Go installed)
+#### From source (requires Go installed)
 
 ```
-git clone https://github.com/Layer9Berlin/pipedream
-cd pipedream
-bin/bootstrap
+git clone https://github.com/Layer9Berlin/PipeDream
+cd PipeDream
+go build
+pipedream
 ```
-then select `Installation` and `Install` when promted.
+then select `Install` when promted.
 
-This will run a compiled version of PipeDream, allowing you to execute the `installation.pipe` file (very meta), which in turn compiles your local directory and installs everything you need. If you make changes to the code, just run PipeDream and execute the `installation.pipe` again to update your installed version.
+This will compile PipeDream and run it locally, allowing you to execute the `install.pipe` file (very meta), which in turn installs everything you need to run PipeDream anywhere on your machine. If you make changes to the code, just run PipeDream and execute the `installation.pipe` again to update your installed version.
 
 ### Write your first pipe
 
 Check out the [Quick Start Guide](./docs/quick-start) or the [Documentation](./cmd). You can also have a look at the
+
+
+### Uninstall
+
+#### Installed via `npm`
+
+```npm uninstall -g @l9/pipedream```
+
+#### Installed via `homebrew`
+
+```brew uninstall pipedream```
+
+#### Compiled from source
+
+Simply run
+
+```pipedream```
+
+in the repo source directory and select `Uninstall`.
+
+#### Not sure
+
+If you don't recall how you installed PipeDream, run
+
+```pipedream version```
+
+and check the `via` field.
+
+
+
 
 
 

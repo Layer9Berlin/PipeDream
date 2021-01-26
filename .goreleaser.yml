@@ -119,6 +119,7 @@ brews:
       include.install Dir["include/*"]
       ln_s("#{include}/pipedream_pipes", "#{bin}", force: true)
       system "#{bin}/pipedream"
+      ln_s("#{bin}/pipedream", "#{bin}/p", force: true)
 
     test: |
       system "#{bin}/pipedream --version"
