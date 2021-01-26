@@ -61,7 +61,6 @@ private:
       - publish::increment-npm-version:
           shell:
             run: "npm version $(svu n) --allow-same-version"
-      - publish::
       - publish::push-to-git-repo:
           shell:
             run: "git push --tags"

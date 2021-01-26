@@ -16,10 +16,10 @@ func Cmd(writer io.Writer) {
 	executableLocation, _ := os.Executable()
 	_, _ = writer.Write([]byte(fmt.Sprintf(
 		`version: %v
+via: %v
+date: %v
 commit: %v
 checksum: %v
-date: %v
-via: %v
 location: %v
-`, Version, CommitHash, RepoChecksum, Date, Via, executableLocation)))
+`, Version, Via, Date, CommitHash, RepoChecksum, executableLocation)))
 }

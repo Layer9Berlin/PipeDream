@@ -107,7 +107,7 @@ private:
             save: PIPEDREAM_VERSION
       - install::pipedream-commit:
           shell:
-            run: "git rev-parse --short HEAD"
+            run: "git rev-parse HEAD"
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_COMMIT_HASH

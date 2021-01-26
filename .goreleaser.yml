@@ -36,6 +36,20 @@ builds:
       - -X pipedream/src/version.CommitHash={{ .Commit }}
       - -X pipedream/src/version.Date={{ .Date }}
       - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+  - id: pipedream_apt
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags:
+      - -s -w
+      - -X pipedream/src/version.Via=apt
+      - -X pipedream/src/version.Version={{ .Version }}
+      - -X pipedream/src/version.CommitHash={{ .Commit }}
+      - -X pipedream/src/version.Date={{ .Date }}
+      - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: semver-compare
     env:
       - CGO_ENABLED=0
@@ -53,6 +67,14 @@ builds:
       - darwin
     binary: util/traffic-light
 archives:
+  - id: npm_archive
+    builds:
+      - pipedream_npm
+      - semver-compare
+      - traffic-light
+    files:
+      - include/*
+    name_template: "npm_{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
   - id: brew_archive
     builds:
       - pipedream_brew
@@ -60,6 +82,7 @@ archives:
       - traffic-light
     files:
       - include/*
+    name_template: "brew_{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -102,7 +125,7 @@ brews:
 nfpms:
   - id: pipedream
     builds:
-      - pipedream_npm
+      - pipedream_apt
       - semver-compare
       - traffic-light
 
