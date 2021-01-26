@@ -8,7 +8,7 @@ public:
           shell:
             run: git status
       - print-if-match:
-          pattern: Everything up-to-date
+          pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
           message: clean
           else: dirty
       - publish::git-status-indicator
