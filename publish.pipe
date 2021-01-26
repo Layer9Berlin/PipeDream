@@ -13,7 +13,7 @@ public:
           else: dirty
       - publish::git-status-indicator
       - publish::upload:
-          when: "'$!!' = 'clean'"
+          when: "'$!!' ~= 'clean$'"
           interpolate:
             escapeQuotes: all
 

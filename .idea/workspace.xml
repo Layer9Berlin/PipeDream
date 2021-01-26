@@ -23,20 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/default/no-pipelines.pipe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/misc/fail.pipe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/strings/convenience.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.goreleaser.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.goreleaser.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/install.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/install.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/tar.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/shell/tar.pipe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/env/env.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/env/env.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parsers/pipelines.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsers/pipelines.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/select.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/select.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/version/version.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
