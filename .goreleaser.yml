@@ -39,18 +39,18 @@ builds:
   - id: semver-compare
     env:
       - CGO_ENABLED=0
-      goos:
-        - linux
-        - windows
-        - darwin
+    goos:
+      - linux
+      - windows
+      - darwin
     binary: util/semver-compare
   - id: traffic-light
     env:
       - CGO_ENABLED=0
-      goos:
-        - linux
-        - windows
-        - darwin
+    goos:
+      - linux
+      - windows
+      - darwin
     binary: util/traffic-light
 archives:
   - id: brew_archive
