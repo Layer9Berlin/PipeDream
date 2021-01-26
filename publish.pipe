@@ -64,4 +64,5 @@ private:
       - publish::push-to-git-repo:
           shell:
             run: "git push --follow-tags"
+          catch: noop
 
