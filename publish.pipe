@@ -64,8 +64,4 @@ private:
       - publish::push-to-git-repo:
           shell:
             run: "git push --tags"
-      - tarball-shasum:
-          dirs: "cmd include src util install.pipe"
-          env:
-            save: PIPEDREAM_INSTALL_SHASUM
 
