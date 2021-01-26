@@ -11,11 +11,13 @@ public:
           pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
           message: clean
           else: dirty
-      - publish::git-status-indicator
-      - publish::upload:
-          when: "'$!!' =~ 'clean'"
-          interpolate:
-            escapeQuotes: all
+      - ~:
+          each:
+            - publish::git-status-indicator
+            - publish::upload:
+                when: "'$!!' =~ 'clean'"
+                interpolate:
+                  escapeQuotes: all
 
 private:
   publish::calculate-shasum:
