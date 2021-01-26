@@ -38,7 +38,7 @@ jobs:
           passphrase: ${{ secrets.PIPEDREAM_RELEASE_GPG_PASSPHRASE }}
       -
         name: Generate repo shasum
-        run: "export PIPEDREAM_INSTALL_SHASUM=\"tar -cf - cmd include src util install.pipe | shasum | sed 's/[^0-9a-f]*//g' | tr -d '\\n'\""
+        run: echo "PIPEDREAM_INSTALL_SHASUM=$(tar -cf - cmd include src util install.pipe | shasum | sed 's/[^0-9a-f]*//g' | tr -d '\\n')" >> $GITHUB_ENV
       -
         name: Run GoReleaser
         id: goreleaser
@@ -49,6 +49,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PIPEDREAM_RELEASE_ACTION_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
+#          PIPEDREAM_INSTALL_SHASUM: $PIPEDREAM_INSTALL_SHASUM
       -
         name: Create Packages file
         run: dpkg-scanpackages -m dist | gzip -c > dist/Packages.gz
