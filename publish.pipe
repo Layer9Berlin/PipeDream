@@ -14,10 +14,7 @@ public:
       - ~:
           each:
             - publish::git-status-indicator
-            - publish::upload:
-                when: "'$!!' =~ 'clean'"
-                interpolate:
-                  escapeQuotes: all
+            - publish::upload
 
 private:
   publish::calculate-shasum:
@@ -57,6 +54,9 @@ private:
       run: "traffic-light"
 
   publish::upload:
+    when: "'$!!' =~ 'clean'"
+    interpolate:
+      escapeQuotes: all
     pipe:
       - publish::increment-npm-version:
           shell:
