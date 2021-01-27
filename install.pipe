@@ -30,6 +30,10 @@ private:
       - install::install-pipedream-binary:
           inherit:
             - binary-install-path
+      - install::link-to-built-in-pipes:
+          shell:
+            dir: "."
+            run: "ln -sf $(pwd)/include/pipedream_pipes @{binary-install-path}"
       - install::install-util:
           binary: semver-compare
           inherit:
@@ -53,7 +57,7 @@ private:
     each:
       - install::check-binary:
           binary-name: PipeDream binary
-          binary: p
+          binary: pipedream
       - install::check-binary:
           binary-name: "semver-compare binary"
           binary: semver-compare
@@ -61,7 +65,7 @@ private:
           binary-name: "traffic-light binary"
           binary: traffic-light
       - install::verify-checksum:
-          binary: p
+          binary: pipedream
           dirs: "cmd include src util install.pipe"
       - install::verify-checksum:
           binary: semver-compare
@@ -128,10 +132,6 @@ private:
           binary: pipedream
           binary-install-path: "@{binary-install-path}"
           flags: "-X 'pipedream/src/version.Version=$PIPEDREAM_VERSION' -X 'pipedream/src/version.CommitHash=$PIPEDREAM_COMMIT_HASH' -X 'pipedream/src/version.RepoChecksum=$PIPEDREAM_INSTALL_SHASUM' -X 'pipedream/src/version.Date=$PIPEDREAM_DATE' -X 'pipedream/src/version.ProjectPath=$PIPEDREAM_INSTALL_PROJECT_PATH'"
-      - install::create-short-symlink:
-          shell:
-            dir: "@{binary-install-path}"
-            run: "ln -sf pipedream p"
       - print:
           message: "[✔] Installed PipeDream utility\n"
 

@@ -4,6 +4,21 @@ version: 0.0.1
 public:
   no-pipelines::handle:
     pipe:
-      - no-pipelines::show-message:
-          print:
-            message: No pipeline files found
+      - print:
+          message: '☁️ Welcome to PipeDream ☁️\nThere are no pipes in this directory.\n\nWould you like to create an example pipeline file to get you started?\n'
+
+      - no-pipelines::user-selection:
+          select:
+            options:
+              - test:
+                  description: "Option 1"
+              - test2:
+                  description: "Option 2"
+
+
+#  no-pipelines::create-example-file:
+#
+#
+#  no-pipelines::exit:
+#    print:
+#      message: "Bye for now!"

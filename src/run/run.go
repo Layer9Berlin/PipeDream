@@ -24,7 +24,7 @@ func Cmd(_ *cobra.Command, args []string) {
 	executableDir := path.Dir(executableLocation)
 	projectPath, _ := filepath.EvalSymlinks(executableDir)
 	executionContext := executionContextFactory(
-		middleware.WithActivityIndicator(logging.NewNestedActivityIndicator()),
+		middleware.WithActivityIndicator(logging.NewSimpleActivityIndicator(osStdout)),
 		middleware.WithMiddlewareStack(middleware_stack.SetUpMiddleware()),
 		middleware.WithProjectPath(projectPath),
 		middleware.WithLogger(Log),

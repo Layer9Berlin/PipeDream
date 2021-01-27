@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"pipedream/src/helpers/custom_io"
 	"pipedream/src/helpers/custom_strings"
 	"pipedream/src/logging/log_fields"
 	"pipedream/src/middleware"
@@ -104,39 +105,39 @@ func (shellMiddleware ShellMiddleware) Apply(
 		executor.Init(arguments.Exec, commandComponents...)
 
 		cmdStdin := executor.CmdStdin()
-		//var stdinIntercept io.ReadWriteCloser = nil
-		//if arguments.Interactive {
-		//	executionContext.ActivityIndicator.SetVisible(false)
-		//
-		//	// in interactive mode, we want to be ready to read user input
-		//	// and show all output in the console
-		//	stdinIntercept = run.Stdin.Intercept()
-		//
-		//	go func() {
-		//		_, _ = io.Copy(cmdStdin, stdinIntercept)
-		//	}()
-		//	go func() {
-		//		// need to wrap the osStdin, as it may return EOF for some time until new user input arrives
-		//		_, _ = io.Copy(io.MultiWriter(stdinIntercept, cmdStdin), custom_io.NewContinuousReader(shellMiddleware.osStdin))
-		//		_ = stdinIntercept.Close()
-		//	}()
-		//
-		//	// the shell command's stdout should be added to the pipe's output
-		//	// and the combination should be copied to the console
-		//	cmdStdout := executor.CmdStdout()
-		//	run.Stdout.MergeWith(cmdStdout)
-		//	run.Stdout.StartCopyingInto(shellMiddleware.osStdout)
-		//
-		//	// same with stderr to preserve the behaviour that both stdout and stderr
-		//	// are shown in the terminal
-		//	cmdStderr := executor.CmdStderr()
-		//	run.Stderr.MergeWith(cmdStderr)
-		//	run.Stderr.StartCopyingInto(shellMiddleware.osStderr)
-		//} else {
+		var stdinIntercept io.ReadWriteCloser = nil
+		if arguments.Interactive {
+			executionContext.ActivityIndicator.SetVisible(false)
+
+			// in interactive mode, we want to be ready to read user input
+			// and show all output in the console
+			stdinIntercept = run.Stdin.Intercept()
+
+			go func() {
+				_, _ = io.Copy(cmdStdin, stdinIntercept)
+			}()
+			go func() {
+				// need to wrap the osStdin, as it may return EOF for some time until new user input arrives
+				_, _ = io.Copy(io.MultiWriter(stdinIntercept, cmdStdin), custom_io.NewContinuousReader(shellMiddleware.osStdin))
+				_ = stdinIntercept.Close()
+			}()
+
+			// the shell command's stdout should be added to the pipe's output
+			// and the combination should be copied to the console
+			cmdStdout := executor.CmdStdout()
+			run.Stdout.MergeWith(cmdStdout)
+			run.Stdout.StartCopyingInto(shellMiddleware.osStdout)
+
+			// same with stderr to preserve the behaviour that both stdout and stderr
+			// are shown in the terminal
+			cmdStderr := executor.CmdStderr()
+			run.Stderr.MergeWith(cmdStderr)
+			run.Stderr.StartCopyingInto(shellMiddleware.osStderr)
+		} else {
 			run.Stdin.StartCopyingInto(cmdStdin)
 			run.Stdout.MergeWith(executor.CmdStdout())
 			run.Stderr.MergeWith(executor.CmdStderr())
-		//}
+		}
 
 		run.Log.DebugWithFields(
 			log_fields.Symbol(">_"),

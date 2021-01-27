@@ -51,7 +51,7 @@ func letUserSelectPipelineFileAndPipeline(
 ) (string, string, error) {
 	pipelineFiles := executionContext.PipelineFiles
 	if pipelineFiles == nil || len(pipelineFiles) == 0 {
-		return "default", "", nil
+		return "no-pipelines::handle", "", nil
 	}
 
 	pipelineFile, err := letUserSelectPipelineFile(executionContext, 10, input, output)

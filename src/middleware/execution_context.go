@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
+	"pipedream/src/helpers/custom_io"
 	"pipedream/src/helpers/custom_math"
 	"pipedream/src/logging"
 	"pipedream/src/logging/log_fields"
@@ -408,7 +409,7 @@ func defaultUserPrompt(
 		CursorPos: initialSelection,
 		Size:      size,
 		Stdin:     input,
-		Stdout:    output,
+		Stdout:    custom_io.NewBellSkipper(output),
 	}
 	return prompt.Run()
 }

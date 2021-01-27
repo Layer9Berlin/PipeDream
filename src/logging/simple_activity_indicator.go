@@ -39,16 +39,7 @@ func (activityIndicator *SimpleActivityIndicator) AddIndicator(subject ActivityI
 	if !activityIndicator.visible {
 		return
 	}
-	_, _ = activityIndicator.writer.Write([]byte(fmt.Sprint(strings.Repeat(" ", indentation), aurora.Green("▶️"), " ", subject, "\n")))
-	activityIndicator.waitGroup.Add(1)
-	go func() {
-		defer activityIndicator.waitGroup.Done()
-		subject.Wait()
-		if !activityIndicator.visible {
-			return
-		}
-		_, _ = activityIndicator.writer.Write([]byte(fmt.Sprint(strings.Repeat(" ", indentation), aurora.Green("⏹"), " ", subject, "\n")))
-	}()
+	_, _ = activityIndicator.writer.Write([]byte(fmt.Sprint(strings.Repeat(" ", indentation), aurora.Blue("▶"), " ", subject, "\n")))
 }
 
 func (activityIndicator *SimpleActivityIndicator) Len() int {

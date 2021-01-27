@@ -60,6 +60,8 @@ then select `Install` when promted.
 
 This will compile PipeDream and run it locally, allowing you to execute the `install.pipe` file (very meta), which in turn installs everything you need to run PipeDream anywhere on your machine. If you make changes to the code, just run PipeDream and execute the `installation.pipe` again to update your installed version.
 
+If you use PipeDream a lot, it might be convenient to set up an alias like `p` that is faster to type.
+
 ### Write your first pipe
 
 Check out the [Quick Start Guide](./docs/quick-start) or the [Documentation](./cmd). You can also have a look at the
