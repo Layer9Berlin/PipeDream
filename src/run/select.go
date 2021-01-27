@@ -11,6 +11,10 @@ import (
 )
 
 func letUserSelectPipelineFile(executionContext *middleware.ExecutionContext, selectionWindowSize int, input io.ReadCloser, output io.WriteCloser) (*models.PipelineFile, error) {
+	if FileFlag != "" {
+		return executionContext.PipelineFileAtPath(FileFlag)
+	}
+
 	pipelineFiles := executionContext.SelectableFiles
 	if pipelineFiles == nil || len(pipelineFiles) == 0 {
 		return nil, fmt.Errorf("no pipeline file found, perhaps you are in the wrong directory")
@@ -65,6 +69,10 @@ func letUserSelectPipelineFileAndPipeline(
 		pipelineIdentifiers = append(pipelineIdentifiers, pipelineIdentifier)
 	}
 	sort.StringSlice.Sort(pipelineIdentifiers)
+
+	if PipelineFlag != "" {
+		return PipelineFlag, pipelineFile.FileName, nil
+	}
 
 	if len(pipelineIdentifiers) == 1 {
 		return pipelineIdentifiers[0], pipelineFile.FileName, nil

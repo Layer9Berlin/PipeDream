@@ -8,12 +8,14 @@ public:
   # the parser expects a dictionary whose keys are pipe identifiers
   # and whose values are the pipe's arguments
   example::first-pipe:
-    pipe:
-      - example::private-pipe0:
+    description: "Pipeline selector"
+    select:
+      prompt: "Please select a pipeline"
+      options:
+        - example::private-pipe0:
 
-      - example::private-pipe1
-      - example::private-pipe2:
-
+        - example::private-pipe1
+        - example::private-pipe2:
 
 # private pipes are not directly selectable by the user, but may be called by other pipes
 private:

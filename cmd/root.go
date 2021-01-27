@@ -26,7 +26,9 @@ func init() {
 
 	// bind the verbose flag
 	// default value is the warn level
-	RootCmd.PersistentFlags().StringVarP(&run.Verbosity, "verbosity", "v", logrus.InfoLevel.String(), "Log level (debug, info, warn, timer, fatal, panic")
+	RootCmd.PersistentFlags().StringVarP(&run.Verbosity, "verbosity", "v", logrus.InfoLevel.String(), "Log level (debug, info, warn, error, fatal, panic)")
+	RootCmd.PersistentFlags().StringVarP(&run.FileFlag, "file", "f", "", "Path to file containing pipe to execute (default is \"\", ambiguity resolved by user prompt)")
+	RootCmd.PersistentFlags().StringVarP(&run.PipelineFlag, "pipe", "p", "", "Identifier of pipeline to execute (default is \"\", ambiguity resolved by user prompt)")
 
 	RootCmd.AddCommand(&cobra.Command{
 		Use:   "version",

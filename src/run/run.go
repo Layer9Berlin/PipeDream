@@ -14,6 +14,8 @@ import (
 
 var Log = logrus.New()
 var Verbosity string
+var PipelineFlag string
+var FileFlag string
 
 var executionContextFactory = middleware.NewExecutionContext
 var osStdin io.ReadCloser = os.Stdin

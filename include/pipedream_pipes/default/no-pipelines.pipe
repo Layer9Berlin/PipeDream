@@ -2,7 +2,8 @@
 version: 0.0.1
 
 public:
-  test::handle:
+  no-pipelines::handle:
+    description: "Handling missing pipelines"
     sync:
       - print:
           message: '☁️ Welcome to PipeDream ☁️\nThere are no pipes in this directory.\n\n'
@@ -36,6 +37,8 @@ private:
     pipe:
       - open:
           url: https://github.com/Layer9Berlin/PipeDream
+      - print:
+          message: "Ok, opening README..."
 
   no-pipelines::exit:
     pipe:
