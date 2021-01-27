@@ -79,7 +79,7 @@ private:
           message: "published $PIPEDREAM_PUBLISH_VERSION"
 
   publish::handle-git-push-error:
-    each:
+    pipe:
       - print:
           when: "'$!!' =~ 'Permission denied'"
           message: "permission denied"
