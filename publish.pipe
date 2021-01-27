@@ -63,7 +63,7 @@ private:
     sync:
       - publish::create-new-version-string:
           shell:
-            run: $(svu n)
+            run: "svu n"
           env:
             save: PIPEDREAM_PUBLISH_VERSION
       - publish::increment-npm-version:
