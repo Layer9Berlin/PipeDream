@@ -1,7 +1,23 @@
 ---
+# config format version
+# use the most recent version for new pipes
 version: 0.0.1
 
+# pipes available for execution by the user should be defined under this key
 public:
-  example::first:
+  # the parser expects a dictionary whose keys are pipe identifiers
+  # and whose values are the pipe's arguments
+  example::first-pipe:
+    pipe:
+      - example::private-pipe0:
+
+      - example::private-pipe1
+      - example::private-pipe2:
 
 
+# private pipes are not directly selectable by the user, but may be called by other pipes
+private:
+  example::private-pipe1:
+
+
+  example::private-pipe2:

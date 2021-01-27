@@ -28,9 +28,9 @@ private:
       - print:
           message: "Created example file in current directory, run PipeDream again to execute!"
 
-#  no-pipelines::copy-example-file:
-#    shell:
-#      run: "cp $!!_pipes/include/default/example.pipe ."
+  no-pipelines::copy-example-file:
+    shell:
+      run: "cp $!!_pipes/default/example.pipe ."
 
   no-pipelines::open-readme:
     pipe:

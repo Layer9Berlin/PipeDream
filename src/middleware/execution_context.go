@@ -7,6 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
+	"os"
+	"os/signal"
 	"pipedream/src/helpers/custom_io"
 	"pipedream/src/helpers/custom_math"
 	"pipedream/src/logging"
@@ -14,6 +16,7 @@ import (
 	"pipedream/src/models"
 	"pipedream/src/parsers"
 	"strings"
+	"syscall"
 )
 
 type ExecutionContextOption func(*ExecutionContext)
@@ -111,8 +114,8 @@ type ExecutionContext struct {
 
 func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 	executionContext := &ExecutionContext{
-		parser: parsers.NewParser(),
-		Log:    logrus.New(),
+		parser:                   parsers.NewParser(),
+		Log:                      logrus.New(),
 		UserPromptImplementation: defaultUserPrompt,
 	}
 	executionContext.executionFunction = func(run *models.PipelineRun) {
@@ -346,10 +349,16 @@ func (executionContext *ExecutionContext) unwindStack(
 }
 
 func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, writer io.Writer) {
-	startProgress(executionContext, writer)
 
+	startProgress(executionContext, writer)
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
+	setUpCancelHandler(func() {
+		err := fullRun.Cancel()
+		if err != nil {
+			fmt.Printf("Failed to cancel: %v", err)
+		}
+	})
 	fullRun.Wait()
 	stopProgress(executionContext)
 
@@ -412,4 +421,16 @@ func defaultUserPrompt(
 		Stdout:    custom_io.NewBellSkipper(output),
 	}
 	return prompt.Run()
+}
+
+func setUpCancelHandler(handler func()) {
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-signalChannel
+		fmt.Println("\nExecution cancelled...")
+		handler()
+		close(signalChannel)
+		signal.Reset(os.Interrupt, syscall.SIGTERM)
+	}()
 }
