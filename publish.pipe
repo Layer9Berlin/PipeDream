@@ -75,7 +75,7 @@ private:
           catch: publish::handle-git-push-error
       - publish::report-push:
           print:
-            message: "published new version \"$PIPEDREAM_PUBLISH_VERSION\""
+            message: "published new version $PIPEDREAM_PUBLISH_VERSION"
 
   publish::handle-git-push-error:
     when: "'$!!' == 'Everything up-to-date'"
