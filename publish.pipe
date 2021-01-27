@@ -24,20 +24,10 @@ private:
           env:
             save: PIPEDREAM_INSTALL_SHASUM
 
-  publish::increment-version:
-    pipe:
-#          catch: publish::catch-git-error
-
   publish::catch-git-status-error:
     pipe:
       - publish::git-status-good-branch:
           when: "'$!!' == 'Everything up-to-date\n'"
-                  #              pipe:
-                  #                - ~:
-                  #                    print:
-                  #                      message: "clean"
-                  #                - publish::calculate-shasum
-                  #                - publish::increment-version
           print:
             message: "clean"
       - publish::git-status-bad-branch:
@@ -54,15 +44,36 @@ private:
       run: "traffic-light"
 
   publish::upload:
-    when: "'$!!' =~ 'clean'"
+    pipe:
+      - publish::perform-upload:
+          when: "'$!!' =~ 'clean'"
+      - print:
+          when: "'$!!' !~ 'clean'"
+          message: "skipped"
+      - publish::report-upload-status:
+          shell:
+            args:
+              - green: "^published"
+              - prefix: "Git push"
+            run: "traffic-light"
+
+  publish::perform-upload:
     interpolate:
       escapeQuotes: all
     sync:
+      - publish::create-new-version-string:
+          shell:
+            run: $(svu n)
+          env:
+            save: PIPEDREAM_PUBLISH_VERSION
       - publish::increment-npm-version:
           shell:
-            run: "npm version $(svu n) --allow-same-version"
+            run: "npm version $PIPEDREAM_PUBLISH_VERSION --allow-same-version"
       - publish::push-to-git-repo:
           shell:
             run: "git push --follow-tags"
           catch: noop
+      - publish::report-push:
+          print:
+            message: "published new version $PIPEDREAM_PUBLISH_VERSION"
 
