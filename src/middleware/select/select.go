@@ -82,7 +82,6 @@ func (selectMiddleware SelectMiddleware) Apply(
 				_, _ = selectMiddleware.osStdout.Write(completeStdin)
 			}
 
-
 			selectionIndex, _, err := executionContext.UserPromptImplementation(
 				label,
 				items,
