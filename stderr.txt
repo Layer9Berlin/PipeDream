@@ -1,3 +1,0 @@
-To github.com:Layer9Berlin/PipeDream.git
-   5e11f29..f66322e  main -> main
- * [new tag]         v0.22.0 -> v0.22.0
