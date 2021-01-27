@@ -295,6 +295,9 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 		run.LogClosingWaitGroup.Done()
 	}()
 	run.Close()
+	if run.Synchronous {
+		run.Wait()
+	}
 	return run
 }
 

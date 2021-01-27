@@ -44,9 +44,15 @@ private:
       run: "traffic-light"
 
   publish::upload:
+    interpolate:
+      escapeQuotes: all
     pipe:
       - publish::perform-upload:
           when: "'$!!' =~ 'clean'"
+          each:
+            - publish::increment-version:
+                wait: true
+            - publish::push
       - print:
           when: "'$!!' !~ 'clean'"
           message: "skipped"
@@ -58,9 +64,7 @@ private:
               - prefix: "Git push"
             run: "traffic-light"
 
-  publish::perform-upload:
-    interpolate:
-      escapeQuotes: all
+  publish::increment-version:
     sync:
       - publish::create-new-version-string:
           shell:
@@ -70,6 +74,11 @@ private:
       - publish::increment-npm-version:
           shell:
             run: "npm version $PIPEDREAM_PUBLISH_VERSION --allow-same-version"
+
+  publish::push:
+    interpolate:
+      escapeQuotes: all
+    pipe:
       - publish::push-to-git-repo:
           shell:
             run: "git push --follow-tags"
@@ -79,6 +88,8 @@ private:
           message: "published $PIPEDREAM_PUBLISH_VERSION"
 
   publish::handle-git-push-error:
+    interpolate:
+      escapeQuotes: all
     pipe:
       - print:
           when: "'$!!' =~ 'Permission denied'"

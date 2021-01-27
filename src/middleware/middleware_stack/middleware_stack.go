@@ -15,6 +15,7 @@ import (
 	"pipedream/src/middleware/ssh"
 	syncMiddleware "pipedream/src/middleware/sync"
 	"pipedream/src/middleware/timer"
+	"pipedream/src/middleware/wait"
 	"pipedream/src/middleware/when"
 )
 
@@ -30,6 +31,7 @@ func SetUpMiddleware() []middleware.Middleware {
 		syncMiddleware.NewSyncMiddleware(),
 		pipe.NewPipeMiddleware(),
 		each.NewEachMiddleware(),
+		wait.NewWaitMiddleware(),
 		shell.NewShellMiddleware(),
 		ssh.NewSshMiddleware(),
 		docker.NewDockerMiddleware(),

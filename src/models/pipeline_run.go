@@ -58,6 +58,8 @@ type PipelineRun struct {
 
 	cancelled   bool
 	cancelHooks []func() error
+
+	Synchronous bool
 }
 
 func NewPipelineRun(
@@ -93,6 +95,8 @@ func NewPipelineRun(
 
 		cancelled:   false,
 		cancelHooks: make([]func() error, 0, 10),
+
+		Synchronous: false,
 	}
 
 	if parent == nil {
