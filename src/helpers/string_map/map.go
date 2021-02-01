@@ -35,6 +35,12 @@ func copyValue(value interface{}) interface{} {
 			result = append(result, copyValue(subValue))
 		}
 		return result
+	case map[interface{}]interface{}:
+		result := map[interface{}]interface{}{}
+		for stringKey, subValue := range typedValue {
+			result[stringKey] = copyValue(subValue)
+		}
+		return result
 	default:
 		return value
 	}

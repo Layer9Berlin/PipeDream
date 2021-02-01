@@ -12,7 +12,7 @@ public:
 private:
   go-mod-test::test-ignores:
     pipe:
-      - print:
+      - print::message:
           message: "github.com/test/test1 v7.2.3\ngithub.com/test/test2 v10.2.0\ngithub.com/test/test1/test v2.0.1 [v5.0.0]\ngithub.com/test/test2 v1.2.0 [v1.3.1]\n"
       - go-mod::apply-ignores:
           ignore-packages:
@@ -23,7 +23,7 @@ private:
 
   go-mod::test-convert-all-to-yaml:
     pipe:
-      - print:
+      - print::message:
           message: "github.com/test/test1 v7.2.3\ngithub.com/test/test2 v10.2.0\ngithub.com/test/test1/test v2.0.1 [v5.0.0]\ngithub.com/test/test2 v1.2.0 [v1.3.1]\n"
       - go-mod::apply-ignores:
           ignore-packages:

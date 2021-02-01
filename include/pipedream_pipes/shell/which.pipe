@@ -2,6 +2,6 @@
 version: 0.0.1
 
 public:
-  which:
+  shell::which:
     shell:
       run: "which @{binary}"

@@ -15,7 +15,7 @@ pipelines:
   test::go-mod::apply-ignores-1:
     selectable: false
     pipe:
-      - print:
+      - print::message:
           file: vectors/go-mod-list.0.stdin.txt
       - go-mod::apply-ignores:
           ignore-packages:

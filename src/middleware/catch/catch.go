@@ -25,12 +25,20 @@ func (catchMiddleware CatchMiddleware) Apply(
 	next func(*models.PipelineRun),
 	executionContext *middleware.ExecutionContext,
 ) {
-	argument := ""
+	var argument middleware.PipelineReference = nil
 	middleware.ParseArguments(&argument, "catch", run)
 
-	if argument != "" {
+	if argument != nil {
 
 		next(run)
+
+		var catchIdentifier *string = nil
+		catchArguments := make(map[string]interface{}, 16)
+		for pipelineIdentifier, pipelineArguments := range argument {
+			catchIdentifier = pipelineIdentifier
+			catchArguments = pipelineArguments
+			break
+		}
 
 		run.Log.TraceWithFields(
 			log_fields.DataStream(catchMiddleware, "creating stdout writer")...,
@@ -48,7 +56,8 @@ func (catchMiddleware CatchMiddleware) Apply(
 			if len(errInput) > 0 {
 				executionContext.FullRun(
 					middleware.WithParentRun(run),
-					middleware.WithIdentifier(&argument),
+					middleware.WithIdentifier(catchIdentifier),
+					middleware.WithArguments(catchArguments),
 					middleware.WithSetupFunc(func(errorRun *models.PipelineRun) {
 						run.Log.TraceWithFields(
 							log_fields.DataStream(catchMiddleware, "merging parent stderr into child stdin")...,

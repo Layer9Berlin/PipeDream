@@ -4,8 +4,9 @@ version: 0.0.1
 public:
   no-pipelines::handle:
     description: "Handling missing pipelines"
-    sync:
-      - print:
+    wait: true
+    each:
+      - print::message:
           message: '☁️ Welcome to PipeDream ☁️\nThere are no pipes in this directory.\n\n'
       - test::user-selection:
           select:
@@ -26,7 +27,7 @@ private:
             run: "which pipedream"
       - strings::remove-new-lines
       - no-pipelines::copy-example-file
-      - print:
+      - print::message:
           message: "Created example file in current directory, run PipeDream again to execute!"
 
   no-pipelines::copy-example-file:
@@ -35,12 +36,12 @@ private:
 
   no-pipelines::open-readme:
     pipe:
-      - open:
+      - shell::open:
           url: https://github.com/Layer9Berlin/PipeDream
-      - print:
+      - print::message:
           message: "Ok, opening README..."
 
   no-pipelines::exit:
     pipe:
-      - print:
+      - print::message:
           message: "Ok, bye for now!"

@@ -2,7 +2,7 @@
 version: 0.0.1
 
 pipelines:
-  bundler:
+  packman::bundler:
     pipe:
       - ~:
           when: "'@{subcommand}' == 'version'"

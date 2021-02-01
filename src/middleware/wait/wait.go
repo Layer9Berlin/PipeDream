@@ -11,7 +11,7 @@ type WaitMiddleware struct {
 }
 
 func (waitMiddleware WaitMiddleware) String() string {
-	return "when"
+	return "wait"
 }
 
 func NewWaitMiddleware() WaitMiddleware {

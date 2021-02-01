@@ -1,0 +1,28 @@
+---
+version: 0.0.1
+
+public:
+  install::path::set:
+    wait: true
+    pipe:
+      - install::path::use-gopath:
+          shell:
+            run: "printf \"$GOPATH/bin\""
+          env:
+            save: PIPEDREAM_BIN_INSTALL_PATH
+      - noop
+
+  install::path::check:
+    pipe:
+      - env::load:
+          var: PATH
+      - strings::convert-colons-to-line-breaks
+      - install::check-for-presence-of-install-path:
+          shell:
+            run: "grep -x \"$PIPEDREAM_BIN_INSTALL_PATH\" || printf \"\""
+      - print::if-empty:
+          message: "no"
+          else: "yes"
+      - util::traffic-light:
+          prefix: "Install dir in PATH"
+          red: "^no"

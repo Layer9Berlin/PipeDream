@@ -86,22 +86,22 @@ private:
           output-pattern: "did not report a checksum"
 
 # mocked implementations
-  env:
+  shell::env:
     pipe:
-      - print:
+      - print::message:
           message: "@{test-install::path-env-var}"
 
-  which:
+  shell::which:
     pipe:
-      - print:
+      - print::message:
           message: "@{test-install::which-output}"
 
   tarball-shasum:
     pipe:
-      - print:
+      - print::message:
           message: "@{test-install::tarball-shasum}"
 
   install::binary-version-command-output:
     pipe:
-      - print:
+      - print::message:
           message: "@{test-install::version-command-output}"

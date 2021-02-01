@@ -1,0 +1,35 @@
+---
+version: 0.0.1
+
+public:
+  install::build::all:
+    description: Install PipeDream and related binaries
+    each:
+      - install::build::binary:
+          binary: pipedream
+          inject-dir: src/version
+          uppercase_identifier: PIPEDREAM
+      - install::build::binary:
+          binary: semver-compare
+          build-dir: util/semver-compare
+          inject-dir: util/semver-compare
+          uppercase_identifier: SEMVER_COMPARE
+      - install::build::binary:
+          binary: traffic-light
+          build-dir: util/traffic-light
+          inject-dir: util/traffic-light
+          uppercase_identifier: TRAFFIC_LIGHT
+
+private:
+  install::build::binary:
+    description: "Install binary \"@{binary}\""
+    pipe:
+      - go::build:
+          binary-install-path: "$PIPEDREAM_BIN_INSTALL_PATH"
+          inherit:
+            - build-dir
+            - binary
+            - inject-dir
+          flags: "-X 'pipedream/@{inject-dir}/cmd.Version=$PIPEDREAM_CURRENT_METADATA_version' -X 'pipedream/@{inject-dir}/cmd.CommitHash=$PIPEDREAM_CURRENT_METADATA_commit' -X 'pipedream/@{inject-dir}/cmd.RepoChecksum=$PIPEDREAM_CURRENT_METADATA_@{uppercase_identifier}_checksum' -X 'pipedream/@{inject-dir}/cmd.Date=$PIPEDREAM_CURRENT_METADATA_date'"
+      - print::message:
+          message: "[✔] Installed \"@{binary}\" binary\n"

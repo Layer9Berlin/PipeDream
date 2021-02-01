@@ -4,7 +4,7 @@ version: 0.0.1
 public:
   prompt:
     pipe:
-      - print:
+      - print::message:
           message: "@{text|''}"
           shell:
             interactive: true
@@ -19,7 +19,7 @@ public:
             - prompt::without-char-limit:
                 when: "!@?{chars}"
       # use default if present and either the output is empty or `yes-to-all` is set
-      - print:
+      - print::message:
           when: "('$!!' == '' || @{yes-to-all|false}) && @?{default}"
           shell:
             interactive: true

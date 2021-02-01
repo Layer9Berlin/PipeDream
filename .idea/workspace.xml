@@ -23,12 +23,70 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/middleware/wait/wait.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/env/env.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/metadata.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/path.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/pipes.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/version.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/shell/symlink.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/strings/convert-colons-to-line-breaks.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/util/traffic-light.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/middleware/input/input.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/middleware/output/output.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/install/pipes.test.pipe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/default/example._pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/example/example._pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/default/no-pipelines.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/no-pipelines/no-pipelines.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/abort.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/exec/abort.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/fail.pipe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/filter.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/parsers/filter.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/go.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/go/build.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/noop.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/exec/noop.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/print.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/print/print.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/prompt.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/misc/prompt.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/misc/test.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/apt.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/apt.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/bundler.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/bundler.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/env-version.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/env-version.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/file-replace.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/file/file-replace.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/go-mod.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/go-mod.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/npm.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/npm.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/remote-version.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/remote-version.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/rvm.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/rvm.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/packman/semver-compare.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/packman/semver-compare.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/env.pipe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/open.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/shell/open.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/tar.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/tar/shasum.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/which.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/shell/which.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/working-dir.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/shell/working-dir.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/strings/convenience.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/strings/remove-new-lines.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/install.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/install.pipe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/helpers/string_map/map.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/helpers/string_map/map.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/catch/catch.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/catch/catch.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/each/each.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/each/each.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/env/env.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/env/env.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/middleware_stack/middleware_stack.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/middleware_stack/middleware_stack.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/pipeline_run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/pipeline_run.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/save/save.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/save/save.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/select/select.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/sync/sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/sync/sync.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/wait/wait.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/wait/wait.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/with/with.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/with/with.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/data_stream.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/data_stream.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/data_stream_processing.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/data_stream_processing.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parsers/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsers/parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/dependencies.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/dependencies.test.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/install/install.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/install/install.test.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/packman/go-mod/go-mod.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/packman/go-mod/go-mod.test.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/tmp.dev" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/build.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/semver-compare/cmd/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/semver-compare/cmd/version.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/util/traffic-light/cmd/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/util/traffic-light/cmd/version.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,24 +125,24 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/middleware/wait" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/middleware" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/include/pipedream_pipes/install" />
-      <recent name="$PROJECT_DIR$/include" />
-      <recent name="$PROJECT_DIR$/dist" />
-      <recent name="$PROJECT_DIR$/src/middleware/stack" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/middleware/wait" />
+      <recent name="$PROJECT_DIR$/src/middleware" />
+      <recent name="$PROJECT_DIR$/src/middleware/output" />
+      <recent name="$PROJECT_DIR$/test/install" />
+      <recent name="$PROJECT_DIR$/test" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/src/middleware/select" />
-      <recent name="$PROJECT_DIR$/include/pipedream_pipes/default" />
-      <recent name="$PROJECT_DIR$/src/logging" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/include/pipedream_pipes/env" />
+      <recent name="$PROJECT_DIR$/test/install" />
+      <recent name="$PROJECT_DIR$/include/pipedream_pipes/no-pipelines" />
+      <recent name="$PROJECT_DIR$/include/pipedream_pipes/tar" />
+      <recent name="$PROJECT_DIR$/include/pipedream_pipes/file" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build pipedream">
@@ -143,6 +201,17 @@
       <pattern value="^\QTestSelect_letUserSelectPipelineFile_userSelection\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="TestShell_PrintfRun in pipedream/src/middleware/shell" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="PipeDream" />
+      <working_directory value="$PROJECT_DIR$/src/middleware/shell" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="pipedream/src/middleware/shell" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestShell_PrintfRun\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="go test pipedream/src/run" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$/src/run" />
@@ -172,9 +241,11 @@
       <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFile_userSelection in pipedream/src/run" />
       <item itemvalue="Go Test.TestRun_Cmd_userPromptError in pipedream/src/run" />
       <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFileAndPipeline_userSelectsPipeline in pipedream/src/run" />
+      <item itemvalue="Go Test.TestShell_PrintfRun in pipedream/src/middleware/shell" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestShell_PrintfRun in pipedream/src/middleware/shell" />
         <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFileAndPipeline_userSelectsPipeline in pipedream/src/run" />
         <item itemvalue="Go Test.TestRun_Cmd_userPromptError in pipedream/src/run" />
         <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFile_userSelection in pipedream/src/run" />
@@ -223,79 +294,87 @@
       <screen x="0" y="25" width="1680" height="947" />
     </state>
     <state x="640" y="336" key="#Go_Modules/0.25.1680.947@0.25.1680.947" timestamp="1610618862086" />
-    <state x="304" y="146" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611742928765">
+    <state x="304" y="146" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1611846667447">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="304" y="146" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611742928765" />
+    <state x="304" y="146" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611846667447" />
     <state x="304" y="157" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1680.947@0.25.1680.947" timestamp="1610618907474" />
     <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1611742292074">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1611742292074" />
-    <state x="1005" y="248" key="#xdebugger.evaluate" timestamp="1611235546659">
+    <state x="1005" y="248" width="474" height="407" key="#xdebugger.evaluate" timestamp="1611945235355">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="1005" y="248" key="#xdebugger.evaluate/0.0.1680.1050@0.0.1680.1050" timestamp="1611235546659" />
+    <state x="1005" y="248" width="474" height="407" key="#xdebugger.evaluate/0.0.1680.1050@0.0.1680.1050" timestamp="1611945235355" />
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog" timestamp="1611739121782">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611739121782" />
-    <state width="1638" height="339" key="GridCell.Tab.0.bottom" timestamp="1611750364680">
+    <state width="1638" height="382" key="GridCell.Tab.0.bottom" timestamp="1612188466361">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="339" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1611750364680" />
+    <state width="1638" height="382" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466361" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
-    <state width="1638" height="339" key="GridCell.Tab.0.center" timestamp="1611750364678">
+    <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
+    <state width="1638" height="382" key="GridCell.Tab.0.center" timestamp="1612188466360">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="339" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1611750364678" />
+    <state width="1638" height="382" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466360" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
-    <state width="1638" height="339" key="GridCell.Tab.0.left" timestamp="1611750364678">
+    <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
+    <state width="1638" height="382" key="GridCell.Tab.0.left" timestamp="1612188466359">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="339" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1611750364678" />
+    <state width="1638" height="382" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466359" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
-    <state width="1638" height="339" key="GridCell.Tab.0.right" timestamp="1611750364679">
+    <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
+    <state width="1638" height="382" key="GridCell.Tab.0.right" timestamp="1612188466361">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="339" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1611750364679" />
+    <state width="1638" height="382" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466361" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
-    <state width="1638" height="364" key="GridCell.Tab.1.bottom" timestamp="1611741920729">
+    <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
+    <state width="1638" height="382" key="GridCell.Tab.1.bottom" timestamp="1612188466363">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1611741920729" />
-    <state width="1638" height="364" key="GridCell.Tab.1.center" timestamp="1611741920728">
+    <state width="1638" height="382" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466363" />
+    <state width="1638" height="449" key="GridCell.Tab.1.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
+    <state width="1638" height="382" key="GridCell.Tab.1.center" timestamp="1612188466362">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1611741920728" />
-    <state width="1638" height="364" key="GridCell.Tab.1.left" timestamp="1611741920727">
+    <state width="1638" height="382" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466362" />
+    <state width="1638" height="449" key="GridCell.Tab.1.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795917" />
+    <state width="1638" height="382" key="GridCell.Tab.1.left" timestamp="1612188466362">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1611741920727" />
-    <state width="1638" height="364" key="GridCell.Tab.1.right" timestamp="1611741920728">
+    <state width="1638" height="382" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466362" />
+    <state width="1638" height="449" key="GridCell.Tab.1.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795916" />
+    <state width="1638" height="382" key="GridCell.Tab.1.right" timestamp="1612188466363">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="364" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1611741920728" />
-    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1611663212561">
+    <state width="1638" height="382" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612188466363" />
+    <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
+    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1612019614397">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1611663212561" />
-    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1611238218613">
+    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1612019614397" />
+    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1611767662796">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611238218613" />
+    <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611767662796" />
     <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1611655542197">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1611655542197" />
-    <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1611743571502">
+    <state x="541" y="280" width="597" height="490" key="find.popup" timestamp="1612188078299">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="541" y="280" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611743571502" />
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1611750368609">
+    <state x="541" y="280" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612188078299" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1612187990285">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1611750368609" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612187990285" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup/0.25.1680.947@0.25.1680.947" timestamp="1610619078061" />
   </component>
   <component name="XDebuggerManager">
@@ -307,9 +386,25 @@
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/middleware/shell/shell.go</url>
-          <line>109</line>
-          <option name="timeStamp" value="50" />
+          <url>file://$PROJECT_DIR$/src/middleware/each/each.go</url>
+          <line>101</line>
+          <option name="timeStamp" value="93" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <condition expression="newReader == nil" language="go" />
+          <url>file://$PROJECT_DIR$/src/models/data_stream_processing.go</url>
+          <line>48</line>
+          <option name="timeStamp" value="103" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/src/middleware/interpolate/interpolate.go</url>
+          <line>92</line>
+          <option name="timeStamp" value="106" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/src/middleware/interpolate/interpolate.go</url>
+          <line>80</line>
+          <option name="timeStamp" value="107" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

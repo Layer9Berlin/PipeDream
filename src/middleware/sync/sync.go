@@ -31,6 +31,8 @@ func (syncMiddleware SyncMiddleware) Apply(
 	arguments := make([]middleware.PipelineReference, 0, 10)
 	middleware.ParseArguments(&arguments, "sync", run)
 
+	next(run)
+
 	haveChildren := len(arguments) > 0
 	if haveChildren {
 		childIdentifiers := make([]*string, 0, len(arguments))
@@ -70,8 +72,6 @@ func (syncMiddleware SyncMiddleware) Apply(
 		finalResultWriteCloser := run.Stdout.WriteCloser()
 		startFullRunForEachChild(childIdentifiers, run, childArguments, initialStdin, finalResultWriteCloser, executionContext, 0)
 	}
-
-	next(run)
 }
 
 func startFullRunForEachChild(

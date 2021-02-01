@@ -1,0 +1,38 @@
+---
+version: 0.0.1
+
+public:
+  util::traffic-light:
+    interpolate:
+      escapeQuotes: 'all'
+      ignoreWarnings: true
+    shell:
+      args:
+        - prefix: "@{prefix}"
+        - red: "@{red|}"
+        - amber: "@{amber|}"
+        - green: "@{green|}"
+      run: traffic-light
+    catch:
+      util::traffic-light::command-not-found:
+        message: "@{prefix}: $!!"
+        redMatch: "('@{red|}' != '' && '$!!' =~ '@{red|}')"
+        amberMatch: "('@{amber|}' != '' && '$!!' =~ '@{amber|}')"
+        greenMismatch: "('@{green|}' != '' && '$!!' !~ '@{green|}')"
+
+private:
+  util::traffic-light::command-not-found:
+    when: "'$!!' =~ 'command not found'"
+    pipe:
+      - print::message:
+          description: "Show red traffic light"
+          when: "@{redMatch|false} || (!@{amberMatch|false} && @{greenMismatch|false})"
+          message: "[✘] @{message}\n"
+      - print::message:
+          description: "Show amber traffic light"
+          when: "!@{redMatch|false} && @{amberMatch|false}"
+          message: "[-] @{message}\n"
+      - print::message:
+          description: "Show green traffic light"
+          when: "!@{redMatch|false} && !@{amberMatch|false} && !@{greenMismatch|false}"
+          message: "[✔] @{message}\n"

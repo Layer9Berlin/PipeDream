@@ -4,10 +4,14 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"io"
+	"os"
 )
 
-var version = "0.0.1"
+var Version = "0.0.1"
+var CommitHash = "-"
 var RepoChecksum = "-"
+var Date = "-"
+var Via = "compiled from source"
 
 func init() {
 	rootCmd.AddCommand(&cobra.Command{
@@ -21,5 +25,13 @@ func init() {
 }
 
 func versionCmd(writer io.Writer) {
-	_, _ = writer.Write([]byte(fmt.Sprintf("%v (repo checksum: %v)", version, RepoChecksum)))
+	executableLocation, _ := os.Executable()
+	_, _ = writer.Write([]byte(fmt.Sprintf(
+		`version: %v
+via: %v
+date: %v
+commit: %v
+checksum: %v
+location: %v
+`, Version, Via, Date, CommitHash, RepoChecksum, executableLocation)))
 }

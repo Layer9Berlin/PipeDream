@@ -2,7 +2,7 @@
 version: 0.0.1
 
 pipelines:
-  npm:
+  packman::npm:
     steps:
       - ~:
           when: "'@{subcommand}' =~ 'outdated|upgrade'"

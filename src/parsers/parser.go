@@ -1,6 +1,7 @@
 package parsers
 
 import (
+	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"path/filepath"
@@ -70,7 +71,7 @@ func (parser *Parser) ParsePipelineFiles(allPipelineFilePaths []string, builtIn 
 		}
 		err = yaml.Unmarshal(fileData, &pipelineFile)
 		if err != nil {
-			returnErr = err
+			returnErr = fmt.Errorf("unable to parse file %q: %w", pipelineFilePath, err)
 			return
 		}
 

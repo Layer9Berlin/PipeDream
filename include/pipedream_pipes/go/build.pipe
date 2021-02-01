@@ -2,7 +2,7 @@
 version: 0.0.1
 
 public:
-  go-build:
+  go::build:
     inherit:
       - build-dir
       - binary

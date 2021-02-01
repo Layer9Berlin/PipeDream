@@ -17,9 +17,10 @@ import (
 
 // Value Replacer
 type interpolateMiddlewareArguments struct {
-	Enable       bool
-	EscapeQuotes string
-	Quote        string
+	Enable         bool
+	EscapeQuotes   string
+	IgnoreWarnings bool
+	Quote          string
 }
 
 type InterpolateMiddleware struct{}
@@ -38,11 +39,14 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := interpolateMiddlewareArguments{
-		Enable:       true,
-		EscapeQuotes: "none",
-		Quote:        "none",
+		Enable:         true,
+		EscapeQuotes:   "none",
+		IgnoreWarnings: false,
+		Quote:          "none",
 	}
 	middleware.ParseArguments(&arguments, "interpolate", run)
+
+	next(run)
 
 	if arguments.Enable {
 		interpolator := NewInterpolator(run.ArgumentsCopy(), arguments)
@@ -55,12 +59,14 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			// this is because we might have other middleware (like `when`)
 			// that renders certain errors moot
 			if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
-				run.Log.WarnWithFields(
-					log_fields.Symbol("⚠️"),
-					log_fields.Message("warning"),
-					log_fields.Info(interpolator.Errors.Errors),
-					log_fields.Middleware(interpolateMiddleware),
-				)
+				if !arguments.IgnoreWarnings {
+					run.Log.WarnWithFields(
+						log_fields.Symbol("⚠️"),
+						log_fields.Message("warning"),
+						log_fields.Info(interpolator.Errors.Errors),
+						log_fields.Middleware(interpolateMiddleware),
+					)
+				}
 			} else {
 				run.Log.DebugWithFields(
 					log_fields.Symbol("💤"),
@@ -71,7 +77,7 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			run.Log.TraceWithFields(
 				log_fields.DataStream(interpolateMiddleware, "copying stdin")...,
 			)
-			stdinCopy := run.Stdin.Copy()
+			stdinCopy := run.Stdin.CopyOrResult()
 			run.Log.TraceWithFields(
 				log_fields.DataStream(interpolateMiddleware, "creating stdout writer")...,
 			)
@@ -138,7 +144,7 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 					childRun.Log.TraceWithFields(
 						log_fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 					)
-					childRun.Stdin.MergeWith(run.Stdin.Copy())
+					childRun.Stdin.MergeWith(run.Stdin.CopyOrResult())
 				}),
 				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
 					childRun.Log.TraceWithFields(
@@ -159,8 +165,6 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			return
 		}
 	}
-
-	next(run)
 }
 
 type Interpolator struct {
@@ -300,24 +304,28 @@ func (interpolator *Interpolator) interpolateArguments(value string) (string, er
 
 func (interpolator *Interpolator) log(logger *models.PipelineRunLogger, interpolateMiddleware InterpolateMiddleware) {
 	if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
-		logger.WarnWithFields(
-			log_fields.Symbol("⚠️"),
-			log_fields.Message("warning"),
-			log_fields.Info(interpolator.Errors.Errors),
-			log_fields.Middleware(interpolateMiddleware),
-		)
-	} else {
-		if len(interpolator.Substitutions) > 1 {
-			logger.DebugWithFields(
-				log_fields.Symbol("⎆"),
-				log_fields.Message(fmt.Sprintf("made %v substitutions", len(interpolator.Substitutions))),
-				log_fields.Info(interpolator.Substitutions),
+		if !interpolator.MiddlewareArguments.IgnoreWarnings {
+			logger.WarnWithFields(
+				log_fields.Symbol("⚠️"),
+				log_fields.Message("warning"),
+				log_fields.Info(interpolator.Errors.Errors),
 				log_fields.Middleware(interpolateMiddleware),
 			)
-		} else {
+		}
+	} else {
+		switch len(interpolator.Substitutions) {
+		case 0:
+		case 1:
 			logger.DebugWithFields(
 				log_fields.Symbol("⎆"),
 				log_fields.Message("made 1 substitution"),
+				log_fields.Info(interpolator.Substitutions),
+				log_fields.Middleware(interpolateMiddleware),
+			)
+		default:
+			logger.DebugWithFields(
+				log_fields.Symbol("⎆"),
+				log_fields.Message(fmt.Sprintf("made %v substitutions", len(interpolator.Substitutions))),
 				log_fields.Info(interpolator.Substitutions),
 				log_fields.Middleware(interpolateMiddleware),
 			)

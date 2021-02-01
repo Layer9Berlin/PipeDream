@@ -2,54 +2,65 @@
 version: 0.0.1
 
 public:
-  print:
+  print::message:
+    interpolate:
+      ignoreWarnings: true
     when: "@?{message}"
     shell:
       run: "printf \"@{message|''}\""
 
-  print-file:
+  print::file:
+    interpolate:
+      ignoreWarnings: true
     when: "@?{file}"
     shell:
       run: "cat @{file}"
 
-  print-if-empty:
+  print::if-empty:
+    interpolate:
+      ignoreWarnings: true
     pipe:
-      - print:
-          when: "@?{message} && '$!!' != ''"
-          message: "@{message}"
-      - print:
-          when: "@?{else} && '$!!' == ''"
-          message: "@{else}"
+      - print::if-empty::when:
+          when: "@?{message} && '$!!' == ''"
+          shell:
+            run: "printf \"@{message|''}\""
+      - print::if-empty::else:
+          when: "@?{else} && '$!!' != ''"
+          shell:
+            run: "printf \"@{else|''}\""
 
-  print-if-match:
+  print::if-match:
     each:
-      - print-if-match::match-branch:
+      - print::if-match::match-branch:
           inherit:
             - pattern
             - message
-      - print-if-match::no-match-branch:
+      - print::if-match::no-match-branch:
           inherit:
             - pattern
             - else
 
-  print-if-match::match-branch:
+private:
+  print::if-match::match-branch:
     interpolate:
       escapeQuotes: all
+      ignoreWarnings: true
     pipe:
-      - print:
+      - print::message:
           when: '@?{message} && @?{pattern} && "$!!" =~ "@{pattern}"'
           message: "@{message}"
-      - print:
+      - print::message:
           when: '!@?{message} || !@?{pattern} || "$!!" !~ "@{pattern}"'
           message: ""
 
-  print-if-match::no-match-branch:
+  print::if-match::no-match-branch:
     interpolate:
       escapeQuotes: all
+      ignoreWarnings: true
     pipe:
-      - print:
+      - print::message:
           when: "@?{else} && @?{pattern} && '$!!' !~ '@{pattern}'"
           message: "@{else}"
-      - print:
+      - print::message:
           when: "!@?{else} || !@?{pattern} || '$!!' =~ '@{pattern}'"
           message: ""

@@ -2,8 +2,8 @@
 version: 0.0.1
 
 pipelines:
-  rvm:
-    steps:
+  packman::rvm:
+    pipe:
       - ~:
           when: "'@{subcommand}' == 'upgrade'"
           shell:

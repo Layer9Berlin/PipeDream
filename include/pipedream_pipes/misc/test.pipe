@@ -21,7 +21,7 @@ public:
       - expect::output-result:
           test-name: "@{test-name}"
           pipe:
-            - print:
+            - print::message:
                 when: "'$!!' == ''"
                 message: "passed"
             - ~:
@@ -37,27 +37,27 @@ private:
       - ~:
           shell:
             run: "diff -s \"@{file}\" - | head -n 10"
-      - print:
+      - print::message:
           when: "\"$!!\" !~ *are identical"
           message: Output does not match file!
-      - print:
+      - print::message:
           when: "\"$!!\" !~ *does not match file!"
           message: ""
 
   expect::check-output:
     each:
-      - print:
+      - print::message:
           when: "'$!!' != '@{output}'"
           message: "output mismatch\nActual:\n$!!\nExpected:\n@{output}\n"
-      - print:
+      - print::message:
           when: "'$!!' == '@{output}'"
           message: ""
 
   expect::check-output-pattern:
     each:
-      - print:
+      - print::message:
           when: "'$!!' !~ '@{output-pattern}'"
           message: "output pattern mismatch\nActual:\n$!!\nExpected pattern:\n@{output-pattern}\n"
-      - print:
+      - print::message:
           when: "'$!!' !~ '^output pattern mismatch'"
           message: ""

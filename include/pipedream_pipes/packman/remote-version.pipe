@@ -2,7 +2,7 @@
 version: 0.0.1
 
 pipelines:
-  remote-version:
+  packman::remote-version:
     steps:
       - ~:
           when: "'@{package}' == 'ruby'"
@@ -28,20 +28,20 @@ pipelines:
           ssh: "@{server}"
           shell:
             run: "mysql -V | sed -E \"s|.*Distrib (.*), .*|\\1|\""
-      - bundler:
+      - packman::bundler:
           when: "'@{package}' == 'bundler'"
           subcommand: version
           ssh: "@{server}"
 
-  remote-version-check:
+  packman::remote-version-check:
     steps:
-      - remote-version:
+      - packman::remote-version:
           server: "@{remote}"
           save: "@{remote}::VERSIONS::@{package}"
-      - env-version:
+      - packman::env-version:
           subcommand: "@{package}"
           save: "ENV::VERSIONS::@{package}"
-      - semver-compare:
+      - packman::semver-compare:
           version1: "#{@{remote}::VERSIONS::@{package}}"
           version2: "#{ENV::VERSIONS::@{package}}"
           prefix: "Version consistency (@{package})"

@@ -48,6 +48,8 @@ func (selectMiddleware SelectMiddleware) Apply(
 	}
 	middleware.ParseArguments(&arguments, "select", run)
 
+	next(run)
+
 	if len(arguments.Options) > 0 {
 		label := "Please select an option"
 		if arguments.Prompt != nil {
@@ -136,8 +138,6 @@ func (selectMiddleware SelectMiddleware) Apply(
 		next(run)
 		return
 	}
-
-	next(run)
 }
 
 type SaveMiddlewareEntry struct {

@@ -2,17 +2,17 @@
 version: 0.0.1
 
 public:
-  tarball-shasum:
+  tar::shasum:
     pipe:
-      - tarball-shasum::tar:
+      - tar::shasum::tar:
           shell:
             run: "tar -cf - @{dirs}"
-      - tarball-shasum::compute-shasum:
+      - tar::shasum::compute-shasum:
           shell:
             run: "shasum"
-      - tarball-shasum::extract-shasum:
+      - tar::shasum::extract-shasum:
           shell:
             run: "sed 's/[^0-9a-f]*//g'"
-      - remove-new-lines:
+      - strings::remove-new-lines:
           shell:
             run: "tr -d '\n'"

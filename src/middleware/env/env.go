@@ -82,9 +82,14 @@ func (envMiddleware EnvMiddleware) Apply(
 			log_fields.Middleware(envMiddleware),
 		)
 	}
+
 	next(run)
 
 	if arguments.Save != nil {
+		// to avoid flakiness, we need to defer subsequent executions,
+		// as they will usually want to use the env var we are setting here
+		run.Synchronous = true
+
 		run.LogClosingWaitGroup.Add(1)
 		go func() {
 			run.Stdout.Wait()
@@ -95,7 +100,7 @@ func (envMiddleware EnvMiddleware) Apply(
 		run.Log.DebugWithFields(
 			log_fields.Symbol("💲"),
 			log_fields.Message(fmt.Sprintf("saving output")),
-			log_fields.Info("$" + *arguments.Save),
+			log_fields.Info("$"+*arguments.Save),
 			log_fields.Middleware(envMiddleware),
 		)
 	}

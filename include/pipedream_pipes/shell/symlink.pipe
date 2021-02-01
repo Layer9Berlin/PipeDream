@@ -1,0 +1,8 @@
+---
+version: 0.0.1
+
+public:
+  shell::symlink::create:
+    description: "Create symlink"
+    shell:
+      run: "ln -sf @{source} @{target}"

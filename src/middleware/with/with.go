@@ -34,6 +34,7 @@ func (withMiddleware WithMiddleware) Apply(
 		Pattern: "",
 	}
 	middleware.ParseArguments(&argument, "with", run)
+
 	next(run)
 
 	if argument.Pattern != "" {
@@ -111,7 +112,5 @@ func (withMiddleware WithMiddleware) Apply(
 			run.Log.PossibleError(stdoutIntercept.Close())
 			run.Log.PossibleError(stderrAppender.Close())
 		}()
-	} else {
-		next(run)
 	}
 }

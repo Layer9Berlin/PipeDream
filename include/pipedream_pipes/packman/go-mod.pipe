@@ -2,68 +2,68 @@
 version: 0.0.1
 
 public:
-  go-mod:
+  packman::go-mod:
     pipe:
-      - go-mod::list:
+      - packman::go-mod::list:
           inherit:
             - ignore-packages
             - ignore-pattern
           when: "'@{subcommand}' == 'list'"
-      - go-mod::outdated:
+      - packman::go-mod::outdated:
           inherit:
             - ignore-packages
             - ignore-pattern
           when: "'@{subcommand}' == 'outdated'"
-      - go-mod::upgrade:
+      - packman::go-mod::upgrade:
           inherit:
             - ignore-packages
             - ignore-pattern
           when: "'@{subcommand}' == 'upgrade'"
 
 private:
-  go-mod::list:
+  packman::go-mod::list:
     pipe:
-      - go-mod::list-all:
+      - packman::go-mod::list-all:
           inherit:
             - ignore-packages
             - ignore-pattern
-      - go-mod::apply-ignores:
+      - packman::go-mod::apply-ignores:
           inherit:
             - ignore-packages
             - ignore-pattern
-      - go-mod::convert-all-to-yaml
+      - packman::go-mod::convert-all-to-yaml
 
-  go-mod::outdated:
+  packman::go-mod::outdated:
     pipe:
-      - go-mod::list-all:
+      - packman::go-mod::list-all:
           inherit:
             - ignore-packages
             - ignore-pattern
-      - go-mod::apply-ignores:
+      - packman::go-mod::apply-ignores:
           inherit:
             - ignore-packages
             - ignore-pattern
-      - go-mod::convert-upgradeable-to-yaml
-      - go-mod::list-available-updates
+      - packman::go-mod::convert-upgradeable-to-yaml
+      - packman::go-mod::list-available-updates
 
-  go-mod::upgrade:
+  packman::go-mod::upgrade:
     pipe:
-      - go-mod::list-all
-      - go-mod::apply-ignores:
+      - packman::go-mod::list-all
+      - packman::go-mod::apply-ignores:
           inherit:
             - ignore-packages
             - ignore-pattern
-      - go-mod::filter-upgradeable
-      - go-mod::compile-install-list
-      - go-mod::install-upgrades
-      - go-mod::outdated
+      - packman::go-mod::filter-upgradeable
+      - packman::go-mod::compile-install-list
+      - packman::go-mod::install-upgrades
+      - packman::go-mod::outdated
 
-  go-mod::list-all:
+  packman::go-mod::list-all:
     pipe:
       shell:
         run: go list -u -m all
 
-  go-mod::apply-ignores:
+  packman::go-mod::apply-ignores:
     pipe:
       - ~:
           when: "@?{ignore-packages}"
@@ -76,38 +76,38 @@ private:
             run: "grep -v -E \"@{ignore-pattern}\""
           catch: go-mod::catch-grep-error
 
-  go-mod::filter-upgradeable:
+  packman::go-mod::filter-upgradeable:
     pipe:
-      - filter:
+      - parsers::filter:
           regex: "^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$"
 
-  go-mod::filter-non-upgradeable:
+  packman::go-mod::filter-non-upgradeable:
     pipe:
-      - filter:
+      - parsers::filter:
           regex: "^([^ ]*) v?([^ ]*)$"
 
-  go-mod::convert-upgradeable-to-yaml:
+  packman::go-mod::convert-upgradeable-to-yaml:
     pipe:
-      - go-mod::filter-upgradeable
+      - packman::go-mod::filter-upgradeable
       - ~:
           shell:
             run: "sed -E \"s/^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$/- pm: go\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n  latest: '\\3'\\\\\n/g\""
 
-  go-mod::convert-non-upgradeable-to-yaml:
+  packman::go-mod::convert-non-upgradeable-to-yaml:
     pipe:
-      - go-mod::filter-non-upgradeable
+      - packman::go-mod::filter-non-upgradeable
       - ~:
           shell:
             run: "sed -E \"s/^([^ ]*) v?([^ ]*)( \\[v)?([^ ]*)\\]?$/- pm: go\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n/g\""
 
-  go-mod::convert-all-to-yaml:
+  packman::go-mod::convert-all-to-yaml:
     pipe:
-      - go-mod::convert-upgradeable-to-yaml
+      - packman::go-mod::convert-upgradeable-to-yaml
 #          shell:
 #            output: input
-      - go-mod::convert-non-upgradeable-to-yaml
+      - packman::go-mod::convert-non-upgradeable-to-yaml
 
-  go-mod::list-available-updates:
+  packman::go-mod::list-available-updates:
     pipe:
       - ~:
           shell:
@@ -120,37 +120,37 @@ private:
               amber: minor updates available
             run: traffic-light
 
-  go-mod::compile-install-list:
+  packman::go-mod::compile-install-list:
     pipe:
-      - go-mod::filter-upgradeable
+      - packman::go-mod::filter-upgradeable
       - ~:
           shell:
             run: "sed -E \"s|^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$|\\1|g\" | tr '\n' ' '"
 
-  go-mod::install-upgrades:
+  packman::go-mod::install-upgrades:
     pipe:
       - ~:
           shell:
             run: "go get -u $!!"
           catch: go-mod::catch-upgrade-errors
 
-  go-mod::catch-upgrade-errors:
+  packman::go-mod::catch-upgrade-errors:
     io: merge
     pipe:
-      - noop:
+      - exec::noop:
           with:
             pattern: "(?m)^go: downloading .*"
-      - noop:
+      - exec::noop:
           with:
             pattern: "(?m)^go: .* upgrade => .*"
       - error:
           when: "'$!!' != ''"
           message: "updating dependencies failed: $!!"
 
-  go-mod::catch-grep-error:
+  packman::go-mod::catch-grep-error:
     io: merge
     pipe:
-      - noop:
+      - exec::noop:
           with:
             # we can ignore exit status 1, as it may simply indicate a lack of results
             pattern: "exit status 1"

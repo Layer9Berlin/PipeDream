@@ -1,11 +1,22 @@
 package models
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"pipedream/src/helpers/custom_io"
 )
+
+func (stream *ComposableDataStream) CopyOrResult() io.Reader {
+	if stream.closed {
+		return bytes.NewReader(stream.result.Bytes())
+	} else {
+		firstReader, secondReader := custom_io.DuplicateReader(stream.outputReader, stream.errorHandler)
+		stream.outputReader = firstReader
+		return secondReader
+	}
+}
 
 func (stream *ComposableDataStream) Copy() io.Reader {
 	if stream.closed {

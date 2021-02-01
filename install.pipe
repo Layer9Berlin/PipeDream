@@ -4,190 +4,27 @@ version: 0.0.1
 public:
   install:
     description: Install
+    wait: true
     each:
-      - install::install-all:
-          binary-install-path: $GOPATH/bin
-      - install::check-binaries
-      - print:
-          message: "Check out the Quick-Start Guide for some ideas on how to get started with PipeDream."
+      - install::setup:
+          wait: true
+          pipe:
+            - install::path::set
+            - install::path::check
+#      - install::metadata::collect-current
+#      - install::build::all
+#      - install::pipes::link
+#      - install::metadata::collect-installed
+#      - install::binary::check-all
+#      - install::pipes::check
+#      - install::output::quick-start-message:
+#          output:
+#            text: "\nCheck out the Quick-Start Guide for some ideas on how to get started with PipeDream:\nhttps://github.com/Layer9Berlin/PipeDream/tree/main/docs/quick-start\n"
 
   check-installation:
     description: Check installation
     each:
-      - install::check-path:
-          binary-install-path: $GOPATH/bin
-      - install::check-binaries
-
-private:
-  install::install-all:
-    description: Install PipeDream and related binaries
-    inherit:
-      - binary-install-path
-    each:
-      - install::check-path:
-          inherit:
-            - binary-install-path
-      - install::install-pipedream-binary:
-          inherit:
-            - binary-install-path
-      - install::link-to-built-in-pipes:
-          shell:
-            dir: "."
-            run: "ln -sf $(pwd)/include/pipedream_pipes @{binary-install-path}"
-      - install::install-util:
-          binary: semver-compare
-          inherit:
-            - binary-install-path
-      - install::install-util:
-          binary: traffic-light
-          inherit:
-            - binary-install-path
-
-  install::check-path:
-    description: Check the install dir is in the PATH
-    pipe:
-      - install::grep-install-path:
-          inherit:
-            - binary-install-path
-      - print-if-empty:
-          message: "[✔] Install dir is in your PATH\n"
-          else: "[✘] The configured install path is not in your PATH. You can either change the \"binary-install-path\" argument or add its value to your \\$PATH\n"
-
-  install::check-binaries:
-    each:
-      - install::check-binary:
-          binary-name: PipeDream binary
-          binary: pipedream
-      - install::check-binary:
-          binary-name: "semver-compare binary"
-          binary: semver-compare
-      - install::check-binary:
-          binary-name: "traffic-light binary"
-          binary: traffic-light
-      - install::verify-checksum:
-          binary: pipedream
-          dirs: "cmd include src util install.pipe"
-      - install::verify-checksum:
-          binary: semver-compare
-          dirs: "util/semver-compare"
-      - install::verify-checksum:
-          binary: traffic-light
-          dirs: "util/traffic-light"
-
-  install::grep-install-path:
-    pipe:
-      - env:
-          var: PATH
-      - install::convert-colons-to-line-breaks:
-          shell:
-            run: "tr : '\n'"
-      - install::check-for-presence-of-install-path:
-          inherit:
-            - binary-install-path
-          shell:
-            run: "grep -x \"@{binary-install-path}\" || printf \"\""
-
-  install::install-util:
-    inherit:
-      - binary
-      - binary-install-path
-    pipe:
-      - tarball-shasum:
-          dirs: "util/@{binary}"
-      - go-build:
-          build-dir: "util/@{binary}"
-          flags: "-X 'pipedream/util/@{binary}/cmd.RepoChecksum=$!!'"
-      - print:
-          message: "[✔] Installed util \"@{binary}\"\n"
-
-  install::install-pipedream-binary:
-    description: Install PipeDream binary
-    sync:
-      - install::pipedream-version:
-          shell:
-            run: "svu c"
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_VERSION
-      - install::pipedream-commit:
-          shell:
-            run: "git rev-parse HEAD"
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_COMMIT_HASH
-      - tarball-shasum:
-          dirs: "cmd include src util install.pipe"
-          env:
-            save: PIPEDREAM_INSTALL_SHASUM
-      - working-dir:
-          env:
-            save: PIPEDREAM_INSTALL_PROJECT_PATH
-      - install::current-date:
-          shell:
-            run: "date"
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_DATE
-      - go-build:
-          binary: pipedream
-          binary-install-path: "@{binary-install-path}"
-          flags: "-X 'pipedream/src/version.Version=$PIPEDREAM_VERSION' -X 'pipedream/src/version.CommitHash=$PIPEDREAM_COMMIT_HASH' -X 'pipedream/src/version.RepoChecksum=$PIPEDREAM_INSTALL_SHASUM' -X 'pipedream/src/version.Date=$PIPEDREAM_DATE' -X 'pipedream/src/version.ProjectPath=$PIPEDREAM_INSTALL_PROJECT_PATH'"
-      - print:
-          message: "[✔] Installed PipeDream utility\n"
-
-  install::check-binary:
-    description: Check utility tool binary is installed
-    pipe:
-      - which:
-          inherit:
-            - binary
-      - print-if-match:
-          pattern: 'not found'
-          message: "@{binary} binary not installed"
-          else: "@{binary} binary installed"
-      - install::output-binary-check-result:
-          shell:
-            args:
-              - red: "not installed$"
-            run: traffic-light
-
-  install::verify-checksum:
-    description: Check if changes have been made to repo since last build
-    sync:
-      - tarball-shasum:
-          dirs: "@{dirs}"
-          env:
-            save: PIPEDREAM_INSTALL_REPO_CHECKSUM_@{binary}
-      - install::extract-installed-checksum:
-          inherit:
-            - binary
-      - print-if-match:
-          pattern: "$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{binary}"
-          message: "No changes since last build"
-          else: "Repo has changed since latest build"
-#      - print:
-#          when: "$PIPEDREAM_INSTALL_INSTALLED_CHECKSUM_@{binary} !~ '[0-9a-f]{40}'"
-#          message: "Installed binary did not report a checksum"
-      - ~:
-          shell:
-            args:
-              - prefix: "@{binary} repo state"
-              - red: "changed|error"
-              - amber: "did not report a checksum"
-            run: traffic-light
-
-  install::extract-installed-checksum:
-    pipe:
-      - install::binary-version-command-output:
-          inherit:
-            - binary
-      - install::extract-checksum:
-          shell:
-            run: "sed 's/^.*checksum: //'"
-      - install::clean-checksum:
-          shell:
-            run: "sed 's/[^0-9a-f]*//g'"
-
-  install::binary-version-command-output:
-    shell:
-      run: "@{binary} version"
+      - install::metadata::collect-current
+      - install::metadata::collect-installed
+      - install::binary::check-all
+      - install::pipes::check

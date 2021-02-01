@@ -7,15 +7,14 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
-	"pipedream/src/models"
 	"os/exec"
+	"pipedream/src/models"
 	"sync"
 	"testing"
 )
 
 func TestShell_NonRunnable(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	testWaitGroup := &sync.WaitGroup{}
 	testWaitGroup.Add(1)
@@ -394,6 +393,32 @@ func TestShell_CancelHook(t *testing.T) {
 	require.Equal(t, 1, run.Log.ErrorCount())
 	require.Contains(t, run.Log.LastError().Error(), "command exited with non-zero exit code")
 	require.Contains(t, run.Log.String(), "shell")
+}
+
+func TestShell_PrintfRun(t *testing.T) {
+	run, err := models.NewPipelineRun(
+		nil,
+		map[string]interface{}{
+			"shell": map[string]interface{}{
+				"run": "printf \"test\"",
+			},
+		},
+		nil,
+		nil,
+	)
+	require.Nil(t, err)
+
+	run.Log.SetLevel(logrus.TraceLevel)
+	NewShellMiddleware().Apply(
+		run,
+		func(run *models.PipelineRun) {
+		},
+		nil,
+	)
+	run.Close()
+	run.Wait()
+
+	require.Equal(t, "test", run.Stdout.String())
 }
 
 type TestCommandExecutor struct {

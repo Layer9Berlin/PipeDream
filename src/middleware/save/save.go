@@ -2,10 +2,10 @@ package save
 
 import (
 	"fmt"
+	"os"
 	"pipedream/src/logging/log_fields"
 	"pipedream/src/middleware"
 	"pipedream/src/models"
-	"os"
 )
 
 // Env Var Storer
@@ -35,6 +35,8 @@ func (saveMiddleware SaveMiddleware) Apply(
 	var envVarName *string = nil
 	middleware.ParseArguments(&envVarName, "save", run)
 
+	next(run)
+
 	if envVarName != nil {
 		run.Log.DebugWithFields(
 			log_fields.Symbol("💾"),
@@ -55,8 +57,6 @@ func (saveMiddleware SaveMiddleware) Apply(
 			run.Log.PossibleError(saveMiddleware.valueSetter(*envVarName, run.Stdout.String()))
 		}()
 	}
-
-	next(run)
 }
 
 type SaveMiddlewareEntry struct {

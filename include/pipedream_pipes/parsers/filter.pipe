@@ -2,7 +2,7 @@
 version: 0.0.1
 
 public:
-  filter:
+  parsers::filter:
     pipe:
       - ~:
           when: "'@{negated|no}' == 'no'"
@@ -15,10 +15,10 @@ public:
             run: "grep -v -E \"@{regex}\""
           catch: filter::catch-error
 
-  filter::catch-error:
-    io: merge
+private:
+  parsers::filter::catch-error:
     pipe:
-      - noop:
+      - exec::noop:
           with:
             # we can ignore exit status 1, as it may simply indicate a lack of results
             pattern: "exit status 1"

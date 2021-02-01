@@ -1,0 +1,108 @@
+version: 0.0.1
+
+import:
+  - ../../include/pipedream_pipes/install/dir.pipe
+
+public:
+  test-all:
+    each:
+      - test::install::pipes::link
+
+private:
+  test::install::pipes::link:
+    each:
+      - test::install::pipes::link-success
+
+#  shell::working-dir:
+#    pipe:
+
+
+  test::install::pipes::link-success:
+    pipe:
+      -
+      - expect:
+          test-name: Test binary check with binary present
+          output-pattern: "test binary is installed"
+
+
+
+  test-install::test-check-path-error:
+    pipe:
+      - install::check-path:
+          binary-install-path: "/test-install-path/not-matching"
+          test-install::path-env-var: "/uninteresting:/test-install-path:/other"
+      - expect:
+          test-name: Test path check error case
+          output-pattern: "The configured install path is not in your"
+
+  test-install::test-check-binary-present:
+    pipe:
+      - install::check-binary:
+          binary: "test"
+          test-install::which-output: "/test/test"
+      - expect:
+          test-name: Test binary check with binary present
+          output-pattern: "test binary is installed"
+
+  test-install::test-check-binary-absent:
+    pipe:
+      - install::check-binary:
+          binary: "test"
+          test-install::which-output: "test not found"
+      - expect:
+          test-name: Test binary check with binary absent
+          output-pattern: "test binary not installed"
+
+  test-install::test-check-valid-shasum:
+    pipe:
+      - install::verify-checksum:
+          binary: test
+          dirs: "test"
+          test-install::tarball-shasum: df401a8f3b1641aa35758f788f35cd5c3b57eb44
+          test-install::version-command-output: "0.0.1 (repo checksum: df401a8f3b1641aa35758f788f35cd5c3b57eb44)"
+      - expect:
+          test-name: Test valid shasum
+          output-pattern: "No changes since last build"
+
+  test-install::test-check-invalid-shasum:
+    pipe:
+      - install::verify-checksum:
+          binary: test
+          dirs: "test"
+          test-install::tarball-shasum: df401a8f3b1641aa35758f788f35cd5c3b57eb44
+          test-install::version-command-output: "0.0.1 (repo checksum: 8f3b1641aa35758f788f35cd5c3b57eb44df401a)"
+      - expect:
+          test-name: Test invalid shasum
+          output-pattern: "Repo has changed since latest build"
+
+  test-install::test-check-invalid-version-output:
+    pipe:
+      - install::verify-checksum:
+          binary: test
+          dirs: "test"
+          test-install::tarball-shasum: df401a8f3b1641aa35758f788f35cd5c3b57eb44
+          test-install::version-command-output: "test command not found"
+      - expect:
+          test-name: Test shasum check with invalid version output
+          output-pattern: "did not report a checksum"
+
+# mocked implementations
+  shell::env:
+    pipe:
+      - print::message:
+          message: "@{test-install::path-env-var}"
+
+  shell::which:
+    pipe:
+      - print::message:
+          message: "@{test-install::which-output}"
+
+  tarball-shasum:
+    pipe:
+      - print::message:
+          message: "@{test-install::tarball-shasum}"
+
+  install::binary-version-command-output:
+    pipe:
+      - print::message:
+          message: "@{test-install::version-command-output}"

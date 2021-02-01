@@ -1,0 +1,23 @@
+---
+version: 0.0.1
+
+public:
+  install::pipes::link:
+    pipe:
+      - shell::working-dir
+      - shell::symlink::create:
+          when: "'$!!' != ''"
+          source: $!!/include/pipedream_pipes
+          target: $PIPEDREAM_BIN_INSTALL_PATH
+
+  install::pipes::check:
+    pipe:
+      - shell::which:
+          binary: pipedream_pipes
+      - print::if-match:
+          pattern: "^$|not found"
+          message: "not linked"
+          else: "linked"
+      - util::traffic-light:
+          prefix: "Built-in pipes"
+          red: "not linked"

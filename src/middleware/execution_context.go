@@ -295,9 +295,6 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 		run.LogClosingWaitGroup.Done()
 	}()
 	run.Close()
-	if run.Synchronous {
-		run.Wait()
-	}
 	return run
 }
 
@@ -357,7 +354,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, wri
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
 	setUpCancelHandler(func() {
-		err := fullRun.Cancel()
+		err := executionContext.Cancel()
 		if err != nil {
 			fmt.Printf("Failed to cancel: %v", err)
 		}
@@ -365,8 +362,8 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, wri
 	fullRun.Wait()
 	stopProgress(executionContext)
 
-	outputResult(fullRun, writer)
 	outputLogs(fullRun, writer)
+	outputResult(fullRun, writer)
 	outputErrors(fullRun, writer)
 }
 
@@ -436,4 +433,14 @@ func setUpCancelHandler(handler func()) {
 		close(signalChannel)
 		signal.Reset(os.Interrupt, syscall.SIGTERM)
 	}()
+}
+
+func (executionContext *ExecutionContext) Cancel() error {
+	err := &multierror.Error{}
+	for _, run := range executionContext.runs {
+		if !run.Completed() {
+			err = multierror.Append(err, run.Cancel())
+		}
+	}
+	return err.ErrorOrNil()
 }

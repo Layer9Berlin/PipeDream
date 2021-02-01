@@ -2,8 +2,8 @@
 version: 0.0.1
 
 pipelines:
-  semver-compare:
-    steps:
+  packman::semver-compare:
+    pipe:
       - ~:
           shell:
             run: "semver-compare @{version1} @{version2}"

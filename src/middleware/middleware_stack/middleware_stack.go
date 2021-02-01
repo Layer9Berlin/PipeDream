@@ -8,7 +8,9 @@ import (
 	"pipedream/src/middleware/each"
 	"pipedream/src/middleware/env"
 	"pipedream/src/middleware/inherit"
+	inputMiddleware "pipedream/src/middleware/input"
 	"pipedream/src/middleware/interpolate"
+	outputMiddleware "pipedream/src/middleware/output"
 	"pipedream/src/middleware/pipe"
 	selectMiddleware "pipedream/src/middleware/select"
 	"pipedream/src/middleware/shell"
@@ -23,6 +25,7 @@ func SetUpMiddleware() []middleware.Middleware {
 	return []middleware.Middleware{
 		selectMiddleware.NewSelectMiddleware(),
 		timer.NewTimerMiddleware(),
+		wait.NewWaitMiddleware(),
 		inherit.NewInheritMiddleware(),
 		interpolate.NewInterpolateMiddleware(),
 		env.NewEnvMiddleware(),
@@ -31,10 +34,11 @@ func SetUpMiddleware() []middleware.Middleware {
 		syncMiddleware.NewSyncMiddleware(),
 		pipe.NewPipeMiddleware(),
 		each.NewEachMiddleware(),
-		wait.NewWaitMiddleware(),
 		shell.NewShellMiddleware(),
 		ssh.NewSshMiddleware(),
 		docker.NewDockerMiddleware(),
 		dir.NewDirMiddleware(),
+		inputMiddleware.NewInputMiddleware(),
+		outputMiddleware.NewOutputMiddleware(),
 	}
 }

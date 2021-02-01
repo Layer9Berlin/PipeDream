@@ -1,0 +1,7 @@
+---
+version: 0.0.1
+
+pipelines:
+  file::replace-pattern:
+    shell:
+      run: "sed -i -E \"s@@{pattern}@@{replacement}@\" @{file}"
