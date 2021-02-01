@@ -8,7 +8,7 @@ PipeDream consists of four main components:
 - The runner
     The runner decides which pipes to execute and passes them to the middleware stack.
 - Middleware stack
-    An array of callable middleware items. Each item, when called, may make changes to the invocation object and the result to be returned. Most middleware simply passes these changed objects to the next item in the stack, although it is also possible to trigger one or several runs of the complete middleware stacks instead. See the [middleware docs](../middleware) for more details.
+    An array of callable middleware items. Each item, when called, may make changes to the invocation object and the result to be returned. Most middleware simply passes these changed objects to the next item in the stack, although it is also possible to trigger one or several runs of the complete middleware stacks instead. See the [middleware docs](../src/middleware) for more details.
 - Built-in pipes
     For convenience, pipes encapsulating common shell commands are bundled into the installation. It is generally preferable to use these pipes instead of naked shell commands.
 
