@@ -22,10 +22,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/assets/PipeDream.png" beforeDir="false" afterPath="$PROJECT_DIR$/docs/assets/PipeDream.png" afterDir="false" />
-    </list>
+    <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -224,7 +221,8 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="refactor: install pipe (WIP)" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: install pipe (WIP)" />
+    <MESSAGE value="docs: improve logo quality" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: improve logo quality" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -295,6 +293,10 @@
     </state>
     <state width="1638" height="382" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612197059542" />
     <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
+    <state x="440" y="262" key="Vcs.Push.Dialog.v2" timestamp="1612198380528">
+      <screen x="0" y="0" width="1680" height="1050" />
+    </state>
+    <state x="440" y="262" key="Vcs.Push.Dialog.v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612198380528" />
     <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1612019614397">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
