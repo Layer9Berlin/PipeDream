@@ -15,16 +15,11 @@ func (middleware CatchMiddleware) Run(
 
 ## Built-in middleware
 
-
-### [`args` - Shell Arguments Appender](./args)
-
-
-
-### [`timer` - Execution timing](./timer)
-
-### [`pipe` - Child invoker](./timer)
-
-### [`pipe` - Child invoker](./timer)
+### [`catch` - Error Handler](./catch)
+### [`dir` - Directory Navigator](./dir)
+### [`docker` - Docker Executor](./docker)
+### [`each` - Input Duplicator](./each)
+### [`timer` - Directory Timer Middleware](./timer)
 
 
 ## Writing your own middleware
