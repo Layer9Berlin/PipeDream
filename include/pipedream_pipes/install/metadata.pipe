@@ -64,9 +64,9 @@ private:
           wait: true
           each:
             - install::metadata::extract-value:
-              inherit:
-                - uppercase_identifier
-              key: "version"
+                inherit:
+                  - uppercase_identifier
+                key: "version"
             - install::metadata::extract-value:
                 inherit:
                   - uppercase_identifier

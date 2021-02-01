@@ -9,6 +9,7 @@ public:
           when: "'$!!' != ''"
           source: $!!/include/pipedream_pipes
           target: $PIPEDREAM_BIN_INSTALL_PATH
+      - noop
 
   install::pipes::check:
     pipe:

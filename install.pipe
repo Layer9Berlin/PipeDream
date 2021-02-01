@@ -11,9 +11,9 @@ public:
           pipe:
             - install::path::set
             - install::path::check
-#      - install::metadata::collect-current
-#      - install::build::all
-#      - install::pipes::link
+      - install::metadata::collect-current
+      - install::build::all
+      - install::pipes::link
 #      - install::metadata::collect-installed
 #      - install::binary::check-all
 #      - install::pipes::check

@@ -46,8 +46,6 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 	}
 	middleware.ParseArguments(&arguments, "interpolate", run)
 
-	next(run)
-
 	if arguments.Enable {
 		interpolator := NewInterpolator(run.ArgumentsCopy(), arguments)
 
@@ -165,6 +163,8 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			return
 		}
 	}
+
+	next(run)
 }
 
 type Interpolator struct {
