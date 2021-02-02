@@ -41,7 +41,7 @@ func outputLogs(run *models.PipelineRun, writer io.Writer) {
 }
 
 func outputErrors(errors *multierror.Error, writer io.Writer) {
-	if errors.Len() > 0 {
+	if errors != nil && errors.Len() > 0 {
 		_, _ = fmt.Fprintln(writer, "===== ERRORS =====")
 		_, _ = fmt.Fprintln(writer, errors)
 	}
