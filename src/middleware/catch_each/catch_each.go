@@ -14,7 +14,7 @@ type CatchEachMiddleware struct {
 }
 
 func (_ CatchEachMiddleware) String() string {
-	return "catch-each"
+	return "catchEach"
 }
 
 func NewCatchEachMiddleware() CatchEachMiddleware {
@@ -27,7 +27,7 @@ func (catchEachMiddleware CatchEachMiddleware) Apply(
 	executionContext *middleware.ExecutionContext,
 ) {
 	argument := ""
-	middleware.ParseArguments(&argument, "catch-each", run)
+	middleware.ParseArguments(&argument, "catchEach", run)
 
 	if argument != "" {
 		next(run)

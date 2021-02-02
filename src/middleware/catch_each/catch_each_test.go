@@ -13,7 +13,7 @@ import (
 
 func TestCatchEach_Error(t *testing.T) {
 	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-		"catch-each": "test-handler",
+		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
@@ -23,10 +23,10 @@ func TestCatchEach_Error(t *testing.T) {
 		run.Stderr.Replace(strings.NewReader("test error"))
 	}, middleware.NewExecutionContext(
 		middleware.WithExecutionFunction(func(errorRun *models.PipelineRun) {
-		require.Equal(t, "test-handler", *errorRun.Identifier)
-		handlerCalled = true
-		errorRun.Stdout.Replace(strings.NewReader("handled"))
-	})))
+			require.Equal(t, "test-handler", *errorRun.Identifier)
+			handlerCalled = true
+			errorRun.Stdout.Replace(strings.NewReader("handled"))
+		})))
 	run.Close()
 	run.Wait()
 
@@ -38,7 +38,7 @@ func TestCatchEach_Error(t *testing.T) {
 
 func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
 	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-		"catch-each": "test-handler",
+		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
@@ -62,14 +62,14 @@ func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
 		}()
 	}, middleware.NewExecutionContext(
 		middleware.WithExecutionFunction(func(errorRun *models.PipelineRun) {
-		handlerInvocations += 1
-		stdoutWriter := errorRun.Stdout.WriteCloser()
-		go func() {
-			_, err := io.WriteString(stdoutWriter, "handled\n")
-			require.Nil(t, err)
-			require.Nil(t, stdoutWriter.Close())
-		}()
-	})))
+			handlerInvocations += 1
+			stdoutWriter := errorRun.Stdout.WriteCloser()
+			go func() {
+				_, err := io.WriteString(stdoutWriter, "handled\n")
+				require.Nil(t, err)
+				require.Nil(t, stdoutWriter.Close())
+			}()
+		})))
 	run.Close()
 	run.Wait()
 
@@ -81,7 +81,7 @@ func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
 
 func TestCatchEach_HandlerNotInvoked(t *testing.T) {
 	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-		"catch-each": "test-handler",
+		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
@@ -104,8 +104,7 @@ func TestCatchEach_HandlerNotInvoked(t *testing.T) {
 }
 
 func TestCatchEach_NoCatchHandler(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewCatchEachMiddleware().Apply(run, func(run *models.PipelineRun) {
@@ -128,7 +127,7 @@ func TestCatchEach_NoCatchHandler(t *testing.T) {
 
 func TestCatchEach_HandlerThrowingError(t *testing.T) {
 	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-		"catch-each": "test-handler",
+		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
@@ -152,11 +151,11 @@ func TestCatchEach_HandlerThrowingError(t *testing.T) {
 		}()
 	}, middleware.NewExecutionContext(
 		middleware.WithExecutionFunction(func(errorRun *models.PipelineRun) {
-		require.Equal(t, "test-handler", *errorRun.Identifier)
-		handlerCalled = true
-		errorRun.Stdout.Replace(strings.NewReader("not properly handled"))
-		errorRun.Stderr.Replace(strings.NewReader("handler error"))
-	})))
+			require.Equal(t, "test-handler", *errorRun.Identifier)
+			handlerCalled = true
+			errorRun.Stdout.Replace(strings.NewReader("not properly handled"))
+			errorRun.Stderr.Replace(strings.NewReader("handler error"))
+		})))
 	run.Close()
 	run.Wait()
 
