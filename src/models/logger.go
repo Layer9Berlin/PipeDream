@@ -210,7 +210,11 @@ func (logger *PipelineRunLogger) Error(err error, fields ...log_fields.LogEntryF
 	logEntry.Level = logrus.ErrorLevel
 	logger.logEntries = append(logger.logEntries, logEntry)
 	if logger.ErrorCallback != nil {
-		logger.ErrorCallback(err)
+		if logger.run.Identifier == nil {
+			logger.ErrorCallback(fmt.Errorf("%v:\n%w\n", "anonymous", err))
+		} else {
+			logger.ErrorCallback(fmt.Errorf("%v:\n%w\n", *logger.run.Identifier, err))
+		}
 	}
 }
 
