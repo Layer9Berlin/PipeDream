@@ -5,6 +5,7 @@
 > Please expect breaking changes. Feel free to file an issue if you
 > - find a bug
 > - need a feature added or tweaked for your use case
+> - have any other suggestions
 
 # PipeDream
 
