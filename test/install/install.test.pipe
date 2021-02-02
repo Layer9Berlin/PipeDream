@@ -4,9 +4,8 @@ import:
   - ../../include/pipedream_pipes/install/install.pipe
 
 public:
-  test-all:
-    io: merge
-    pipe:
+  test-install::test-all:
+    each:
       - test-install::test-check-path-success
       - test-install::test-check-path-error
       - test-install::test-check-binary-present

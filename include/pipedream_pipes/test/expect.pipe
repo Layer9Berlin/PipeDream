@@ -5,21 +5,22 @@ default:
   command: install
 
 public:
-  expect:
+  test::expect:
+    inherit:
+      - testName
     pipe:
-      - expect::check-all:
+      - test::expect::check-all:
           file: "@{file}"
-          output: "@{output}"
-          output-pattern: "@{output-pattern}"
+          expectedOutput: "@{output}"
+          expectedOutputPattern: "@{output-pattern}"
           pipe:
-            - expect::check-file:
+            - test::expect::check-file:
                 when: "@?{file}"
-            - expect::check-output:
-                when: "@?{output}"
-            - expect::check-output-pattern:
-                when: "@?{output-pattern}"
+            - test::expect::check-output:
+                when: "@?{expectedOutput}"
+            - test::expect::check-output-pattern:
+                when: "@?{expectedOutputPattern}"
       - expect::output-result:
-          test-name: "@{test-name}"
           pipe:
             - print::message:
                 when: "'$!!' == ''"
@@ -28,7 +29,7 @@ public:
                 shell:
                   args:
                     green: "^passed$"
-                    prefix: "@{test-name|Test}"
+                    prefix: "@{testName|Test}"
                   run: "traffic-light"
 
 private:
@@ -47,17 +48,17 @@ private:
   expect::check-output:
     each:
       - print::message:
-          when: "'$!!' != '@{output}'"
-          message: "output mismatch\nActual:\n$!!\nExpected:\n@{output}\n"
+          when: "'$!!' != '@{expectedOutput}'"
+          message: "output mismatch\nActual:\n$!!\nExpected:\n@{expectedOutput}\n"
       - print::message:
-          when: "'$!!' == '@{output}'"
+          when: "'$!!' == '@{expectedOutput}'"
           message: ""
 
   expect::check-output-pattern:
     each:
       - print::message:
-          when: "'$!!' !~ '@{output-pattern}'"
-          message: "output pattern mismatch\nActual:\n$!!\nExpected pattern:\n@{output-pattern}\n"
+          when: "'$!!' !~ '@{expectedOutputPattern}'"
+          message: "output pattern mismatch\nActual:\n$!!\nExpected pattern:\n@{expectedOutputPattern}\n"
       - print::message:
           when: "'$!!' !~ '^output pattern mismatch'"
           message: ""
