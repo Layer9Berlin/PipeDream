@@ -7,6 +7,10 @@
 > - need a feature added or tweaked for your use case
 > - have any other suggestions
 
+[![Release](https://img.shields.io/github/v/release/Layer9Berlin/PipeDream.svg?style=for-the-badge)](https://github.com/Layer9Berlin/PipeDream/releases/latest)
+[![Software License](https://img.shields.io/badge/license-GPLv3-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
+[![Codecov branch](https://img.shields.io/codecov/c/github/Layer9Berlin/PipeDream/main.svg?style=for-the-badge)](https://codecov.io/gh/Layer9Berlin/PipeDream)
+
 # PipeDream
 
 PipeDream is an open-source, general-purpose **automation tool**.

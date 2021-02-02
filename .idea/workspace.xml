@@ -23,10 +23,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/test/coverage.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/misc/test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/test/expect.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/install/install.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/install/install.test.pipe" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,7 +40,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" path="$PROJECT_DIR$/../../../../sdk/go1.15" />
+  <component name="GOROOT" path="/usr/local/Cellar/go/1.15.7_1/libexec" />
   <component name="Git.Settings">
     <option name="INCOMING_CHECK_STRATEGY" value="Never" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -64,12 +64,15 @@
     <property name="DefaultGoTemplateProperty" value="Go File" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="configurable.Global.GOPATH.is.expanded" value="true" />
+    <property name="configurable.Module.GOPATH.is.expanded" value="false" />
+    <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/middleware/timer" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="go.sdk" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -87,7 +90,7 @@
       <recent name="$PROJECT_DIR$/docs/assets" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build pipedream">
+  <component name="RunManager" selected="Go Test.go test src">
     <configuration name="go build pipedream" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
@@ -168,6 +171,7 @@
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
+      <parameters value="-coverprofile=test/coverage.out" />
       <framework value="gotest" />
       <kind value="DIRECTORY" />
       <package value="pipedream" />
@@ -234,7 +238,8 @@
     <MESSAGE value="fix: crash when execution context has no errors" />
     <MESSAGE value="chore: convert middleware identifiers to snake-case" />
     <MESSAGE value="feat: log run identifier in execution context errors" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: log run identifier in execution context errors" />
+    <MESSAGE value="docs: improve README" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: improve README" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -244,10 +249,10 @@
       <screen x="0" y="25" width="1680" height="947" />
     </state>
     <state x="640" y="336" key="#Go_Modules/0.25.1680.947@0.25.1680.947" timestamp="1610618862086" />
-    <state x="367" y="195" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612268305464">
+    <state x="367" y="195" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612278082384">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="367" y="195" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612268305464" />
+    <state x="367" y="195" width="1071" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612278082384" />
     <state x="304" y="157" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1680.947@0.25.1680.947" timestamp="1610618907474" />
     <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1611742292074">
       <screen x="0" y="0" width="1680" height="1050" />
@@ -261,28 +266,28 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611739121782" />
-    <state width="1638" height="528" key="GridCell.Tab.0.bottom" timestamp="1612268309523">
+    <state width="1638" height="528" key="GridCell.Tab.0.bottom" timestamp="1612278670987">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="528" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612268309523" />
+    <state width="1638" height="528" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612278670987" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="528" key="GridCell.Tab.0.center" timestamp="1612268309521">
+    <state width="1638" height="528" key="GridCell.Tab.0.center" timestamp="1612278670986">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="528" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612268309521" />
+    <state width="1638" height="528" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612278670986" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="528" key="GridCell.Tab.0.left" timestamp="1612268309518">
+    <state width="1638" height="528" key="GridCell.Tab.0.left" timestamp="1612278670980">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="528" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612268309518" />
+    <state width="1638" height="528" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612278670980" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="528" key="GridCell.Tab.0.right" timestamp="1612268309522">
+    <state width="1638" height="528" key="GridCell.Tab.0.right" timestamp="1612278670986">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="528" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612268309522" />
+    <state width="1638" height="528" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612278670986" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
     <state width="1638" height="382" key="GridCell.Tab.1.bottom" timestamp="1612261995174">
@@ -305,14 +310,14 @@
     </state>
     <state width="1638" height="382" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612261995174" />
     <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
-    <state x="349" y="161" key="SettingsEditor" timestamp="1612268182646">
+    <state x="349" y="161" key="SettingsEditor" timestamp="1612278127621">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="349" y="161" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1612268182646" />
-    <state x="440" y="262" key="Vcs.Push.Dialog.v2" timestamp="1612202911015">
+    <state x="349" y="161" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1612278127621" />
+    <state x="440" y="262" key="Vcs.Push.Dialog.v2" timestamp="1612276557958">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="440" y="262" key="Vcs.Push.Dialog.v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612202911015" />
+    <state x="440" y="262" key="Vcs.Push.Dialog.v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612276557958" />
     <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1612019614397">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
