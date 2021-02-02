@@ -7,13 +7,15 @@ public:
     wait: true
     each:
       - install::setup:
-          wait: true
           pipe:
             - install::path::set
-            - install::path::check
+            - install::path::check:
+                wait: true
       - install::metadata::collect-current
-      - install::build::all
-      - install::pipes::link
+      - install::build::all:
+          wait: true
+      - install::pipes::link:
+          wait: true
 #      - install::metadata::collect-installed
 #      - install::binary::check-all
 #      - install::pipes::check

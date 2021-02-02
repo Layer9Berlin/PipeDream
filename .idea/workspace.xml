@@ -24,8 +24,8 @@
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docs/middleware/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/middleware/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/install.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/install.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,24 +64,24 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/docs/middleware" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/middleware/timer" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/middleware/dir" />
       <recent name="$PROJECT_DIR$/include/pipedream_pipes/env" />
       <recent name="$PROJECT_DIR$/test/install" />
       <recent name="$PROJECT_DIR$/include/pipedream_pipes/no-pipelines" />
       <recent name="$PROJECT_DIR$/include/pipedream_pipes/tar" />
-      <recent name="$PROJECT_DIR$/include/pipedream_pipes/file" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/middleware/timer" />
+      <recent name="$PROJECT_DIR$/src/middleware/each" />
+      <recent name="$PROJECT_DIR$/src/middleware/docker" />
       <recent name="$PROJECT_DIR$/docs/middleware" />
       <recent name="$PROJECT_DIR$/docs/assets" />
-      <recent name="$PROJECT_DIR$/src/middleware" />
-      <recent name="$PROJECT_DIR$/src/middleware/output" />
-      <recent name="$PROJECT_DIR$/test/install" />
     </key>
   </component>
   <component name="RunManager" selected="Go Build.go build pipedream">
@@ -254,28 +254,28 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1611739121782" />
-    <state width="1638" height="382" key="GridCell.Tab.0.bottom" timestamp="1612197059541">
+    <state width="1638" height="387" key="GridCell.Tab.0.bottom" timestamp="1612255621418">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="382" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612197059541" />
+    <state width="1638" height="387" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612255621418" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="382" key="GridCell.Tab.0.center" timestamp="1612197059540">
+    <state width="1638" height="387" key="GridCell.Tab.0.center" timestamp="1612255621416">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="382" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612197059540" />
+    <state width="1638" height="387" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612255621416" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="382" key="GridCell.Tab.0.left" timestamp="1612197059539">
+    <state width="1638" height="387" key="GridCell.Tab.0.left" timestamp="1612255621416">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="382" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612197059539" />
+    <state width="1638" height="387" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612255621416" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="382" key="GridCell.Tab.0.right" timestamp="1612197059540">
+    <state width="1638" height="387" key="GridCell.Tab.0.right" timestamp="1612255621417">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="382" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612197059540" />
+    <state width="1638" height="387" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612255621417" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
     <state width="1638" height="382" key="GridCell.Tab.1.bottom" timestamp="1612197059543">

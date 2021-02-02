@@ -1,6 +1,7 @@
 package shell
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -55,6 +56,7 @@ func NewShellMiddlewareArguments() ShellMiddlewareArguments {
 	return ShellMiddlewareArguments{
 		Args:        make([]interface{}, 0, 10),
 		Exec:        "sh",
+		Indefinite:  false,
 		Interactive: false,
 		Login:       false,
 		Quote:       "double",
@@ -134,7 +136,9 @@ func (shellMiddleware ShellMiddleware) Apply(
 			run.Stderr.MergeWith(cmdStderr)
 			run.Stderr.StartCopyingInto(shellMiddleware.osStderr)
 		} else {
-			run.Stdin.StartCopyingInto(cmdStdin)
+			if !run.Synchronous {
+				run.Stdin.StartCopyingInto(cmdStdin)
+			}
 			run.Stdout.MergeWith(executor.CmdStdout())
 			run.Stderr.MergeWith(executor.CmdStderr())
 		}
@@ -145,7 +149,19 @@ func (shellMiddleware ShellMiddleware) Apply(
 			log_fields.Middleware(shellMiddleware),
 		)
 
-		run.Log.PossibleError(executor.Start())
+		// TODO: deal with runs that are both synchronous and interactive
+		if run.Synchronous {
+			go func() {
+				run.Stdin.Wait()
+				go func() {
+					_, err := io.Copy(cmdStdin, bytes.NewReader(run.Stdin.Bytes()))
+					run.Log.PossibleError(err)
+				}()
+				run.Log.PossibleError(executor.Start())
+			}()
+		} else {
+			run.Log.PossibleError(executor.Start())
+		}
 
 		run.AddCancelHook(func() error {
 			run.Log.WarnWithFields(
@@ -156,7 +172,7 @@ func (shellMiddleware ShellMiddleware) Apply(
 			return executor.Kill()
 		})
 
-		if !arguments.Indefinite && !arguments.Interactive {
+		if !run.Synchronous && !arguments.Indefinite && !arguments.Interactive {
 			go func() {
 				run.Stdin.Wait()
 				run.Log.PossibleError(cmdStdin.Close())
