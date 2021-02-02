@@ -94,6 +94,8 @@ type ExecutionContext struct {
 
 	runs []*models.PipelineRun
 
+	errors *multierror.Error
+
 	ActivityIndicator logging.ActivityIndicator
 
 	preCallback       func(*models.PipelineRun)
@@ -196,6 +198,9 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 	run, err := models.NewPipelineRun(runOptions.pipelineIdentifier, runOptions.arguments, pipelineDefinition, runOptions.parentRun)
 	if err != nil {
 		panic(fmt.Errorf("failed to create pipeline run: %w", err))
+	}
+	run.Log.ErrorCallback = func(err error) {
+		executionContext.errors = multierror.Append(executionContext.errors, err)
 	}
 	if runOptions.logWriter == nil {
 		if runOptions.parentRun != nil {
@@ -364,7 +369,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, wri
 
 	outputLogs(fullRun, writer)
 	outputResult(fullRun, writer)
-	outputErrors(fullRun, writer)
+	outputErrors(executionContext.errors, writer)
 }
 
 func (executionContext *ExecutionContext) SetUpPipelines(args []string) error {

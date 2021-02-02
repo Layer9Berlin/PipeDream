@@ -69,8 +69,7 @@ private:
 
   install::binary::verify-commit-hash:
     description: Check if there have been new commits since the binary was installed
-    wait: true
-    each:
+    pipe:
       - install::metadata::extract-installed:
           key: commit
           inherit:
@@ -84,11 +83,13 @@ private:
           red: "out of date"
 
   install::binary::verify-checksum:
+    inherit:
+      - dirs
     description: Check if changes have been made to repo since last build
-    wait: true
-    each:
+    pipe:
       - tar::shasum:
-          dirs: "@{dirs}"
+          inherit:
+            - dirs
           env:
             save: PIPEDREAM_INSTALL_REPO_CHECKSUM_@{binary}
       - install::metadata::extract-installed:

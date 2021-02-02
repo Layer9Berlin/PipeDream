@@ -3,7 +3,6 @@ version: 0.0.1
 
 public:
   install::path::set:
-    wait: true
     pipe:
       - install::path::use-gopath:
           shell:
@@ -13,6 +12,7 @@ public:
       - noop
 
   install::path::check:
+    wait: true
     pipe:
       - env::load:
           var: PATH

@@ -35,6 +35,12 @@ private:
             install::build::binary::error-handler:
               output:
                 text: "failed"
+      - install::build::output-results
+
+  install::build::output-results:
+    inherit:
+      - binary
+    pipe:
       - install::build::binary::success:
           when: "'$!!' == ''"
           output:

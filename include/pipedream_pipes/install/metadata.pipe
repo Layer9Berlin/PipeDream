@@ -3,7 +3,6 @@ version: 0.0.1
 
 public:
   install::metadata::collect-current:
-    wait: true
     pipe:
       - install::pipedream-version:
           shell:
@@ -17,18 +16,18 @@ public:
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_CURRENT_METADATA_commit
-#      - tar::shasum:
-#          dirs: "cmd include src install.pipe"
-#          env:
-#            save: PIPEDREAM_CURRENT_METADATA_pipedream_checksum
-#      - tar::shasum:
-#          dirs: "util/semver-compare"
-#          env:
-#            save: PIPEDREAM_CURRENT_METADATA_semver-compare_checksum
-#      - tar::shasum:
-#          dirs: "util/traffic-light"
-#          env:
-#            save: PIPEDREAM_CURRENT_METADATA_traffic-light_checksum
+      - tar::shasum:
+          dirs: "cmd include src install.pipe"
+          env:
+            save: PIPEDREAM_CURRENT_METADATA_pipedream_checksum
+      - tar::shasum:
+          dirs: "util/semver-compare"
+          env:
+            save: PIPEDREAM_CURRENT_METADATA_semver-compare_checksum
+      - tar::shasum:
+          dirs: "util/traffic-light"
+          env:
+            save: PIPEDREAM_CURRENT_METADATA_traffic-light_checksum
       - install::current-date:
           shell:
             run: "date"
@@ -38,7 +37,6 @@ public:
       - noop
 
   install::metadata::collect-installed:
-    wait: true
     pipe:
       - install::metadata::extract-installed:
           binary: pipedream
@@ -52,7 +50,6 @@ public:
 
 private:
   install::metadata::extract-installed:
-    wait: true
     pipe:
       - install::metadata::version-command:
           shell:
@@ -61,7 +58,6 @@ private:
       - install::metadata::extract-values:
           inherit:
             - uppercase_identifier
-          wait: true
           each:
             - install::metadata::extract-value:
                 inherit:
@@ -84,7 +80,6 @@ private:
     when: "'$!!' =~ 'command not found'"
 
   install::metadata::extract-value:
-    wait: true
     pipe:
       - install::metadata::extract-value::find-value:
           inherit:

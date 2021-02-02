@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
 	"io"
 	"pipedream/src/models"
-	"strings"
 )
 
 func startProgress(executionContext *ExecutionContext, writer io.Writer) {
@@ -40,9 +40,9 @@ func outputLogs(run *models.PipelineRun, writer io.Writer) {
 	}
 }
 
-func outputErrors(run *models.PipelineRun, writer io.Writer) {
-	if run.Log.ErrorCount() > 0 {
+func outputErrors(errors *multierror.Error, writer io.Writer) {
+	if errors.Len() > 0 {
 		_, _ = fmt.Fprintln(writer, "===== ERRORS =====")
-		_, _ = fmt.Fprintln(writer, strings.Join(run.Log.AllErrorMessages(), "\n"))
+		_, _ = fmt.Fprintln(writer, errors)
 	}
 }

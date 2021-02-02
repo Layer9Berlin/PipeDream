@@ -16,12 +16,12 @@ public:
           wait: true
       - install::pipes::link:
           wait: true
-#      - install::metadata::collect-installed
-#      - install::binary::check-all
-#      - install::pipes::check
-#      - install::output::quick-start-message:
-#          output:
-#            text: "\nCheck out the Quick-Start Guide for some ideas on how to get started with PipeDream:\nhttps://github.com/Layer9Berlin/PipeDream/tree/main/docs/quick-start\n"
+      - install::metadata::collect-installed
+      - install::binary::check-all
+      - install::pipes::check
+      - install::output::quick-start-message:
+          output:
+            text: "\nCheck out the Quick-Start Guide for some ideas on how to get started with PipeDream:\nhttps://github.com/Layer9Berlin/PipeDream/tree/main/docs/quick-start\n"
 
   check-installation:
     description: Check installation

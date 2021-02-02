@@ -34,6 +34,8 @@ type PipelineRunLogger struct {
 	completed           bool
 	completionMutex     *sync.Mutex
 	completionWaitGroup *sync.WaitGroup
+
+	ErrorCallback func(error)
 }
 
 func NewPipelineRunLogger(run *PipelineRun, indentation int) *PipelineRunLogger {
@@ -207,6 +209,9 @@ func (logger *PipelineRunLogger) Error(err error, fields ...log_fields.LogEntryF
 	}
 	logEntry.Level = logrus.ErrorLevel
 	logger.logEntries = append(logger.logEntries, logEntry)
+	if logger.ErrorCallback != nil {
+		logger.ErrorCallback(err)
+	}
 }
 
 func (logger *PipelineRunLogger) WarnWithFields(fields ...log_fields.LogEntryField) {
