@@ -3,5 +3,8 @@ version: 0.0.1
 
 public:
   shell::working-dir:
-    shell:
-      run: "pwd"
+    pipe:
+      - shell::working-dir::run-command:
+          shell:
+            run: "pwd"
+      - strings::remove-new-lines

@@ -19,15 +19,15 @@ public:
       - tar::shasum:
           dirs: "cmd include src install.pipe"
           env:
-            save: PIPEDREAM_CURRENT_METADATA_pipedream_checksum
+            save: PIPEDREAM_CURRENT_METADATA_PIPEDREAM_checksum
       - tar::shasum:
           dirs: "util/semver-compare"
           env:
-            save: PIPEDREAM_CURRENT_METADATA_semver-compare_checksum
+            save: PIPEDREAM_CURRENT_METADATA_SEMVER_COMPARE_checksum
       - tar::shasum:
           dirs: "util/traffic-light"
           env:
-            save: PIPEDREAM_CURRENT_METADATA_traffic-light_checksum
+            save: PIPEDREAM_CURRENT_METADATA_TRAFFIC_LIGHT_checksum
       - install::current-date:
           shell:
             run: "date"

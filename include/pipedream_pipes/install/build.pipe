@@ -35,6 +35,12 @@ private:
             install::build::binary::error-handler:
               output:
                 text: "failed"
+#          sync:
+#            envVars:
+#              - PIPEDREAM_CURRENT_METADATA_version
+#              - PIPEDREAM_CURRENT_METADATA_commit
+#              - "PIPEDREAM_CURRENT_METADATA_@{uppercase_identifier}_checksum"
+#              - PIPEDREAM_CURRENT_METADATA_date
       - install::build::output-results
 
   install::build::output-results:

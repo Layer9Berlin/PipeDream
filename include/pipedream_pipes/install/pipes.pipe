@@ -5,20 +5,34 @@ public:
   install::pipes::link:
     pipe:
       - shell::working-dir
-      - shell::symlink::create:
-          when: "'$!!' != ''"
-          source: $!!/include/pipedream_pipes
-          target: $PIPEDREAM_BIN_INSTALL_PATH
-      - noop
+      - install::pipes::create-symlink:
+          output:
+            text: ''
 
   install::pipes::check:
     pipe:
       - shell::which:
-          binary: pipedream_pipes
+          binary: pipedream
       - print::if-match:
           pattern: "^$|not found"
-          message: "not linked"
-          else: "linked"
+          message: "n/a"
+          else: ""
+      - install::pipes::try-navigating-into-dir
       - util::traffic-light:
           prefix: "Built-in pipes"
           red: "not linked"
+
+private:
+  install::pipes::create-symlink:
+    pipe:
+      - shell::symlink::create:
+          when: "'$!!' != ''"
+          source: $!!/include/pipedream_pipes
+          target: $PIPEDREAM_BIN_INSTALL_PATH
+#          sync:
+#            envVars:
+#              - PIPEDREAM_BIN_INSTALL_PATH
+
+  install::pipes::try-navigating-into-dir:
+    shell:
+      run: "cd $!!_pipes"

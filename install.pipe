@@ -9,13 +9,10 @@ public:
       - install::setup:
           pipe:
             - install::path::set
-            - install::path::check:
-                wait: true
+            - install::path::check
       - install::metadata::collect-current
-      - install::build::all:
-          wait: true
-      - install::pipes::link:
-          wait: true
+      - install::build::all
+      - install::pipes::link
       - install::metadata::collect-installed
       - install::binary::check-all
       - install::pipes::check

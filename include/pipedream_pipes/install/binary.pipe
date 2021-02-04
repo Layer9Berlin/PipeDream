@@ -8,15 +8,20 @@ public:
       - install::binary::check:
           binary: pipedream
           uppercase_identifier: PIPEDREAM
+          dirs: "cmd include src install.pipe"
       - install::binary::check:
           binary: semver-compare
           uppercase_identifier: SEMVER_COMPARE
+          dirs: util/semver-compare
       - install::binary::check:
           binary: traffic-light
           uppercase_identifier: TRAFFIC_LIGHT
+          dirs: util/traffic-light
 
 private:
   install::binary::check:
+    inherit:
+      - dirs
     each:
       - install::binary::check-presence:
           inherit:
@@ -26,6 +31,7 @@ private:
           inherit:
             - binary
             - uppercase_identifier
+            - dirs
           when: "'$PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location' != ''"
           each:
             - install::binary::check-location-in-path:
@@ -40,6 +46,7 @@ private:
                 inherit:
                   - binary
                   - uppercase_identifier
+                  - dirs
 
   install::binary::check-presence:
     pipe:
@@ -95,16 +102,27 @@ private:
           inherit:
             - dirs
           env:
-            save: PIPEDREAM_INSTALL_REPO_CHECKSUM_@{binary}
+            save: PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}
       - install::metadata::extract-installed:
           key: checksum
           uppercase_identifier: CHECKSUM
           inherit:
             - binary
       - print::if-match:
+          when: "'$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}' != ''"
           pattern: "$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
           message: "unchanged"
           else: "changed"
+          sync:
+            envVars:
+              - "PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
+      - print::message:
+          when: "'$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}' == ''"
+          message: "n/a (no checksum)"
+          sync:
+            envVars:
+              - "PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
       - util::traffic-light:
           prefix: "Repo state for \"@{binary}\""
-          red: "changed|error"
+          amber: "^n/a"
+          red: "^changed|^error"
