@@ -50,7 +50,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PIPEDREAM_RELEASE_ACTION_TOKEN }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
-#          PIPEDREAM_INSTALL_SHASUM: $PIPEDREAM_INSTALL_SHASUM
       -
         name: Create Packages file
         run: dpkg-scanpackages -m dist | gzip -c > dist/Packages.gz
@@ -65,20 +64,6 @@ jobs:
           asset_path: dist/Packages.gz
           asset_name: Packages.gz
           asset_content_type: application/gzip
-#      -
-#        name: Create Release file
-#        run: echo "Packages.gz" > dist/Release
-#      -
-#        name: Upload Release file
-#        id: upload-release-file
-#        uses: actions/upload-release-asset@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          upload_url: ${{ steps.create_release.outputs.upload_url }}
-#          asset_path: dist/Release
-#          asset_name: Release
-#          asset_content_type: text/plain
       - uses: actions/setup-node@v1
       - name: Publish
         run: |
