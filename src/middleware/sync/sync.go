@@ -1,18 +1,17 @@
 package sync_middleware
 
 import (
-	"bytes"
-	"io"
-	"io/ioutil"
-	"pipedream/src/helpers/string_map"
+	"fmt"
+	"os"
 	"pipedream/src/logging/log_fields"
 	"pipedream/src/middleware"
 	"pipedream/src/models"
-	"strings"
+	"time"
 )
 
-// Synchronous Execution Chain
+// Execution Synchronizer
 type SyncMiddleware struct {
+	LookupEnv func(string) (string, bool)
 }
 
 func (syncMiddleware SyncMiddleware) String() string {
@@ -20,7 +19,14 @@ func (syncMiddleware SyncMiddleware) String() string {
 }
 
 func NewSyncMiddleware() SyncMiddleware {
-	return SyncMiddleware{}
+	return SyncMiddleware{
+		LookupEnv: os.LookupEnv,
+	}
+}
+
+type SyncMiddlewareArguments struct {
+	waitFor []string
+	envVars []string
 }
 
 func (syncMiddleware SyncMiddleware) Apply(
@@ -28,84 +34,48 @@ func (syncMiddleware SyncMiddleware) Apply(
 	next func(*models.PipelineRun),
 	executionContext *middleware.ExecutionContext,
 ) {
-	arguments := make([]middleware.PipelineReference, 0, 10)
+	arguments := SyncMiddlewareArguments{}
 	middleware.ParseArguments(&arguments, "sync", run)
 
-	next(run)
-
-	haveChildren := len(arguments) > 0
-	if haveChildren {
-		childIdentifiers := make([]*string, 0, len(arguments))
-		childArguments := make([]map[string]interface{}, 0, len(arguments))
-		for _, childReference := range arguments {
-			for pipelineIdentifier, pipelineArguments := range childReference {
-				childIdentifiers = append(childIdentifiers, pipelineIdentifier)
-				childArguments = append(childArguments, string_map.CopyMap(pipelineArguments))
+	if arguments.waitFor != nil {
+		for _, pipelineIdentifier := range arguments.waitFor {
+			for _, dependentRun := range executionContext.Runs {
+				if dependentRun.Identifier != nil && *dependentRun.Identifier == pipelineIdentifier {
+					run.StartWaitGroup.Add(1)
+					run.Log.DebugWithFields(
+						log_fields.Symbol("🕙"),
+						log_fields.Message(fmt.Sprintf("waiting for run %q", pipelineIdentifier)),
+						log_fields.Middleware(syncMiddleware),
+					)
+					go func() {
+						dependentRun.Wait()
+						run.StartWaitGroup.Done()
+					}()
+				}
 			}
 		}
+	}
 
-		info := make([]string, 0, len(childIdentifiers))
-		for _, childIdentifier := range childIdentifiers {
-			if childIdentifier == nil {
-				info = append(info, "anonymous")
-			} else {
-				info = append(info, *childIdentifier)
-			}
-		}
-
-		switch len(info) {
-		case 1:
+	if arguments.envVars != nil {
+		for _, envVar := range arguments.envVars {
+			run.StartWaitGroup.Add(1)
+			envVar := envVar
 			run.Log.DebugWithFields(
-				log_fields.Symbol("⇣"),
-				log_fields.Message("single invocation: "+strings.Join(info, ", ")),
+				log_fields.Symbol("🕙"),
+				log_fields.Message(fmt.Sprintf("waiting for env var %q to be set", envVar)),
 				log_fields.Middleware(syncMiddleware),
 			)
-		default:
-			run.Log.DebugWithFields(
-				log_fields.Symbol("⇣"),
-				log_fields.Message("invocation chain: "+strings.Join(info, ", ")),
-				log_fields.Middleware(syncMiddleware),
-			)
-		}
-
-		initialStdin := run.Stdin.Copy()
-		finalResultWriteCloser := run.Stdout.WriteCloser()
-		startFullRunForEachChild(childIdentifiers, run, childArguments, initialStdin, finalResultWriteCloser, executionContext, 0)
-	}
-}
-
-func startFullRunForEachChild(
-	childIdentifiers []*string,
-	run *models.PipelineRun,
-	arguments []map[string]interface{},
-	stdinReader io.Reader,
-	finalResultWriteCloser io.WriteCloser,
-	executionContext *middleware.ExecutionContext,
-	index int,
-) {
-	if len(childIdentifiers) == 0 {
-		go func() {
-			_, _ = io.Copy(finalResultWriteCloser, stdinReader)
-			_ = finalResultWriteCloser.Close()
-		}()
-		return
-	}
-	firstChildIdentifier, childIdentifiers := childIdentifiers[0], childIdentifiers[1:]
-	executionContext.FullRun(
-		middleware.WithParentRun(run),
-		middleware.WithIdentifier(firstChildIdentifier),
-		middleware.WithArguments(arguments[index]),
-		middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
-			childRun.Stdin.MergeWith(stdinReader)
-		}),
-		middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
-			childStdout := childRun.Stdout.Copy()
-			// return immediately, but wait for execution to complete and call next child
 			go func() {
-				completeOutput, _ := ioutil.ReadAll(childStdout)
-				childRun.Wait()
-				startFullRunForEachChild(childIdentifiers, run, arguments, bytes.NewReader(completeOutput), finalResultWriteCloser, executionContext, index+1)
+				for {
+					if _, ok := syncMiddleware.LookupEnv(envVar); ok {
+						break
+					}
+					time.Sleep(200)
+				}
+				run.StartWaitGroup.Done()
 			}()
-		}),
-	)
+		}
+	}
+
+	next(run)
 }

@@ -61,7 +61,7 @@ func TestRun_Cmd_userPromptError(t *testing.T) {
 			) (int, string, error) {
 				return 0, "", fmt.Errorf("test error")
 			}),
-			)
+		)
 		executionContext := middleware.NewExecutionContext(options...)
 		executionContext.Log.SetOutput(buffer)
 		return executionContext
@@ -118,6 +118,6 @@ public:
 	_ = writer.Close()
 	waitGroup.Wait()
 	require.Contains(t, string(result), "===== RESULT =====")
-	require.Contains(t, string(result), "====== LOGS ======")
+	require.NotContains(t, string(result), "====== LOGS ======")
 	require.Equal(t, "", buffer.String())
 }

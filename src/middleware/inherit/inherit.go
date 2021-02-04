@@ -34,7 +34,8 @@ func (inheritMiddleware InheritMiddleware) Apply(
 			parentValue, haveParentValue := parentArguments[inheritedArgument]
 			_, haveExistingValue := pipelineArguments[inheritedArgument]
 			if !haveExistingValue && haveParentValue {
-				_ = run.SetArgumentAtPath(parentValue, inheritedArgument)
+				err := run.SetArgumentAtPath(parentValue, inheritedArgument)
+				run.Log.PossibleError(err)
 				substitutions[inheritedArgument] = parentValue
 			}
 		}

@@ -1,8 +1,6 @@
 package each
 
 import (
-	"bytes"
-	"io"
 	"pipedream/src/helpers/string_map"
 	"pipedream/src/logging/log_fields"
 	"pipedream/src/middleware"
@@ -30,8 +28,6 @@ func (eachMiddleware EachMiddleware) Apply(
 	arguments := make([]middleware.PipelineReference, 0, 10)
 	middleware.ParseArguments(&arguments, "each", run)
 
-	next(run)
-
 	haveChildren := len(arguments) > 0
 	if haveChildren {
 		childIdentifiers := make([]*string, 0, len(arguments))
@@ -57,25 +53,10 @@ func (eachMiddleware EachMiddleware) Apply(
 			log_fields.Info(strings.Join(info, ", ")),
 			log_fields.Middleware(eachMiddleware),
 		)
-		inputReaders := make([]io.Reader, 0, len(childIdentifiers))
-		if run.Synchronous {
-			run.Stdin.Close()
-			run.Stdin.Wait()
-			for _, _ = range childIdentifiers {
-				inputReaders = append(inputReaders, bytes.NewReader(run.Stdin.Bytes()))
-			}
-		} else {
-			for _, _ = range childIdentifiers {
-				inputReaders = append(inputReaders, run.Stdin.Copy())
-			}
-			go func() {
-				run.Stdin.Close()
-			}()
-		}
 		for index, childIdentifier := range childIdentifiers {
 			arguments := childArguments[index]
 			identifier := childIdentifier
-			childRun := executionContext.FullRun(
+			executionContext.FullRun(
 				middleware.WithParentRun(run),
 				middleware.WithIdentifier(identifier),
 				middleware.WithArguments(arguments),
@@ -83,25 +64,20 @@ func (eachMiddleware EachMiddleware) Apply(
 					run.Log.TraceWithFields(
 						log_fields.DataStream(eachMiddleware, "copy parent stdin into child stdin")...,
 					)
-					childRun.Stdin.MergeWith(inputReaders[index])
+					childRun.Stdin.MergeWith(run.Stdin.Copy())
 				}),
 				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
-					if !run.Synchronous {
-						run.Log.TraceWithFields(
-							log_fields.DataStream(eachMiddleware, "copy child stdout into parent stdout")...,
-						)
-						run.Stdout.MergeWith(childRun.Stdout.Copy())
-						run.Log.TraceWithFields(
-							log_fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
-						)
-						run.Stderr.MergeWith(childRun.Stderr.Copy())
-					}
+					run.Log.TraceWithFields(
+						log_fields.DataStream(eachMiddleware, "copy child stdout into parent stdout")...,
+					)
+					run.Stdout.MergeWith(childRun.Stdout.Copy())
+					run.Log.TraceWithFields(
+						log_fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
+					)
+					run.Stderr.MergeWith(childRun.Stderr.Copy())
 				}))
-			if run.Synchronous {
-				childRun.Wait()
-				run.Stdout.MergeWith(bytes.NewReader(childRun.Stdout.Bytes()))
-				run.Stderr.MergeWith(bytes.NewReader(childRun.Stderr.Bytes()))
-			}
 		}
 	}
+
+	next(run)
 }

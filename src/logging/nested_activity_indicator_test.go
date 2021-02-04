@@ -30,8 +30,8 @@ func (t TestStringer) Completed() bool {
 
 func NewTestStringer(value string) *TestStringer {
 	return &TestStringer{
-		Complete: false,
-		Value:    value,
+		Complete:  false,
+		Value:     value,
 		WaitGroup: &sync.WaitGroup{},
 	}
 }
@@ -46,8 +46,8 @@ func TestNestedActivityIndicator_Shown(t *testing.T) {
 	subject2.WaitGroup.Add(1)
 	buffer := new(bytes.Buffer)
 	activityIndicator := NewNestedActivityIndicator(mpb.WithOutput(buffer))
-	activityIndicator.AddSpinner(subject1, 2)
-	activityIndicator.AddSpinner(subject2, 4)
+	activityIndicator.AddIndicator(subject1, 2)
+	activityIndicator.AddIndicator(subject2, 4)
 
 	time.Sleep(300 * time.Millisecond)
 
@@ -77,8 +77,8 @@ func TestNestedActivityIndicator_Len(t *testing.T) {
 	defer subject1.WaitGroup.Done()
 	subject2.WaitGroup.Add(1)
 	defer subject2.WaitGroup.Done()
-	activityIndicator.AddSpinner(subject1, 2)
-	activityIndicator.AddSpinner(subject2, 4)
+	activityIndicator.AddIndicator(subject1, 2)
+	activityIndicator.AddIndicator(subject2, 4)
 	require.Equal(t, 2, activityIndicator.Len())
 }
 
@@ -91,7 +91,7 @@ func TestNestedActivityIndicator_SetVisible(t *testing.T) {
 	subject := NewTestStringer("test")
 	subject.WaitGroup.Add(1)
 	defer subject.WaitGroup.Done()
-	activityIndicator.AddSpinner(subject, 2)
+	activityIndicator.AddIndicator(subject, 2)
 	time.Sleep(300 * time.Millisecond)
 	require.Equal(t, 1, activityIndicator.Len())
 	activityIndicator.SetVisible(false)
@@ -104,7 +104,7 @@ func TestNestedActivityIndicator_SetVisible(t *testing.T) {
 	require.NotContains(t, string(result), "test")
 	require.Equal(t, 0, activityIndicator.Len())
 
-	activityIndicator.AddSpinner(subject, 2)
+	activityIndicator.AddIndicator(subject, 2)
 	require.Equal(t, 0, activityIndicator.Len())
 }
 
@@ -118,8 +118,8 @@ func TestNestedActivityIndicator_Wait(t *testing.T) {
 	subject2 := NewTestStringer("test2")
 	subject1.WaitGroup.Add(1)
 	subject2.WaitGroup.Add(1)
-	activityIndicator.AddSpinner(subject1, 2)
-	activityIndicator.AddSpinner(subject2, 4)
+	activityIndicator.AddIndicator(subject1, 2)
+	activityIndicator.AddIndicator(subject2, 4)
 	go func() {
 		defer subject1.WaitGroup.Done()
 		time.Sleep(300 * time.Millisecond)
@@ -138,6 +138,6 @@ func TestNestedActivityIndicator_Wait(t *testing.T) {
 	require.NotContains(t, string(result), "test")
 	require.Equal(t, 0, activityIndicator.Len())
 
-	activityIndicator.AddSpinner(subject1, 2)
+	activityIndicator.AddIndicator(subject1, 2)
 	require.Equal(t, 0, activityIndicator.Len())
 }

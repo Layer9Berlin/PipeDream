@@ -10,6 +10,8 @@ type ActivityIndicatingSubject interface {
 
 type ActivityIndicator interface {
 	AddIndicator(subject ActivityIndicatingSubject, indentation int)
-	Wait()
+	Len() int
 	SetVisible(visible bool)
+	Visible() bool
+	Wait()
 }

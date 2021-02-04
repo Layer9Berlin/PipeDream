@@ -3,6 +3,7 @@ package models
 import (
 	"bytes"
 	"io"
+	"os"
 	"sync"
 )
 
@@ -74,7 +75,15 @@ func (stream *ComposableDataStream) Close() {
 		defer stream.completionWaitGroup.Done()
 		_, err := io.Copy(stream.result, stream.outputReader)
 		if err != nil {
-			stream.errorHandler(err)
+			if pathErr, ok := err.(*os.PathError); ok {
+				if pathErr.Error() == "write |1: broken pipe" {
+					// this is to be expected - we did close the pipe, after all
+				} else {
+					stream.errorHandler(err)
+				}
+			} else {
+				stream.errorHandler(err)
+			}
 		}
 		stream.completed = true
 		// the counter is initialized to 1,

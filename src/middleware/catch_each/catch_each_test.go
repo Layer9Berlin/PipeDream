@@ -33,7 +33,7 @@ func TestCatchEach_Error(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.True(t, handlerCalled)
 	require.Equal(t, "output\nhandled", run.Stdout.String())
-	require.Contains(t, run.Log.String(), "catch-each")
+	require.Contains(t, run.Log.String(), "catchEach")
 }
 
 func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
@@ -76,7 +76,7 @@ func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, 3, handlerInvocations)
 	require.Equal(t, "output\nhandled\nhandled\nhandled\n", run.Stdout.String())
-	require.Contains(t, run.Log.String(), "catch-each")
+	require.Contains(t, run.Log.String(), "catchEach")
 }
 
 func TestCatchEach_HandlerNotInvoked(t *testing.T) {
@@ -100,7 +100,7 @@ func TestCatchEach_HandlerNotInvoked(t *testing.T) {
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, "output\n", run.Stdout.String())
-	require.Contains(t, run.Log.String(), "catch-each")
+	require.Contains(t, run.Log.String(), "catchEach")
 }
 
 func TestCatchEach_NoCatchHandler(t *testing.T) {
@@ -163,5 +163,5 @@ func TestCatchEach_HandlerThrowingError(t *testing.T) {
 	require.True(t, handlerCalled)
 	require.Equal(t, "output\nnot properly handled", run.Stdout.String())
 	require.Equal(t, "handler error", run.Stderr.String())
-	require.Contains(t, run.Log.String(), "catch-each")
+	require.Contains(t, run.Log.String(), "catchEach")
 }

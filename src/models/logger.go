@@ -190,6 +190,7 @@ func (logger *PipelineRunLogger) StderrOutput(message string, fields ...log_fiel
 		"prefix":  "⛔️ ",
 		"message": message,
 	})
+	fields = append(fields, log_fields.Run(logger.run))
 	for _, withField := range fields {
 		logEntry = withField(logEntry)
 	}
@@ -204,6 +205,7 @@ func (logger *PipelineRunLogger) Error(err error, fields ...log_fields.LogEntryF
 		"prefix":  "🛑 ",
 		"message": err.Error(),
 	})
+	fields = append(fields, log_fields.Run(logger.run))
 	for _, withField := range fields {
 		logEntry = withField(logEntry)
 	}
@@ -220,6 +222,7 @@ func (logger *PipelineRunLogger) Error(err error, fields ...log_fields.LogEntryF
 
 func (logger *PipelineRunLogger) WarnWithFields(fields ...log_fields.LogEntryField) {
 	logger.logCountWarning += 1
+	fields = append(fields, log_fields.Run(logger.run))
 	entry := log_fields.EntryWithFields(fields...)
 	entry.Level = logrus.WarnLevel
 	logger.logEntries = append(logger.logEntries, entry)
@@ -239,6 +242,7 @@ func (logger *PipelineRunLogger) Info(entry *logrus.Entry) {
 
 func (logger *PipelineRunLogger) InfoWithFields(fields ...log_fields.LogEntryField) {
 	logger.logCountInfo += 1
+	fields = append(fields, log_fields.Run(logger.run))
 	entry := log_fields.EntryWithFields(fields...)
 	entry.Level = logrus.InfoLevel
 	logger.logEntries = append(logger.logEntries, entry)
@@ -252,6 +256,7 @@ func (logger *PipelineRunLogger) Debug(entry *logrus.Entry) {
 
 func (logger *PipelineRunLogger) DebugWithFields(fields ...log_fields.LogEntryField) {
 	logger.logCountDebug += 1
+	fields = append(fields, log_fields.Run(logger.run))
 	entry := log_fields.EntryWithFields(fields...)
 	entry.Level = logrus.DebugLevel
 	logger.logEntries = append(logger.logEntries, entry)
@@ -265,6 +270,7 @@ func (logger *PipelineRunLogger) Trace(entry *logrus.Entry) {
 
 func (logger *PipelineRunLogger) TraceWithFields(fields ...log_fields.LogEntryField) {
 	logger.logCountTrace += 1
+	fields = append(fields, log_fields.Run(logger.run))
 	entry := log_fields.EntryWithFields(fields...)
 	entry.Level = logrus.TraceLevel
 	logger.logEntries = append(logger.logEntries, entry)

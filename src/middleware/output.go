@@ -6,6 +6,7 @@ import (
 	"github.com/logrusorgru/aurora/v3"
 	"io"
 	"pipedream/src/models"
+	"strings"
 )
 
 func startProgress(executionContext *ExecutionContext, writer io.Writer) {
@@ -43,6 +44,10 @@ func outputLogs(run *models.PipelineRun, writer io.Writer) {
 func outputErrors(errors *multierror.Error, writer io.Writer) {
 	if errors != nil && errors.Len() > 0 {
 		_, _ = fmt.Fprintln(writer, "===== ERRORS =====")
-		_, _ = fmt.Fprintln(writer, errors)
+		errorMessages := make([]string, 0, errors.Len())
+		for _, err := range errors.Errors {
+			errorMessages = append(errorMessages, err.Error())
+		}
+		_, _ = fmt.Fprintln(writer, strings.Join(errorMessages, "\n"))
 	}
 }

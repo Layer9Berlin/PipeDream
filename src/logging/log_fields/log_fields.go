@@ -21,13 +21,19 @@ func Info(info interface{}) LogEntryField {
 
 func Symbol(symbol string) LogEntryField {
 	return func(entry *logrus.Entry) *logrus.Entry {
-		return entry.WithField("prefix", symbol + " ")
+		return entry.WithField("prefix", symbol+" ")
 	}
 }
 
 func Color(color string) LogEntryField {
 	return func(entry *logrus.Entry) *logrus.Entry {
 		return entry.WithField("color", color)
+	}
+}
+
+func Run(run interface{}) LogEntryField {
+	return func(entry *logrus.Entry) *logrus.Entry {
+		return entry.WithField("run", run)
 	}
 }
 

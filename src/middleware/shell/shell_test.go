@@ -387,7 +387,6 @@ func TestShell_CancelHook(t *testing.T) {
 	run.Close()
 	err := run.Cancel()
 	require.Nil(t, err)
-	run.Close()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())

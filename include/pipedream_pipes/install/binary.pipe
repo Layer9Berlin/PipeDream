@@ -21,11 +21,11 @@ private:
       - install::binary::check-presence:
           inherit:
             - binary
-            - upppercase_identifier
+            - uppercase_identifier
       - install::binary::check-installation:
           inherit:
             - binary
-            - upppercase_identifier
+            - uppercase_identifier
           when: "'$PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location' != ''"
           each:
             - install::binary::check-location-in-path:
@@ -44,7 +44,7 @@ private:
   install::binary::check-presence:
     pipe:
       - shell::env:
-          var: PIPEDREAM_INSTALLED_METADATA_@{upppercase_identifier}_location
+          var: PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
       - print::if-empty:
           message: "not installed"
           else: "installed"
@@ -72,6 +72,7 @@ private:
     pipe:
       - install::metadata::extract-installed:
           key: commit
+          uppercase_identifier: COMMIT_HASH
           inherit:
             - binary
       - print::if-match:
@@ -94,6 +95,7 @@ private:
             save: PIPEDREAM_INSTALL_REPO_CHECKSUM_@{binary}
       - install::metadata::extract-installed:
           key: checksum
+          uppercase_identifier: CHECKSUM
           inherit:
             - binary
       - print::if-match:

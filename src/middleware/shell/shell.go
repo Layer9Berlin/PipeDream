@@ -1,7 +1,6 @@
 package shell
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -149,19 +148,10 @@ func (shellMiddleware ShellMiddleware) Apply(
 			log_fields.Middleware(shellMiddleware),
 		)
 
-		// TODO: deal with runs that are both synchronous and interactive
-		if run.Synchronous {
-			go func() {
-				run.Stdin.Wait()
-				go func() {
-					_, err := io.Copy(cmdStdin, bytes.NewReader(run.Stdin.Bytes()))
-					run.Log.PossibleError(err)
-				}()
-				run.Log.PossibleError(executor.Start())
-			}()
-		} else {
+		go func() {
+			run.StartWaitGroup.Wait()
 			run.Log.PossibleError(executor.Start())
-		}
+		}()
 
 		run.AddCancelHook(func() error {
 			run.Log.WarnWithFields(
@@ -172,7 +162,7 @@ func (shellMiddleware ShellMiddleware) Apply(
 			return executor.Kill()
 		})
 
-		if !run.Synchronous && !arguments.Indefinite && !arguments.Interactive {
+		if !arguments.Indefinite && !arguments.Interactive {
 			go func() {
 				run.Stdin.Wait()
 				run.Log.PossibleError(cmdStdin.Close())
@@ -298,6 +288,9 @@ func (executor *DefaultCommandExecutor) Wait() error {
 }
 
 func (executor *DefaultCommandExecutor) Kill() error {
+	if executor.command.Process == nil {
+		return nil
+	}
 	return executor.command.Process.Kill()
 }
 

@@ -1,9 +1,7 @@
 package pipe
 
 import (
-	"bytes"
 	"io"
-	"io/ioutil"
 	"pipedream/src/helpers/string_map"
 	"pipedream/src/logging/log_fields"
 	"pipedream/src/middleware"
@@ -73,29 +71,25 @@ func (pipeMiddleware PipeMiddleware) Apply(
 			)
 		}
 		var previousOutput io.Reader = nil
-		if run.Synchronous {
-			run.Stdin.Close()
-			run.Stdin.Wait()
-			previousOutput = bytes.NewReader(run.Stdin.Bytes())
-		} else {
-			previousOutput = run.Stdin.Copy()
-			go func() {
-				run.Stdin.Close()
-			}()
-		}
-		mergeDescription := "merging parent stdin into stdin"
 		for index, childIdentifier := range childIdentifiers {
 			identifier := childIdentifier
-			arguments := childArguments[index]
-			childRun := executionContext.FullRun(
+			childRunArguments := childArguments[index]
+			executionContext.FullRun(
 				middleware.WithParentRun(run),
 				middleware.WithIdentifier(identifier),
-				middleware.WithArguments(arguments),
+				middleware.WithArguments(childRunArguments),
 				middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
-					childRun.Log.TraceWithFields(
-						log_fields.DataStream(pipeMiddleware, mergeDescription)...,
-					)
-					childRun.Stdin.MergeWith(previousOutput)
+					if index == 0 {
+						childRun.Log.TraceWithFields(
+							log_fields.DataStream(pipeMiddleware, "merging parent stdin into stdin")...,
+						)
+						childRun.Stdin.MergeWith(run.Stdin.Copy())
+					} else {
+						childRun.Log.TraceWithFields(
+							log_fields.DataStream(pipeMiddleware, "merging previous stdout into stdin")...,
+						)
+						childRun.Stdin.MergeWith(previousOutput)
+					}
 				}),
 				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
 					childRun.Log.TraceWithFields(
@@ -105,19 +99,12 @@ func (pipeMiddleware PipeMiddleware) Apply(
 					// or the parent's output, if this is the last child
 					previousOutput = childRun.Stdout.Copy()
 				}))
-			mergeDescription = "merging previous stdout into stdin"
-			if run.Synchronous {
-				completeOutput, err := ioutil.ReadAll(previousOutput)
-				run.Log.PossibleError(err)
-				previousOutput = bytes.NewReader(completeOutput)
-				childRun.Wait()
-			}
 		}
 		run.Log.TraceWithFields(
 			log_fields.DataStream(pipeMiddleware, "merging last child's stdout into stdout")...,
 		)
 		run.Stdout.MergeWith(previousOutput)
-	} else {
-		next(run)
 	}
+
+	next(run)
 }

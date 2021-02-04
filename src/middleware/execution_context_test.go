@@ -13,11 +13,11 @@ import (
 
 func TestExecutionContext_CancelAll(t *testing.T) {
 	executionContext := NewExecutionContext()
-	executionContext.runs = []*models.PipelineRun{{}, {}}
+	executionContext.Runs = []*models.PipelineRun{{}, {}}
 	err := executionContext.CancelAll()
 	require.Nil(t, err)
-	require.True(t, executionContext.runs[0].Cancelled())
-	require.True(t, executionContext.runs[1].Cancelled())
+	require.True(t, executionContext.Runs[0].Cancelled())
+	require.True(t, executionContext.Runs[1].Cancelled())
 }
 
 func TestExecutionContext_FullRun_WithoutOptions(t *testing.T) {
@@ -163,8 +163,7 @@ func TestExecutionContext_LookUpPipelineDefinition(t *testing.T) {
 				Public:   false,
 			},
 		},
-		"test2": {
-		},
+		"test2": {},
 	}
 	definition, found := LookUpPipelineDefinition(definitionsLookup, "test1", "test3.file")
 	require.True(t, found)
@@ -191,8 +190,9 @@ func TestExecutionContext_Execute(t *testing.T) {
 	buffer := new(bytes.Buffer)
 	executionContext := NewExecutionContext()
 	executionContext.Execute("test", buffer)
-	require.Contains(t, buffer.String(), "====== LOGS ======")
+	require.NotContains(t, buffer.String(), "====== LOGS ======")
 	require.Contains(t, buffer.String(), "===== RESULT =====")
+	require.NotContains(t, buffer.String(), "===== ERRORS =====")
 }
 
 func TestExecutionContext_SetUpPipelines(t *testing.T) {

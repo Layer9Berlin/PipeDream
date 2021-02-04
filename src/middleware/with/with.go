@@ -7,6 +7,7 @@ import (
 	"pipedream/src/middleware"
 	"pipedream/src/models"
 	"regexp"
+	"sync"
 )
 
 // Pattern Extractor
@@ -69,12 +70,15 @@ func (withMiddleware WithMiddleware) Apply(
 			log_fields.Middleware(withMiddleware),
 		)
 		stderrAppender := run.Stderr.WriteCloser()
+		waitGroup := &sync.WaitGroup{}
 		go func() {
 			completeInput, err := ioutil.ReadAll(stdinCopy)
+			inputMutex := &sync.Mutex{}
 			run.Log.PossibleError(err)
 			matches := regex.FindAllSubmatch(completeInput, -1)
+			waitGroup.Add(len(matches))
 			for _, match := range matches {
-				fullOutput := new(bytes.Buffer)
+				match := match
 				executionContext.FullRun(
 					middleware.WithParentRun(run),
 					middleware.WithIdentifier(run.Identifier),
@@ -90,27 +94,28 @@ func (withMiddleware WithMiddleware) Apply(
 					middleware.WithTearDownFunc(func(matchRun *models.PipelineRun) {
 						run.Log.TraceWithFields(
 							log_fields.Symbol("⎇"),
-							log_fields.Message("copying child stdout into parent stdout"),
-							log_fields.Middleware(withMiddleware),
-						)
-						matchRun.Stdout.StartCopyingInto(fullOutput)
-						run.Log.TraceWithFields(
-							log_fields.Symbol("⎇"),
 							log_fields.Message("copying child stderr into parent stderr"),
 							log_fields.Middleware(withMiddleware),
 						)
 						matchRun.Stderr.StartCopyingInto(stderrAppender)
 
-						matchRun.Close()
-						matchRun.Wait()
-						completeStdout := matchRun.Stdout.Bytes()
-						completeInput = bytes.Replace(completeInput, match[0], completeStdout, -1)
+						go func() {
+							defer waitGroup.Done()
+							matchRun.Wait()
+							defer inputMutex.Unlock()
+							inputMutex.Lock()
+							completeStdout := matchRun.Stdout.Bytes()
+							completeInput = bytes.Replace(completeInput, match[0], completeStdout, -1)
+						}()
 					}))
 			}
-			_, err = stdoutIntercept.Write(completeInput)
-			run.Log.PossibleError(err)
-			run.Log.PossibleError(stdoutIntercept.Close())
-			run.Log.PossibleError(stderrAppender.Close())
+			go func() {
+				waitGroup.Wait()
+				_, err = stdoutIntercept.Write(completeInput)
+				run.Log.PossibleError(err)
+				run.Log.PossibleError(stdoutIntercept.Close())
+				run.Log.PossibleError(stderrAppender.Close())
+			}()
 		}()
 	}
 }

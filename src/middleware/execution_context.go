@@ -92,7 +92,7 @@ type ExecutionContext struct {
 
 	SelectableFiles []string
 
-	runs []*models.PipelineRun
+	Runs []*models.PipelineRun
 
 	errors *multierror.Error
 
@@ -131,7 +131,7 @@ func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 
 func (executionContext *ExecutionContext) CancelAll() error {
 	err := &multierror.Error{}
-	for _, run := range executionContext.runs {
+	for _, run := range executionContext.Runs {
 		err = multierror.Append(err, run.Cancel())
 	}
 	return err.ErrorOrNil()
@@ -246,7 +246,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *mod
 	if runOptions.parentRun == nil && executionContext.rootRun == nil {
 		executionContext.rootRun = run
 	}
-	executionContext.runs = append(executionContext.runs, run)
+	executionContext.Runs = append(executionContext.Runs, run)
 	if executionContext.ActivityIndicator != nil {
 		executionContext.ActivityIndicator.AddIndicator(run, run.Log.Indentation)
 	}
@@ -442,7 +442,7 @@ func setUpCancelHandler(handler func()) {
 
 func (executionContext *ExecutionContext) Cancel() error {
 	err := &multierror.Error{}
-	for _, run := range executionContext.runs {
+	for _, run := range executionContext.Runs {
 		if !run.Completed() {
 			err = multierror.Append(err, run.Cancel())
 		}

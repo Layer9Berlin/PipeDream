@@ -24,10 +24,12 @@ require (
 	github.com/dgryski/go-sip13 v0.0.0-20200911182023-62edffca9245 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/fatih/color v1.10.0 // indirect
+	github.com/fogleman/gg v1.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-gl/glfw v0.0.0-20201108214237-06ea97f0c265 // indirect
 	github.com/gobeam/stringy v0.0.0-20200717095810-8a3637503f62 // indirect
 	github.com/gogo/protobuf v1.3.1 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/google/pprof v0.0.0-20201117184057-ae444373da19 // indirect
@@ -48,6 +50,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/mdns v1.0.3 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
+	github.com/jpoles1/gopherbadger v2.4.0+incompatible // indirect
 	github.com/kisielk/errcheck v1.4.0 // indirect
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/logrusorgru/aurora/v3 v3.0.0

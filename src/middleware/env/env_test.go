@@ -36,7 +36,7 @@ func TestEnv_InterpolateShallow(t *testing.T) {
 	expandEnv := func(value string) string {
 		result := value
 		for key, newValue := range env {
-			result = strings.Replace(value, "$" + key, newValue, -1)
+			result = strings.Replace(value, "$"+key, newValue, -1)
 		}
 		return result
 	}
@@ -100,7 +100,7 @@ func TestEnv_InterpolateDeep(t *testing.T) {
 	expandEnv := func(value string) string {
 		result := value
 		for key, newValue := range env {
-			result = strings.Replace(value, "$" + key, newValue, -1)
+			result = strings.Replace(value, "$"+key, newValue, -1)
 		}
 		return result
 	}
@@ -167,7 +167,7 @@ func TestEnv_NoSubstitutions(t *testing.T) {
 	expandEnv := func(value string) string {
 		result := value
 		for key, newValue := range env {
-			result = strings.Replace(value, "$" + key, newValue, -1)
+			result = strings.Replace(value, "$"+key, newValue, -1)
 		}
 		return result
 	}
@@ -234,7 +234,7 @@ func TestEnv_InterpolateNone(t *testing.T) {
 	expandEnv := func(value string) string {
 		result := value
 		for key, newValue := range env {
-			result = strings.Replace(value, "$" + key, newValue, -1)
+			result = strings.Replace(value, "$"+key, newValue, -1)
 		}
 		return result
 	}
@@ -289,7 +289,7 @@ func TestEnv_Save(t *testing.T) {
 	expandEnv := func(value string) string {
 		result := value
 		for key, newValue := range env {
-			result = strings.Replace(value, "$" + key, newValue, -1)
+			result = strings.Replace(value, "$"+key, newValue, -1)
 		}
 		return result
 	}
@@ -309,7 +309,7 @@ func TestEnv_Save(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, "test", run.Stdout.String())
 	require.Equal(t, "test", env["KEY"])
-	require.NotContains(t, run.Log.String(), "env")
+	require.Contains(t, run.Log.String(), "env")
 }
 
 func TestEnv_NewEnvMiddleware(t *testing.T) {
@@ -318,8 +318,8 @@ func TestEnv_NewEnvMiddleware(t *testing.T) {
 	err := envMiddleware.Setenv(key, "value")
 	require.Nil(t, err)
 	require.Equal(t, "value", os.Getenv(key))
-	require.Equal(t, "test value", envMiddleware.ExpandEnv("test $" + key))
+	require.Equal(t, "test value", envMiddleware.ExpandEnv("test $"+key))
 	_ = os.Unsetenv(key)
 	require.Equal(t, "", os.Getenv(key))
-	require.Equal(t, "test ", envMiddleware.ExpandEnv("test $" + key))
+	require.Equal(t, "test ", envMiddleware.ExpandEnv("test $"+key))
 }

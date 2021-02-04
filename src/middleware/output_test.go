@@ -57,13 +57,11 @@ func TestRun_outputLogs(t *testing.T) {
 
 func TestRun_Output_outputErrors(t *testing.T) {
 	buffer := new(bytes.Buffer)
-	outputErrors(&models.PipelineRun{
-		Log: models.NewClosedPipelineRunLoggerWithErrors(&multierror.Error{
-			Errors: []error{
-				fmt.Errorf("test error 1"),
-				fmt.Errorf("test error 2"),
-			},
-		}),
+	outputErrors(&multierror.Error{
+		Errors: []error{
+			fmt.Errorf("test error 1"),
+			fmt.Errorf("test error 2"),
+		},
 	}, buffer)
 	require.Equal(t, fmt.Sprintln("===== ERRORS =====")+fmt.Sprintln("test error 1")+fmt.Sprintln("test error 2"), buffer.String())
 }

@@ -43,8 +43,8 @@ func TestParsers_Pipelines_UserPipelineFilePaths(t *testing.T) {
 func TestParsers_Pipelines_UserPipelineFilePaths_noArgs(t *testing.T) {
 	parser := NewParser(
 		WithFindByGlobImplementation(func(pattern string) ([]string, error) {
-		return []string{"test1.pipe", "test2.pipe"}, nil
-	}))
+			return []string{"test1.pipe", "test2.pipe"}, nil
+		}))
 	result, err := parser.UserPipelineFilePaths([]string{})
 	require.Nil(t, err)
 	require.Equal(t, []string{"test1.pipe", "test2.pipe"}, result)
@@ -53,8 +53,8 @@ func TestParsers_Pipelines_UserPipelineFilePaths_noArgs(t *testing.T) {
 func TestParsers_Pipelines_UserPipelineFilePaths_noArgs_globError(t *testing.T) {
 	parser := NewParser(
 		WithFindByGlobImplementation(func(pattern string) ([]string, error) {
-		return []string{"test1.pipe", "test2.pipe"}, fmt.Errorf("test error")
-	}))
+			return []string{"test1.pipe", "test2.pipe"}, fmt.Errorf("test error")
+		}))
 	_, err := parser.UserPipelineFilePaths([]string{})
 	require.NotNil(t, err)
 	require.Equal(t, "failed to glob pipeline files: test error", err.Error())
@@ -63,18 +63,18 @@ func TestParsers_Pipelines_UserPipelineFilePaths_noArgs_globError(t *testing.T) 
 func TestParsers_Pipelines_UserPipelineFilePaths_noArgs_noMatches(t *testing.T) {
 	parser := NewParser(
 		WithFindByGlobImplementation(func(pattern string) ([]string, error) {
-		return []string{}, nil
-	}))
-	_, err := parser.UserPipelineFilePaths([]string{})
-	require.NotNil(t, err)
-	require.Equal(t, "no pipeline files found, please switch directories or provide path argument", err.Error())
+			return []string{}, nil
+		}))
+	pipelineFilePaths, err := parser.UserPipelineFilePaths([]string{})
+	require.Nil(t, err)
+	require.Equal(t, []string{}, pipelineFilePaths)
 }
 
 func TestParsers_Pipelines_UserPipelineFilePaths_passSinglePathArg(t *testing.T) {
 	parser := NewParser(
 		WithFindByGlobImplementation(func(pattern string) ([]string, error) {
-		return []string{"test1.pipe"}, nil
-	}))
+			return []string{"test1.pipe"}, nil
+		}))
 	result, err := parser.UserPipelineFilePaths([]string{"test1"})
 	require.Nil(t, err)
 	require.Equal(t, []string{"test1.pipe"}, result)

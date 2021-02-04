@@ -10,8 +10,6 @@ import (
 	"sync"
 )
 
-var simpleActivityIndicatorWidth = 1
-
 type SimpleActivityIndicator struct {
 	waitGroup *sync.WaitGroup
 

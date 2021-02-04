@@ -13,7 +13,7 @@ type PipelineReference = map[*string]Arguments
 var pipelineReferenceType = reflect.TypeOf(PipelineReference{})
 
 func pipelineReferenceDecodeHook(
-	inputType reflect.Type,
+	_ reflect.Type,
 	outputType reflect.Type,
 	value interface{},
 ) (interface{}, error) {

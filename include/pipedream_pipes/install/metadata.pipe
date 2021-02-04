@@ -63,10 +63,12 @@ private:
                 inherit:
                   - uppercase_identifier
                 key: "version"
+                uppercase_key: "VERSION"
             - install::metadata::extract-value:
                 inherit:
                   - uppercase_identifier
                 key: "commit"
+                uppercase_key: "COMMIT"
             - install::metadata::extract-value:
                 inherit:
                   - uppercase_identifier

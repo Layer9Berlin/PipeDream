@@ -110,13 +110,14 @@ func TestSelect_letUserSelectPipelineFile_fileSelectionError(t *testing.T) {
 func TestSelect_letUserSelectPipelineFileAndPipeline_noFiles(t *testing.T) {
 	executionContext := middleware.NewExecutionContext()
 	executionContext.PipelineFiles = []models.PipelineFile{}
-	_, _, err := letUserSelectPipelineFileAndPipeline(
+	pipeline, file, err := letUserSelectPipelineFileAndPipeline(
 		executionContext,
 		10,
 		os.Stdin,
 		os.Stdout)
-	require.NotNil(t, err)
-	require.Contains(t, err.Error(), "no pipeline file found")
+	require.Nil(t, err)
+	require.Equal(t, "no-pipelines::handle", pipeline)
+	require.Equal(t, "", file)
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_noSelectableFiles(t *testing.T) {

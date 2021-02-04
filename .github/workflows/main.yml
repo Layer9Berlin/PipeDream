@@ -3,7 +3,7 @@ name: PipeDream release
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
   goreleaser:
@@ -19,14 +19,6 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.15
-      -
-        name: Go test
-        run: go test ./src/... -coverprofile=test/coverage.out
-      -
-        name: Upload code coverage
-        run: bash <(curl -s https://codecov.io/bash)
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       -
         name: Create Release
         id: create_release

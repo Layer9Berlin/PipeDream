@@ -59,7 +59,8 @@ type PipelineRun struct {
 	cancelled   bool
 	cancelHooks []func() error
 
-	Synchronous bool
+	Synchronous    bool
+	StartWaitGroup *sync.WaitGroup
 }
 
 func NewPipelineRun(
@@ -96,7 +97,8 @@ func NewPipelineRun(
 		cancelled:   false,
 		cancelHooks: make([]func() error, 0, 10),
 
-		Synchronous: false,
+		Synchronous:    false,
+		StartWaitGroup: &sync.WaitGroup{},
 	}
 
 	if parent == nil {
