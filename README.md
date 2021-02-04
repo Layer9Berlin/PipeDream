@@ -1,4 +1,7 @@
-<img src="docs/assets/PipeDream.png" width="360" height="234">
+<p align="center">
+    <img src="docs/assets/PipeDream.png" width="360" height="234">
+    <p align="center">Maintainable automation.</p>
+</p>
 
 [![Release](https://img.shields.io/github/v/release/Layer9Berlin/PipeDream.svg?style=for-the-badge)](https://github.com/Layer9Berlin/PipeDream/releases/latest)
 [![Software License](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
@@ -10,8 +13,6 @@
 > - find a bug
 > - need a feature added or tweaked for your use case
 > - have any other suggestions
-
-# PipeDream
 
 PipeDream is an open-source, general-purpose **automation tool**.
 

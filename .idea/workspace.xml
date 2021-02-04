@@ -22,15 +22,9 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="feat: sync pipe">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
+    <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: install pipe (WIP)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/build.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/build.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/metadata.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/metadata.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/pipes.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/pipes.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/shell/working-dir.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/shell/working-dir.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/install.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/install.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -251,7 +245,6 @@
     <MESSAGE value="docs: improve logo quality" />
     <MESSAGE value="docs: improve middleware docs (WIP)" />
     <MESSAGE value="feat: wait for input (WIP)" />
-    <MESSAGE value="fix: install pipe (WIP)" />
     <MESSAGE value="fix: crash when execution context has no errors" />
     <MESSAGE value="chore: convert middleware identifiers to snake-case" />
     <MESSAGE value="feat: log run identifier in execution context errors" />
@@ -264,7 +257,8 @@
     <MESSAGE value="fix: publish pipe" />
     <MESSAGE value="docs: adjust logo size in README" />
     <MESSAGE value="feat: sync pipe" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: sync pipe" />
+    <MESSAGE value="fix: install pipe (WIP)" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: install pipe (WIP)" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -291,28 +285,28 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="562" key="GridCell.Tab.0.bottom" timestamp="1612459960420">
+    <state width="1638" height="446" key="GridCell.Tab.0.bottom" timestamp="1612460332074">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="562" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612459960420" />
+    <state width="1638" height="446" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612460332074" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="562" key="GridCell.Tab.0.center" timestamp="1612459960419">
+    <state width="1638" height="446" key="GridCell.Tab.0.center" timestamp="1612460332073">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="562" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612459960419" />
+    <state width="1638" height="446" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612460332073" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="562" key="GridCell.Tab.0.left" timestamp="1612459960418">
+    <state width="1638" height="446" key="GridCell.Tab.0.left" timestamp="1612460332072">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="562" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612459960418" />
+    <state width="1638" height="446" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612460332072" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="562" key="GridCell.Tab.0.right" timestamp="1612459960420">
+    <state width="1638" height="446" key="GridCell.Tab.0.right" timestamp="1612460332074">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="562" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612459960420" />
+    <state width="1638" height="446" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612460332074" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
     <state width="1638" height="447" key="GridCell.Tab.1.bottom" timestamp="1612452320606">
