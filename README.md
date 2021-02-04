@@ -1,7 +1,7 @@
 ![PipeDream](docs/assets/PipeDream.png)
 
 [![Release](https://img.shields.io/github/v/release/Layer9Berlin/PipeDream.svg?style=for-the-badge)](https://github.com/Layer9Berlin/PipeDream/releases/latest)
-[![Software License](https://img.shields.io/badge/license-GPL v3-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
+[![Software License](https://img.shields.io/badge/license-GPL%20v3-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
 [![Codecov branch](https://img.shields.io/codecov/c/github/Layer9Berlin/PipeDream/main.svg?style=for-the-badge)](https://codecov.io/gh/Layer9Berlin/PipeDream)
 
 >## 🚧 Status: alpha 🚧
