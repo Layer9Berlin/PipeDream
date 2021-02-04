@@ -98,5 +98,5 @@ private:
       - exec::noop:
           when: "'$!!' =~ 'Everything up-to-date'"
       - print::message:
-          when: "'$!!' !~ 'Permission denied|Everything up-to-date'"
+          when: "'$!!' !~ 'Permission denied|Everything up-to-date|To github\.com:Layer9Berlin/PipeDream\.git'"
           message: "uncaught error ('$!!')"
