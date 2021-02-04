@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -251,7 +252,8 @@
     <MESSAGE value="docs: improve README" />
     <MESSAGE value="docs: add badges to README" />
     <MESSAGE value="docs: test coverage in README" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: test coverage in README" />
+    <MESSAGE value="fix: publish pipe" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: publish pipe" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
