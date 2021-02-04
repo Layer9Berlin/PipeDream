@@ -23,8 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -253,7 +253,8 @@
     <MESSAGE value="docs: add badges to README" />
     <MESSAGE value="docs: test coverage in README" />
     <MESSAGE value="fix: publish pipe" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: publish pipe" />
+    <MESSAGE value="fix: remove .DS_Store files" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove .DS_Store files" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -352,10 +353,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="252" y="231" width="597" height="490" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612435180727" />
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1612439682868">
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1612440497554">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612439682868" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612440497554" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup/0.25.1680.947@0.25.1680.947" timestamp="1610619078061" />
   </component>
   <component name="XDebuggerManager">
