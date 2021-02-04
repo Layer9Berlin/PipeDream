@@ -24,10 +24,10 @@ func NewBarActivityIndicator(writer io.Writer, options ...mpb.ContainerOption) *
 	options = append(options, mpb.WithWidth(64))
 
 	progress := mpb.New(options...)
-	bar := progress.AddBar(10)
 	indicator := BarActivityIndicator{
-		bar:       bar,
+		bar:       nil,
 		len:       0,
+		progress:  progress,
 		visible:   true,
 		waitGroup: waitGroup,
 		writer:    writer,
@@ -39,7 +39,11 @@ func (activityIndicator *BarActivityIndicator) AddIndicator(subject ActivityIndi
 	if !activityIndicator.visible {
 		return
 	}
-	activityIndicator.bar.SetTotal(int64(activityIndicator.len), false)
+	if activityIndicator.bar == nil {
+		activityIndicator.bar = activityIndicator.progress.AddBar(1)
+	} else {
+		activityIndicator.bar.SetTotal(int64(activityIndicator.len), false)
+	}
 	activityIndicator.waitGroup.Add(1)
 	go func() {
 		subject.Wait()
@@ -61,6 +65,7 @@ func (activityIndicator *BarActivityIndicator) Wait() {
 
 func (activityIndicator *BarActivityIndicator) cancel() {
 	activityIndicator.visible = false
+	activityIndicator.bar.Abort(true)
 }
 
 func (activityIndicator *BarActivityIndicator) SetVisible(visible bool) {

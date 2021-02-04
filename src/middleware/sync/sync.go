@@ -25,8 +25,8 @@ func NewSyncMiddleware() SyncMiddleware {
 }
 
 type SyncMiddlewareArguments struct {
-	waitFor []string
-	envVars []string
+	Pipes   []string
+	EnvVars []string
 }
 
 func (syncMiddleware SyncMiddleware) Apply(
@@ -37,8 +37,8 @@ func (syncMiddleware SyncMiddleware) Apply(
 	arguments := SyncMiddlewareArguments{}
 	middleware.ParseArguments(&arguments, "sync", run)
 
-	if arguments.waitFor != nil {
-		for _, pipelineIdentifier := range arguments.waitFor {
+	if arguments.Pipes != nil {
+		for _, pipelineIdentifier := range arguments.Pipes {
 			for _, dependentRun := range executionContext.Runs {
 				if dependentRun.Identifier != nil && *dependentRun.Identifier == pipelineIdentifier {
 					run.StartWaitGroup.Add(1)
@@ -56,8 +56,8 @@ func (syncMiddleware SyncMiddleware) Apply(
 		}
 	}
 
-	if arguments.envVars != nil {
-		for _, envVar := range arguments.envVars {
+	if arguments.EnvVars != nil {
+		for _, envVar := range arguments.EnvVars {
 			run.StartWaitGroup.Add(1)
 			envVar := envVar
 			run.Log.DebugWithFields(

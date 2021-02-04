@@ -7,7 +7,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"pipedream/src/logging"
 	"pipedream/src/middleware"
 	"pipedream/src/middleware/middleware_stack"
 )
@@ -26,7 +25,7 @@ func Cmd(_ *cobra.Command, args []string) {
 	executableDir := path.Dir(executableLocation)
 	projectPath, _ := filepath.EvalSymlinks(executableDir)
 	executionContext := executionContextFactory(
-		middleware.WithActivityIndicator(logging.NewBarActivityIndicator(osStdout)),
+		//middleware.WithActivityIndicator(logging.NewBarActivityIndicator(osStdout)),
 		middleware.WithMiddlewareStack(middleware_stack.SetUpMiddleware()),
 		middleware.WithProjectPath(projectPath),
 		middleware.WithLogger(Log),

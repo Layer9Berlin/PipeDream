@@ -43,8 +43,11 @@ private:
 
   install::binary::check-presence:
     pipe:
-      - shell::env:
+      - env::load:
           var: PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
+          sync:
+            envVars:
+              - PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
       - print::if-empty:
           message: "not installed"
           else: "installed"
