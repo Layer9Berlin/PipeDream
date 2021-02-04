@@ -1,7 +1,7 @@
 package main
 
 import (
-	"pipedream/util/semver-compare/cmd"
+	"github.com/Layer9Berlin/pipedream/util/semver-compare/cmd"
 )
 
 func main() {

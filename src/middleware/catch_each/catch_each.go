@@ -3,9 +3,9 @@ package catch_each
 import (
 	"bufio"
 	"bytes"
-	"pipedream/src/logging/log_fields"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"sync"
 )
 

@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 )
 
@@ -10,8 +10,7 @@ func TestParseArgumentsIncludingParents(t *testing.T) {
 	parentRun, _ := models.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{"test"},
 	}, nil, nil)
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, parentRun)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, parentRun)
 	reference := make([]interface{}, 0, 1)
 	require.Equal(t, true, ParseArgumentsIncludingParents(&reference, "test", run))
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -32,8 +31,7 @@ func TestParseArguments_WithMalformedArguments(t *testing.T) {
 }
 
 func TestParseArguments_WithoutArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 	require.Equal(t, false, ParseArguments(&[]PipelineReference{}, "test", run))
 }
 
@@ -160,8 +158,7 @@ func TestParsePipelineReferences_WithNonArrayArguments(t *testing.T) {
 }
 
 func TestParsePipelineReferences_WithoutArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 	require.Equal(t, false, ParseArguments(&[]PipelineReference{}, "test", run))
 }
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"pipedream/util/traffic-light/cmd"
+	"github.com/Layer9Berlin/pipedream/util/traffic-light/cmd"
 )
 
 func main() {

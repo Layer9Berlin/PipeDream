@@ -2,10 +2,10 @@ package models
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/logging/log_fields"
 	"testing"
 )
 
@@ -21,7 +21,7 @@ func TestPipelineRunLogger_Error(t *testing.T) {
 	logger.Error(fmt.Errorf("test error"))
 	require.Equal(t, 1, logger.ErrorCount())
 	require.Equal(t, "test error", logger.LastError().Error())
-	logger.Error(fmt.Errorf("another error"), log_fields.Middleware("test 2"), )
+	logger.Error(fmt.Errorf("another error"), log_fields.Middleware("test 2"))
 	require.Equal(t, 2, logger.ErrorCount())
 	require.Equal(t, "another error", logger.LastError().Error())
 }

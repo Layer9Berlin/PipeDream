@@ -2,11 +2,11 @@ package each
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"strings"
 	"sync"
 	"testing"
@@ -38,22 +38,22 @@ func TestEach_Apply(t *testing.T) {
 		},
 		middleware.NewExecutionContext(
 			middleware.WithExecutionFunction(
-			func(childRun *models.PipelineRun) {
-				stdinCopy := childRun.Stdin.Copy()
-				waitGroup.Add(1)
-				go func() {
-					defer waitGroup.Done()
-					completeInput, err := ioutil.ReadAll(stdinCopy)
-					require.Nil(t, err)
-					allInputs = append(allInputs, string(completeInput))
-				}()
-				identifier := "anonymous"
-				if childRun.Identifier != nil {
-					identifier = *childRun.Identifier
-				}
-				childRun.Stdout.Replace(strings.NewReader(fmt.Sprintf("output of pipeline `%v`\n", identifier)))
-			}),
-	))
+				func(childRun *models.PipelineRun) {
+					stdinCopy := childRun.Stdin.Copy()
+					waitGroup.Add(1)
+					go func() {
+						defer waitGroup.Done()
+						completeInput, err := ioutil.ReadAll(stdinCopy)
+						require.Nil(t, err)
+						allInputs = append(allInputs, string(completeInput))
+					}()
+					identifier := "anonymous"
+					if childRun.Identifier != nil {
+						identifier = *childRun.Identifier
+					}
+					childRun.Stdout.Replace(strings.NewReader(fmt.Sprintf("output of pipeline `%v`\n", identifier)))
+				}),
+		))
 	run.Close()
 	run.Wait()
 	waitGroup.Wait()

@@ -1,10 +1,10 @@
 package with
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"strings"
 	"sync"
 	"testing"

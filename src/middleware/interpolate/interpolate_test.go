@@ -2,11 +2,11 @@ package interpolate
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"strings"
 	"sync"
 	"testing"
@@ -77,8 +77,8 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 func TestInterpolate_SingleSubstitution(t *testing.T) {
 	identifier := "child identifier"
 	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
-		"arg":   "value",
-		"arg2":  "@{arg}",
+		"arg":  "value",
+		"arg2": "@{arg}",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("TestInput"))
 
@@ -100,8 +100,8 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
-		"arg":   "value",
-		"arg2":   "value",
+		"arg":  "value",
+		"arg2": "value",
 	}, runArguments)
 	require.Equal(t, "child identifier", childIdentifier)
 	require.Contains(t, run.Log.String(), "child run log entry")

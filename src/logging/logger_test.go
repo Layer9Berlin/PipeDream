@@ -1,9 +1,9 @@
 package logging
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/logging/log_fields"
 	"strings"
 	"testing"
 )

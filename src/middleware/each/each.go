@@ -1,10 +1,10 @@
 package each
 
 import (
-	"pipedream/src/helpers/string_map"
-	"pipedream/src/logging/log_fields"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/helpers/string_map"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"strings"
 )
 

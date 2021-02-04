@@ -3,12 +3,12 @@ package models
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
 	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"io"
-	"pipedream/src/logging"
-	"pipedream/src/logging/log_fields"
 	"strings"
 	"sync"
 )

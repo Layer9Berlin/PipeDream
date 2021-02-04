@@ -1,7 +1,7 @@
 package main
 
 import (
-	"pipedream/cmd"
+	"github.com/Layer9Berlin/pipedream/cmd"
 )
 
 func main() {

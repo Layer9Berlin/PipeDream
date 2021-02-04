@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/models"
 )
 
 type Middleware interface {

@@ -3,11 +3,11 @@ package run
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/parsers"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
-	"pipedream/src/middleware"
-	"pipedream/src/parsers"
 	"sync"
 	"testing"
 )

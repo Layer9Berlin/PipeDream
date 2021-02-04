@@ -2,8 +2,8 @@ package parsers
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"gopkg.in/yaml.v3"
-	"pipedream/src/models"
 	"sort"
 )
 

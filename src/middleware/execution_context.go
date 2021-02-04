@@ -2,6 +2,12 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/helpers/custom_io"
+	"github.com/Layer9Berlin/pipedream/src/helpers/custom_math"
+	"github.com/Layer9Berlin/pipedream/src/logging"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/parsers"
 	"github.com/hashicorp/go-multierror"
 	"github.com/manifoldco/promptui"
 	"github.com/sirupsen/logrus"
@@ -9,12 +15,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/signal"
-	"pipedream/src/helpers/custom_io"
-	"pipedream/src/helpers/custom_math"
-	"pipedream/src/logging"
-	"pipedream/src/logging/log_fields"
-	"pipedream/src/models"
-	"pipedream/src/parsers"
 	"strings"
 	"syscall"
 )

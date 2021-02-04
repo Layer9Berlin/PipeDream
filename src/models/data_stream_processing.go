@@ -3,9 +3,9 @@ package models
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/helpers/custom_io"
 	"io"
 	"io/ioutil"
-	"pipedream/src/helpers/custom_io"
 )
 
 func (stream *ComposableDataStream) CopyOrResult() io.Reader {

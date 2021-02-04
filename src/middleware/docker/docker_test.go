@@ -1,9 +1,9 @@
 package docker
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 )
 
@@ -90,8 +90,7 @@ func TestDocker_NonRunnable(t *testing.T) {
 		},
 	}, nil, nil)
 
-	childRun, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, run)
+	childRun, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, run)
 
 	childRun.Log.SetLevel(logrus.TraceLevel)
 	NewDockerMiddleware().Apply(

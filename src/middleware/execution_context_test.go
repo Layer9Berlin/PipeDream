@@ -3,10 +3,10 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging"
+	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/parsers"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/logging"
-	"pipedream/src/models"
-	"pipedream/src/parsers"
 	"strings"
 	"testing"
 )

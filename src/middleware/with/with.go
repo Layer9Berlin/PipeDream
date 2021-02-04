@@ -2,10 +2,10 @@ package with
 
 import (
 	"bytes"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"io/ioutil"
-	"pipedream/src/logging/log_fields"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"regexp"
 	"sync"
 )

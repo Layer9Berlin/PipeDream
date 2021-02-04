@@ -1,9 +1,9 @@
 package save
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"os"
 	"strings"
 	"testing"

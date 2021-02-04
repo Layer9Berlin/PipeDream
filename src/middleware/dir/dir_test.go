@@ -2,9 +2,9 @@ package dir
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 )
 
@@ -43,8 +43,7 @@ func TestDir_DontChangeDir(t *testing.T) {
 		},
 	}
 	currentDir = "pre-test"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	dirMiddleware.Apply(

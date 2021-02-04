@@ -1,4 +1,4 @@
-module Layer9Berlin/pipedream
+module github.com/Layer9Berlin/pipedream
 
 go 1.15
 

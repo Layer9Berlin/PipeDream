@@ -1,14 +1,14 @@
 package run
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/middleware/middleware_stack"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
-	"pipedream/src/middleware"
-	"pipedream/src/middleware/middleware_stack"
 )
 
 var Log = logrus.New()

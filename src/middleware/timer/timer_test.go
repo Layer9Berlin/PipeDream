@@ -1,9 +1,9 @@
 package timer
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 	"time"
 )

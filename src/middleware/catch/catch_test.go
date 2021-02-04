@@ -1,12 +1,12 @@
 package catch
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"strings"
 	"testing"
 )
@@ -113,8 +113,7 @@ func TestCatch_HandlerNotInvoked(t *testing.T) {
 }
 
 func TestCatch_WithoutHandler(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewCatchMiddleware().Apply(run, func(run *models.PipelineRun) {

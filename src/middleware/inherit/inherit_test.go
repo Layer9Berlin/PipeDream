@@ -2,10 +2,10 @@ package inherit
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 )
 

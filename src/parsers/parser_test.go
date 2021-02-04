@@ -2,8 +2,8 @@ package parsers
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 )
 
@@ -263,23 +263,23 @@ func TestParser_Imports(t *testing.T) {
 	importedFiles := make([]string, 0, 2)
 	parser := NewParser(
 		WithReadFileImplementation(func(filename string) ([]byte, error) {
-		importedFiles = append(importedFiles, filename)
-		switch filename {
-		case "test1.file":
-			return []byte(`
+			importedFiles = append(importedFiles, filename)
+			switch filename {
+			case "test1.file":
+				return []byte(`
 version: 0.0.1
 
 import:
  - test2.file
 `), nil
-		case "test2.file":
-			return []byte(`
+			case "test2.file":
+				return []byte(`
 version: 0.0.1
 `), nil
-		}
-		require.Fail(t, "unexpected import")
-		return nil, nil
-	}))
+			}
+			require.Fail(t, "unexpected import")
+			return nil, nil
+		}))
 
 	imports, err := parser.RecursivelyAddImports([]string{
 		"test1.file",

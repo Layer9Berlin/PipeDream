@@ -3,11 +3,11 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/logging"
-	"pipedream/src/models"
 	"testing"
 )
 

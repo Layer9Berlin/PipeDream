@@ -2,9 +2,9 @@ package models
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/logging/log_fields"
 	"strings"
 	"testing"
 )
@@ -181,8 +181,7 @@ func TestPipelineRun_UnmergeableDefinition(t *testing.T) {
 }
 
 func TestPipelineRun_SetArguments(t *testing.T) {
-	run, err := NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, err := NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 	require.NotNil(t, run)
 	require.Nil(t, err)
 	run.SetArguments(map[string]interface{}{

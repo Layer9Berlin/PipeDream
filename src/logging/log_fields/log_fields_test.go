@@ -2,9 +2,9 @@ package log_fields
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/logging"
 	"strings"
 	"testing"
 )

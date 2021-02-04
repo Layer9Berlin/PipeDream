@@ -1,12 +1,12 @@
 package cmd
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/logging"
+	"github.com/Layer9Berlin/pipedream/src/run"
+	"github.com/Layer9Berlin/pipedream/src/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"os"
-	"pipedream/src/logging"
-	"pipedream/src/run"
-	"pipedream/src/version"
 )
 
 var RootCmd = &cobra.Command{

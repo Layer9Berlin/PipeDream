@@ -2,10 +2,10 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
 	"io"
-	"pipedream/src/models"
 	"strings"
 )
 

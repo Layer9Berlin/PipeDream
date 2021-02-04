@@ -2,10 +2,10 @@ package parsers
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"path/filepath"
-	"pipedream/src/models"
 )
 
 type ParserOption func(parser *Parser)

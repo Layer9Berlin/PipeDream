@@ -1,11 +1,11 @@
 package pipe
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"strings"
 	"sync"
 	"testing"
@@ -32,32 +32,32 @@ func TestPipe_Apply(t *testing.T) {
 		},
 		middleware.NewExecutionContext(
 			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
-			switch *childRun.Identifier {
-			case "test1":
-				stdinCopy := childRun.Stdin.Copy()
-				waitGroup.Add(1)
-				go func() {
-					defer waitGroup.Done()
-					completeInput, err := ioutil.ReadAll(stdinCopy)
-					require.Nil(t, err)
-					require.Equal(t, "test input", string(completeInput))
-				}()
-				childRun.Stdout.Replace(strings.NewReader("test1 output"))
-				childRun.Log.Info(logrus.WithField("message", "test1 log entry"))
-			case "test2":
-				stdinCopy := childRun.Stdin.Copy()
-				waitGroup.Add(1)
-				go func() {
-					completeInput, err := ioutil.ReadAll(stdinCopy)
-					require.Nil(t, err)
-					require.Equal(t, "test1 output", string(completeInput))
-					waitGroup.Done()
-				}()
-				childRun.Stdout.Replace(strings.NewReader("test2 output"))
-				childRun.Log.Info(logrus.WithField("message", "test2 log entry"))
-			}
-		}),
-	))
+				switch *childRun.Identifier {
+				case "test1":
+					stdinCopy := childRun.Stdin.Copy()
+					waitGroup.Add(1)
+					go func() {
+						defer waitGroup.Done()
+						completeInput, err := ioutil.ReadAll(stdinCopy)
+						require.Nil(t, err)
+						require.Equal(t, "test input", string(completeInput))
+					}()
+					childRun.Stdout.Replace(strings.NewReader("test1 output"))
+					childRun.Log.Info(logrus.WithField("message", "test1 log entry"))
+				case "test2":
+					stdinCopy := childRun.Stdin.Copy()
+					waitGroup.Add(1)
+					go func() {
+						completeInput, err := ioutil.ReadAll(stdinCopy)
+						require.Nil(t, err)
+						require.Equal(t, "test1 output", string(completeInput))
+						waitGroup.Done()
+					}()
+					childRun.Stdout.Replace(strings.NewReader("test2 output"))
+					childRun.Log.Info(logrus.WithField("message", "test2 log entry"))
+				}
+			}),
+		))
 	run.Close()
 	run.Wait()
 	waitGroup.Wait()
@@ -153,10 +153,10 @@ func TestPipe_AnonymousReference(t *testing.T) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction( func(childRun *models.PipelineRun) {
-			fullRunCalled = true
-		}),
-	))
+			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+				fullRunCalled = true
+			}),
+		))
 	run.Close()
 	run.Wait()
 

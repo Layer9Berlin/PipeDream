@@ -2,12 +2,12 @@ package models
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/helpers/custom_strings"
+	"github.com/Layer9Berlin/pipedream/src/helpers/string_map"
+	"github.com/Layer9Berlin/pipedream/src/logging"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
 	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
-	"pipedream/src/helpers/custom_strings"
-	"pipedream/src/helpers/string_map"
-	"pipedream/src/logging"
-	"pipedream/src/logging/log_fields"
 	"strings"
 	"sync"
 )

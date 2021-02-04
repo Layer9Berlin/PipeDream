@@ -1,9 +1,9 @@
 package when
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
-	"pipedream/src/models"
 	"testing"
 )
 
@@ -19,7 +19,7 @@ func TestWhen_TrueCondition(t *testing.T) {
 		nil,
 	)
 	run.Close()
-run.Wait()
+	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Contains(t, run.Log.String(), "when | satisfied | \"8 in (7,8,9)\"")
@@ -37,7 +37,7 @@ func TestWhen_FalseCondition(t *testing.T) {
 		nil,
 	)
 	run.Close()
-run.Wait()
+	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Contains(t, run.Log.String(), "when | not satisfied | \"1 == 2\"")
@@ -55,7 +55,7 @@ func TestWhen_UnparseableCondition(t *testing.T) {
 		nil,
 	)
 	run.Close()
-run.Wait()
+	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
 	require.Contains(t, run.Log.LastError().Error(), "error parsing condition")
@@ -63,8 +63,7 @@ run.Wait()
 }
 
 func TestWhen_WithoutCondition(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
-	}, nil, nil)
+	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewWhenMiddleware().Apply(
@@ -73,7 +72,7 @@ func TestWhen_WithoutCondition(t *testing.T) {
 		nil,
 	)
 	run.Close()
-run.Wait()
+	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.NotContains(t, run.Log.String(), "when")

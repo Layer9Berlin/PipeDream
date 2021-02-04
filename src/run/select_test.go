@@ -2,12 +2,12 @@ package run
 
 import (
 	"bytes"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"os"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
 	"sync"
 	"testing"
 )

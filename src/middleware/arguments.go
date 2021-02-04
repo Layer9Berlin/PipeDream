@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/models"
 	"github.com/mitchellh/mapstructure"
-	"pipedream/src/models"
 	"reflect"
 )
 

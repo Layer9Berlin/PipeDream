@@ -2,10 +2,10 @@ package when
 
 import (
 	"fmt"
-	"pipedream/src/helpers/custom_evaluate"
-	"pipedream/src/logging/log_fields"
-	"pipedream/src/middleware"
-	"pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/helpers/custom_evaluate"
+	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/middleware"
+	"github.com/Layer9Berlin/pipedream/src/models"
 )
 
 // Conditional Executor
