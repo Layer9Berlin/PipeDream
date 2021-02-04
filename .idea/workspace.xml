@@ -23,39 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.github/workflows/main.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/main.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/metadata.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/metadata.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logging/activity_indicator.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/activity_indicator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logging/log_fields/log_fields.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/log_fields/log_fields.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logging/nested_activity_indicator_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/nested_activity_indicator_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logging/simple_activity_indicator.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/simple_activity_indicator.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/arguments.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/arguments.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/catch_each/catch_each_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/catch_each/catch_each_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/each/each.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/each/each.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/env/env_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/env/env_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/inherit/inherit.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/inherit/inherit.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/output_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/sync/sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/sync/sync.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/sync/sync_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/sync/sync_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/with/with.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/with/with.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/data_stream.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/data_stream.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/logger.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/pipeline_run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/pipeline_run.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parsers/pipelines_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsers/pipelines_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/run_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/select_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/select_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version/version_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/version/version_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/coverage.out" beforeDir="false" afterPath="$PROJECT_DIR$/test/coverage.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -282,7 +250,8 @@
     <MESSAGE value="feat: log run identifier in execution context errors" />
     <MESSAGE value="docs: improve README" />
     <MESSAGE value="docs: add badges to README" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: add badges to README" />
+    <MESSAGE value="docs: test coverage in README" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: test coverage in README" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
