@@ -1,7 +1,7 @@
 ![PipeDream](docs/assets/PipeDream.png)
 
 [![Release](https://img.shields.io/github/v/release/Layer9Berlin/PipeDream.svg?style=for-the-badge)](https://github.com/Layer9Berlin/PipeDream/releases/latest)
-[![Software License](https://img.shields.io/badge/license-GPL%20v3-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
+[![Software License](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
 [![Codecov branch](https://img.shields.io/codecov/c/github/Layer9Berlin/PipeDream/main.svg?style=for-the-badge)](https://codecov.io/gh/Layer9Berlin/PipeDream)
 
 >## 🚧 Status: alpha 🚧
@@ -29,11 +29,15 @@ Have a look at the [Quick Start Guide](./docs/quick-start), the [Documentation](
 
 ### From `npm`
 
-```npm i -g @l9/pipedream```
+```
+npm i -g @l9/pipedream
+```
 
 ### Using `homebrew` (Mac OS/linux)
 
-```brew install layer9berlin/tap/pipedream```
+```
+brew install layer9berlin/tap/pipedream
+```
 
 ### From source (requires Go installed)
 
@@ -53,17 +57,23 @@ If you use PipeDream a lot, it might be convenient to set up an alias like `p` t
 
 ### Installed via `npm`
 
-```npm uninstall -g @l9/pipedream```
+```
+npm uninstall -g @l9/pipedream
+```
 
 ### Installed via `homebrew`
 
-```brew uninstall pipedream```
+```
+brew uninstall pipedream
+```
 
 ### Compiled from source
 
 Simply run
 
-```pipedream```
+```
+pipedream
+```
 
 in the repo source directory and select `Uninstall`.
 
@@ -71,7 +81,9 @@ in the repo source directory and select `Uninstall`.
 
 If you don't recall how you installed PipeDream, run
 
-```pipedream version```
+```
+pipedream version
+```
 
 and check the `via` field.
 

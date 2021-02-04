@@ -23,7 +23,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -254,7 +253,8 @@
     <MESSAGE value="docs: test coverage in README" />
     <MESSAGE value="fix: publish pipe" />
     <MESSAGE value="fix: remove .DS_Store files" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove .DS_Store files" />
+    <MESSAGE value="docs: minor README tweak" />
+    <option name="LAST_COMMIT_MESSAGE" value="docs: minor README tweak" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
