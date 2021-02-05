@@ -24,8 +24,6 @@
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/coverage.out" beforeDir="false" afterPath="$PROJECT_DIR$/test/coverage.out" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,7 +70,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/logging" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="go.sdk" />
+    <property name="settings.editor.selected.configurable" value="preferences.intentionPowerPack" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -90,7 +88,7 @@
       <recent name="$PROJECT_DIR$/include/pipedream_pipes/no-pipelines" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build pipedream">
+  <component name="RunManager" selected="Go Test.go test src">
     <configuration name="go build pipedream" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
@@ -261,7 +259,8 @@
     <MESSAGE value="fix: install pipe (WIP)" />
     <MESSAGE value="docs: minor README tweak" />
     <MESSAGE value="fix: module path" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: module path" />
+    <MESSAGE value="chore: clean up dependencies" />
+    <option name="LAST_COMMIT_MESSAGE" value="chore: clean up dependencies" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -288,28 +287,28 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="321" key="GridCell.Tab.0.bottom" timestamp="1612515442844">
+    <state width="1638" height="432" key="GridCell.Tab.0.bottom" timestamp="1612516054570">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="321" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612515442844" />
+    <state width="1638" height="432" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612516054570" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="321" key="GridCell.Tab.0.center" timestamp="1612515442841">
+    <state width="1638" height="432" key="GridCell.Tab.0.center" timestamp="1612516054568">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="321" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612515442841" />
+    <state width="1638" height="432" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612516054568" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="321" key="GridCell.Tab.0.left" timestamp="1612515442840">
+    <state width="1638" height="432" key="GridCell.Tab.0.left" timestamp="1612516054567">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="321" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612515442840" />
+    <state width="1638" height="432" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612516054567" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="321" key="GridCell.Tab.0.right" timestamp="1612515442843">
+    <state width="1638" height="432" key="GridCell.Tab.0.right" timestamp="1612516054569">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="321" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612515442843" />
+    <state width="1638" height="432" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612516054569" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
     <state width="1638" height="447" key="GridCell.Tab.1.bottom" timestamp="1612513762276">
@@ -332,10 +331,10 @@
     </state>
     <state width="1638" height="447" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612513762276" />
     <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
-    <state x="349" y="161" key="SettingsEditor" timestamp="1612278127621">
+    <state x="349" y="161" key="SettingsEditor" timestamp="1612515582840">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="349" y="161" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1612278127621" />
+    <state x="349" y="161" key="SettingsEditor/0.0.1680.1050@0.0.1680.1050" timestamp="1612515582840" />
     <state x="100" y="100" width="1480" height="850" key="VCS.FileHistoryDialog" timestamp="1612288147098">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
