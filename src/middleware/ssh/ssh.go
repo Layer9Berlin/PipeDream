@@ -1,10 +1,11 @@
+// The `ssh` middleware enables remote command execution via SSH
 package ssh
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
 // SSH Executor
@@ -20,8 +21,8 @@ func NewSshMiddleware() SshMiddleware {
 }
 
 func (sshMiddleware SshMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	arguments := struct {
@@ -31,9 +32,9 @@ func (sshMiddleware SshMiddleware) Apply(
 
 	if arguments.Host != nil {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("👨‍💻"),
-			log_fields.Message(arguments.Host),
-			log_fields.Middleware(sshMiddleware),
+			fields.Symbol("👨‍💻"),
+			fields.Message(arguments.Host),
+			fields.Middleware(sshMiddleware),
 		)
 		prefixWithSshHost(run, *arguments.Host)
 	}
@@ -41,7 +42,7 @@ func (sshMiddleware SshMiddleware) Apply(
 	next(run)
 }
 
-func prefixWithSshHost(run *models.PipelineRun, sshHost string) {
+func prefixWithSshHost(run *pipeline.Run, sshHost string) {
 	path := []string{"shell", "run"}
 	// get the existing value - the shell -> run argument is not inheritable
 	existingValue, err := run.ArgumentAtPath(path...)

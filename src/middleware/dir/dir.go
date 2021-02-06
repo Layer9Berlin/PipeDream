@@ -1,9 +1,10 @@
+// The `dir` middleware allows for changing the current working directory
 package dir
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"os"
 )
 
@@ -26,8 +27,8 @@ func NewDirMiddleware() DirMiddleware {
 }
 
 func (dirMiddleware DirMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	dirArgument := ""
@@ -35,9 +36,9 @@ func (dirMiddleware DirMiddleware) Apply(
 
 	if dirArgument != "" {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("📂"),
-			log_fields.Message(dirArgument),
-			log_fields.Middleware(dirMiddleware),
+			fields.Symbol("📂"),
+			fields.Message(dirArgument),
+			fields.Middleware(dirMiddleware),
 		)
 		dirMiddleware.changeDirectory(dirArgument, run)
 	}
@@ -48,7 +49,7 @@ func (dirMiddleware DirMiddleware) Apply(
 	dirMiddleware.changeDirectory(dirMiddleware.WorkingDir, run)
 }
 
-func (dirMiddleware DirMiddleware) changeDirectory(directory interface{}, run *models.PipelineRun) {
+func (dirMiddleware DirMiddleware) changeDirectory(directory interface{}, run *pipeline.Run) {
 	dir, ok := directory.(string)
 	if ok && dir != "" {
 		err := dirMiddleware.DirChanger(dir)

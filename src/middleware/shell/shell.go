@@ -1,13 +1,14 @@
+// The `shell` middleware executes commands in a shell
 package shell
 
 import (
 	"errors"
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_io"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_strings"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	customio "github.com/Layer9Berlin/pipedream/src/custom/io"
+	customstrings "github.com/Layer9Berlin/pipedream/src/custom/strings"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io"
 	"os"
 	"os/exec"
@@ -63,8 +64,8 @@ func NewShellMiddlewareArguments() ShellMiddlewareArguments {
 }
 
 func (shellMiddleware ShellMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(pipelineRun *models.PipelineRun),
+	run *pipeline.Run,
+	next func(pipelineRun *pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := NewShellMiddlewareArguments()
@@ -77,7 +78,7 @@ func (shellMiddleware ShellMiddleware) Apply(
 		if err != nil {
 			run.Log.Error(
 				err,
-				log_fields.Middleware(shellMiddleware),
+				fields.Middleware(shellMiddleware),
 			)
 			return
 		} else {
@@ -119,7 +120,7 @@ func (shellMiddleware ShellMiddleware) Apply(
 			}()
 			go func() {
 				// need to wrap the osStdin, as it may return EOF for some time until new user input arrives
-				_, _ = io.Copy(io.MultiWriter(stdinIntercept, cmdStdin), custom_io.NewContinuousReader(shellMiddleware.osStdin))
+				_, _ = io.Copy(io.MultiWriter(stdinIntercept, cmdStdin), customio.NewContinuousReader(shellMiddleware.osStdin))
 				_ = stdinIntercept.Close()
 			}()
 
@@ -143,9 +144,9 @@ func (shellMiddleware ShellMiddleware) Apply(
 		}
 
 		run.Log.DebugWithFields(
-			log_fields.Symbol(">_"),
-			log_fields.Message(executor.String()),
-			log_fields.Middleware(shellMiddleware),
+			fields.Symbol(">_"),
+			fields.Message(executor.String()),
+			fields.Middleware(shellMiddleware),
 		)
 
 		go func() {
@@ -155,9 +156,9 @@ func (shellMiddleware ShellMiddleware) Apply(
 
 		run.AddCancelHook(func() error {
 			run.Log.WarnWithFields(
-				log_fields.Symbol("⎋"),
-				log_fields.Message("cancelled"),
-				log_fields.Info(executor.String()),
+				fields.Symbol("⎋"),
+				fields.Message("cancelled"),
+				fields.Info(executor.String()),
 			)
 			return executor.Kill()
 		})
@@ -212,11 +213,11 @@ func convertMapToStringArray(values map[string]interface{}, quoteType string) []
 	for argumentKey, argumentValue := range values {
 		if argumentValueAsString, argumentValueIsString := argumentValue.(string); argumentValueIsString {
 			if strings.HasPrefix(argumentKey, "-") {
-				stringResults = append(stringResults, fmt.Sprintf("%v%v", argumentKey, custom_strings.QuoteValue(argumentValueAsString, quoteType)))
+				stringResults = append(stringResults, fmt.Sprintf("%v%v", argumentKey, customstrings.QuoteValue(argumentValueAsString, quoteType)))
 			} else if len(argumentKey) == 1 {
-				stringResults = append(stringResults, fmt.Sprintf("-%v %v", argumentKey, custom_strings.QuoteValue(argumentValueAsString, quoteType)))
+				stringResults = append(stringResults, fmt.Sprintf("-%v %v", argumentKey, customstrings.QuoteValue(argumentValueAsString, quoteType)))
 			} else {
-				stringResults = append(stringResults, fmt.Sprintf("--%v=%v", argumentKey, custom_strings.QuoteValue(argumentValueAsString, quoteType)))
+				stringResults = append(stringResults, fmt.Sprintf("--%v=%v", argumentKey, customstrings.QuoteValue(argumentValueAsString, quoteType)))
 			}
 		} else if argumentValueAsBool, argumentValueIsBool := argumentValue.(bool); argumentValueIsBool {
 			if argumentValueAsBool {

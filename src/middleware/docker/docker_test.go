@@ -1,14 +1,14 @@
 package docker
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestDocker_RunInDockerContainer(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"service": "test-service",
 		},
@@ -20,7 +20,7 @@ func TestDocker_RunInDockerContainer(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewDockerMiddleware().Apply(
 		run,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -32,7 +32,7 @@ func TestDocker_RunInDockerContainer(t *testing.T) {
 }
 
 func TestDocker_MalformedArgument(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"test": "test-service",
 		},
@@ -44,7 +44,7 @@ func TestDocker_MalformedArgument(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewDockerMiddleware().Apply(
 		run,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -57,13 +57,13 @@ func TestDocker_MalformedArgument(t *testing.T) {
 }
 
 func TestDocker_InheritArgument(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"service": "test-service",
 		},
 	}, nil, nil)
 
-	childRun, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "test",
 		},
@@ -72,7 +72,7 @@ func TestDocker_InheritArgument(t *testing.T) {
 	childRun.Log.SetLevel(logrus.TraceLevel)
 	NewDockerMiddleware().Apply(
 		childRun,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	childRun.Close()
@@ -84,18 +84,18 @@ func TestDocker_InheritArgument(t *testing.T) {
 }
 
 func TestDocker_NonRunnable(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"service": "test-service",
 		},
 	}, nil, nil)
 
-	childRun, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, run)
+	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, run)
 
 	childRun.Log.SetLevel(logrus.TraceLevel)
 	NewDockerMiddleware().Apply(
 		childRun,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	childRun.Close()

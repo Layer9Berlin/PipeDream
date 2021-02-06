@@ -4,7 +4,6 @@ version: 0.0.1
 public:
   no-pipelines::handle:
     description: "Handling missing pipelines"
-    wait: true
     each:
       - print::message:
           message: '☁️ Welcome to PipeDream ☁️\nThere are no pipes in this directory.\n\n'

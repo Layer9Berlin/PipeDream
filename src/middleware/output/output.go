@@ -1,9 +1,10 @@
-package outputMiddleware
+// The `output` middleware overwrites a pipe's output directly
+package outputmiddleware
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io/ioutil"
 )
 
@@ -30,8 +31,8 @@ func NewOutputMiddlewareArguments() OutputMiddlewareArguments {
 }
 
 func (outputMiddleware OutputMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(pipelineRun *models.PipelineRun),
+	run *pipeline.Run,
+	next func(pipelineRun *pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := NewOutputMiddlewareArguments()
@@ -41,9 +42,9 @@ func (outputMiddleware OutputMiddleware) Apply(
 
 	if arguments.Text != nil {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("↗️️"),
-			log_fields.Message(*arguments.Text),
-			log_fields.Middleware(outputMiddleware),
+			fields.Symbol("↗️️"),
+			fields.Message(*arguments.Text),
+			fields.Middleware(outputMiddleware),
 		)
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {

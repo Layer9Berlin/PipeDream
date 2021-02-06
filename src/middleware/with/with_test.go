@@ -2,7 +2,7 @@ package with
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"strings"
@@ -11,7 +11,7 @@ import (
 )
 
 func TestWith_Pattern(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"with": map[string]interface{}{
 			"pattern": "(?m)^test.*",
 		},
@@ -21,11 +21,11 @@ func TestWith_Pattern(t *testing.T) {
 	allInputs := make([]string, 0, 3)
 	NewWithMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\ntest1\nbla\ntest2\ntest3\nend\n"))
 		},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				stdinCopier := childRun.Stdin.Copy()
 				waitGroup.Add(1)
 				go func() {
@@ -48,11 +48,11 @@ func TestWith_Pattern(t *testing.T) {
 }
 
 func TestWith_NoPattern(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, nil, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, nil, nil, nil)
 
 	NewWithMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\ntest1\nbla\ntest2\ntest3\nend\n"))
 		},
 		nil,
@@ -67,7 +67,7 @@ func TestWith_NoPattern(t *testing.T) {
 }
 
 func TestWith_NoMatch(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"with": map[string]interface{}{
 			"pattern": "(?m)^test.*",
 		},
@@ -75,7 +75,7 @@ func TestWith_NoMatch(t *testing.T) {
 
 	NewWithMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))
 		},
 		nil,
@@ -89,7 +89,7 @@ func TestWith_NoMatch(t *testing.T) {
 }
 
 func TestWith_PatternDoesNotCompile(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"with": map[string]interface{}{
 			"pattern": "(?m^test.*",
 		},
@@ -97,7 +97,7 @@ func TestWith_PatternDoesNotCompile(t *testing.T) {
 
 	NewWithMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))
 		},
 		nil,

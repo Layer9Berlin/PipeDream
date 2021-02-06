@@ -1,10 +1,11 @@
+// The `sync` middleware defers execution until a condition is fulfilled
 package sync_middleware
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"os"
 	"time"
 )
@@ -30,8 +31,8 @@ type SyncMiddlewareArguments struct {
 }
 
 func (syncMiddleware SyncMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := SyncMiddlewareArguments{}
@@ -43,9 +44,9 @@ func (syncMiddleware SyncMiddleware) Apply(
 				if dependentRun.Identifier != nil && *dependentRun.Identifier == pipelineIdentifier {
 					run.StartWaitGroup.Add(1)
 					run.Log.DebugWithFields(
-						log_fields.Symbol("🕙"),
-						log_fields.Message(fmt.Sprintf("waiting for run %q", pipelineIdentifier)),
-						log_fields.Middleware(syncMiddleware),
+						fields.Symbol("🕙"),
+						fields.Message(fmt.Sprintf("waiting for run %q", pipelineIdentifier)),
+						fields.Middleware(syncMiddleware),
 					)
 					go func() {
 						dependentRun.Wait()
@@ -61,9 +62,9 @@ func (syncMiddleware SyncMiddleware) Apply(
 			run.StartWaitGroup.Add(1)
 			envVar := envVar
 			run.Log.DebugWithFields(
-				log_fields.Symbol("🕙"),
-				log_fields.Message(fmt.Sprintf("waiting for env var %q to be set", envVar)),
-				log_fields.Middleware(syncMiddleware),
+				fields.Symbol("🕙"),
+				fields.Message(fmt.Sprintf("waiting for env var %q to be set", envVar)),
+				fields.Middleware(syncMiddleware),
 			)
 			go func() {
 				for {

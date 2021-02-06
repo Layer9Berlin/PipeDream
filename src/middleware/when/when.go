@@ -1,11 +1,12 @@
+// The `when` middleware enables conditional execution
 package when
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_evaluate"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/custom/evaluate"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
 // Conditional Executor
@@ -21,8 +22,8 @@ func NewWhenMiddleware() WhenMiddleware {
 }
 
 func (whenMiddleware WhenMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	argument := ""
@@ -33,7 +34,7 @@ func (whenMiddleware WhenMiddleware) Apply(
 		return
 	}
 
-	shouldExecute, err := custom_evaluate.EvaluateBool(argument)
+	shouldExecute, err := evaluate.EvaluateBool(argument)
 	if err != nil {
 		run.Log.Error(err)
 		return
@@ -41,19 +42,19 @@ func (whenMiddleware WhenMiddleware) Apply(
 
 	if shouldExecute {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("?"),
-			log_fields.Message("satisfied"),
-			log_fields.Info(fmt.Sprintf("%q", argument)),
-			log_fields.Middleware(whenMiddleware),
+			fields.Symbol("?"),
+			fields.Message("satisfied"),
+			fields.Info(fmt.Sprintf("%q", argument)),
+			fields.Middleware(whenMiddleware),
 		)
 		next(run)
 	} else {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("?"),
-			log_fields.Message("not satisfied"),
-			log_fields.Info(fmt.Sprintf("%q", argument)),
-			log_fields.Color("lightgrey"),
-			log_fields.Middleware(whenMiddleware),
+			fields.Symbol("?"),
+			fields.Message("not satisfied"),
+			fields.Info(fmt.Sprintf("%q", argument)),
+			fields.Color("lightgrey"),
+			fields.Middleware(whenMiddleware),
 		)
 		// the provided input should not be discarded, but passed through
 		// (there might be a next invocation in the chain)

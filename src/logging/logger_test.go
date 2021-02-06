@@ -1,7 +1,7 @@
 package logging
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"strings"
@@ -11,7 +11,7 @@ import (
 func TestLogger_FormatWithReader(t *testing.T) {
 	reader := strings.NewReader("test")
 	logger := logrus.New()
-	result, err := CustomFormatter{}.Format(log_fields.WithReader(reader)(logrus.NewEntry(logger)))
+	result, err := CustomFormatter{}.Format(fields.WithReader(reader)(logrus.NewEntry(logger)))
 	require.Nil(t, err)
 	require.Equal(t, "test", string(result))
 }
@@ -105,40 +105,40 @@ func TestLogger_Colors(t *testing.T) {
 }
 
 func TestLogger_ColorOverrides(t *testing.T) {
-	entry := log_fields.EntryWithFields(
-		log_fields.Message("some message"),
-		log_fields.Color("red"),
+	entry := fields.EntryWithFields(
+		fields.Message("some message"),
+		fields.Color("red"),
 	)
 	log, _ := CustomFormatter{}.Format(entry)
 	// red
 	require.Contains(t, string(log), "\x1b[31m")
 
-	entry = log_fields.Color("yellow")(entry)
+	entry = fields.Color("yellow")(entry)
 	log, _ = CustomFormatter{}.Format(entry)
 	// amber
 	require.Contains(t, string(log), "\x1b[33m")
 
-	entry = log_fields.Color("blue")(entry)
+	entry = fields.Color("blue")(entry)
 	log, _ = CustomFormatter{}.Format(entry)
 	// blue
 	require.Contains(t, string(log), "\x1b[34m")
 
-	entry = log_fields.Color("gray")(entry)
+	entry = fields.Color("gray")(entry)
 	log, _ = CustomFormatter{}.Format(entry)
 	// gray
 	require.Contains(t, string(log), "\x1b[38;5;244m")
 
-	entry = log_fields.Color("lightgray")(entry)
+	entry = fields.Color("lightgray")(entry)
 	log, _ = CustomFormatter{}.Format(entry)
 	// light gray
 	require.Contains(t, string(log), "\x1b[38;5;250m")
 
-	entry = log_fields.Color("cyan")(entry)
+	entry = fields.Color("cyan")(entry)
 	log, _ = CustomFormatter{}.Format(entry)
 	// cyan
 	require.Contains(t, string(log), "\x1b[36m")
 
-	entry = log_fields.Color("black")(entry)
+	entry = fields.Color("black")(entry)
 	log, _ = CustomFormatter{}.Format(entry)
 	// black
 	require.Contains(t, string(log), "\x1b[30m")

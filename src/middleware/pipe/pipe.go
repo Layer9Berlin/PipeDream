@@ -1,10 +1,11 @@
+// The `pipe` middleware executes several commands in sequence
 package pipe
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/helpers/string_map"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io"
 	"strings"
 )
@@ -21,8 +22,8 @@ func NewPipeMiddleware() PipeMiddleware {
 }
 
 func (pipeMiddleware PipeMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(pipelineRun *models.PipelineRun),
+	run *pipeline.Run,
+	next func(pipelineRun *pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := make([]middleware.PipelineReference, 0, 10)
@@ -35,7 +36,7 @@ func (pipeMiddleware PipeMiddleware) Apply(
 		for _, childReference := range arguments {
 			for pipelineIdentifier, pipelineArguments := range childReference {
 				childIdentifiers = append(childIdentifiers, pipelineIdentifier)
-				childArguments = append(childArguments, string_map.CopyMap(pipelineArguments))
+				childArguments = append(childArguments, stringmap.CopyMap(pipelineArguments))
 			}
 		}
 
@@ -51,23 +52,23 @@ func (pipeMiddleware PipeMiddleware) Apply(
 		switch len(info) {
 		case 0:
 			run.Log.DebugWithFields(
-				log_fields.Symbol("⇣"),
-				log_fields.Message("no invocation"),
-				log_fields.Middleware(pipeMiddleware),
+				fields.Symbol("⇣"),
+				fields.Message("no invocation"),
+				fields.Middleware(pipeMiddleware),
 			)
 			next(run)
 			return
 		case 1:
 			run.Log.DebugWithFields(
-				log_fields.Symbol("⇣"),
-				log_fields.Message("single invocation: "+strings.Join(info, ", ")),
-				log_fields.Middleware(pipeMiddleware),
+				fields.Symbol("⇣"),
+				fields.Message("single invocation: "+strings.Join(info, ", ")),
+				fields.Middleware(pipeMiddleware),
 			)
 		default:
 			run.Log.DebugWithFields(
-				log_fields.Symbol("⇣"),
-				log_fields.Message("invocation chain: "+strings.Join(info, ", ")),
-				log_fields.Middleware(pipeMiddleware),
+				fields.Symbol("⇣"),
+				fields.Message("invocation chain: "+strings.Join(info, ", ")),
+				fields.Middleware(pipeMiddleware),
 			)
 		}
 		var previousOutput io.Reader = nil
@@ -78,22 +79,22 @@ func (pipeMiddleware PipeMiddleware) Apply(
 				middleware.WithParentRun(run),
 				middleware.WithIdentifier(identifier),
 				middleware.WithArguments(childRunArguments),
-				middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
+				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
 					if index == 0 {
 						childRun.Log.TraceWithFields(
-							log_fields.DataStream(pipeMiddleware, "merging parent stdin into stdin")...,
+							fields.DataStream(pipeMiddleware, "merging parent stdin into stdin")...,
 						)
 						childRun.Stdin.MergeWith(run.Stdin.Copy())
 					} else {
 						childRun.Log.TraceWithFields(
-							log_fields.DataStream(pipeMiddleware, "merging previous stdout into stdin")...,
+							fields.DataStream(pipeMiddleware, "merging previous stdout into stdin")...,
 						)
 						childRun.Stdin.MergeWith(previousOutput)
 					}
 				}),
-				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
+				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 					childRun.Log.TraceWithFields(
-						log_fields.DataStream(pipeMiddleware, "copying stdout")...,
+						fields.DataStream(pipeMiddleware, "copying stdout")...,
 					)
 					// write to the next run's input
 					// or the parent's output, if this is the last child
@@ -101,7 +102,7 @@ func (pipeMiddleware PipeMiddleware) Apply(
 				}))
 		}
 		run.Log.TraceWithFields(
-			log_fields.DataStream(pipeMiddleware, "merging last child's stdout into stdout")...,
+			fields.DataStream(pipeMiddleware, "merging last child's stdout into stdout")...,
 		)
 		run.Stdout.MergeWith(previousOutput)
 	}

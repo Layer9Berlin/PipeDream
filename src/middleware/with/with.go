@@ -1,10 +1,11 @@
+// The `with` middleware extracts and processes input patterns
 package with
 
 import (
 	"bytes"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io/ioutil"
 	"regexp"
 	"sync"
@@ -27,8 +28,8 @@ type withMiddlewareArguments struct {
 }
 
 func (withMiddleware WithMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	argument := withMiddlewareArguments{
@@ -40,34 +41,34 @@ func (withMiddleware WithMiddleware) Apply(
 
 	if argument.Pattern != "" {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("／"),
-			log_fields.Middleware(withMiddleware),
-			log_fields.Message("pattern"),
-			log_fields.Info(argument.Pattern),
+			fields.Symbol("／"),
+			fields.Middleware(withMiddleware),
+			fields.Message("pattern"),
+			fields.Info(argument.Pattern),
 		)
 
 		regex, err := regexp.Compile(argument.Pattern)
 		if err != nil {
-			run.Log.Error(err, log_fields.Middleware(withMiddleware))
+			run.Log.Error(err, fields.Middleware(withMiddleware))
 			return
 		}
 
 		run.Log.TraceWithFields(
-			log_fields.Symbol("⎇"),
-			log_fields.Message("copying stdin"),
-			log_fields.Middleware(withMiddleware),
+			fields.Symbol("⎇"),
+			fields.Message("copying stdin"),
+			fields.Middleware(withMiddleware),
 		)
 		stdinCopy := run.Stdin.Copy()
 		run.Log.TraceWithFields(
-			log_fields.Symbol("⎇"),
-			log_fields.Message("intercepting stdout"),
-			log_fields.Middleware(withMiddleware),
+			fields.Symbol("⎇"),
+			fields.Message("intercepting stdout"),
+			fields.Middleware(withMiddleware),
 		)
 		stdoutIntercept := run.Stdout.Intercept()
 		run.Log.TraceWithFields(
-			log_fields.Symbol("⎇"),
-			log_fields.Message("creating stderr writer"),
-			log_fields.Middleware(withMiddleware),
+			fields.Symbol("⎇"),
+			fields.Message("creating stderr writer"),
+			fields.Middleware(withMiddleware),
 		)
 		stderrAppender := run.Stderr.WriteCloser()
 		waitGroup := &sync.WaitGroup{}
@@ -83,19 +84,19 @@ func (withMiddleware WithMiddleware) Apply(
 					middleware.WithParentRun(run),
 					middleware.WithIdentifier(run.Identifier),
 					middleware.WithArguments(run.ArgumentsCopy()),
-					middleware.WithSetupFunc(func(matchRun *models.PipelineRun) {
+					middleware.WithSetupFunc(func(matchRun *pipeline.Run) {
 						run.Log.TraceWithFields(
-							log_fields.Symbol("⎇"),
-							log_fields.Message("replacing stdin with regex match"),
-							log_fields.Middleware(withMiddleware),
+							fields.Symbol("⎇"),
+							fields.Message("replacing stdin with regex match"),
+							fields.Middleware(withMiddleware),
 						)
 						matchRun.Stdin.Replace(bytes.NewBuffer(match[0]))
 					}),
-					middleware.WithTearDownFunc(func(matchRun *models.PipelineRun) {
+					middleware.WithTearDownFunc(func(matchRun *pipeline.Run) {
 						run.Log.TraceWithFields(
-							log_fields.Symbol("⎇"),
-							log_fields.Message("copying child stderr into parent stderr"),
-							log_fields.Middleware(withMiddleware),
+							fields.Symbol("⎇"),
+							fields.Message("copying child stderr into parent stderr"),
+							fields.Middleware(withMiddleware),
 						)
 						matchRun.Stderr.StartCopyingInto(stderrAppender)
 

@@ -2,12 +2,12 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_io"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_math"
+	customio "github.com/Layer9Berlin/pipedream/src/custom/io"
+	"github.com/Layer9Berlin/pipedream/src/custom/math"
 	"github.com/Layer9Berlin/pipedream/src/logging"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
-	"github.com/Layer9Berlin/pipedream/src/models"
-	"github.com/Layer9Berlin/pipedream/src/parsers"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
+	"github.com/Layer9Berlin/pipedream/src/parser"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/hashicorp/go-multierror"
 	"github.com/manifoldco/promptui"
 	"github.com/sirupsen/logrus"
@@ -21,13 +21,13 @@ import (
 
 type ExecutionContextOption func(*ExecutionContext)
 
-func WithExecutionFunction(executionFunction func(run *models.PipelineRun)) ExecutionContextOption {
+func WithExecutionFunction(executionFunction func(run *pipeline.Run)) ExecutionContextOption {
 	return func(executionContext *ExecutionContext) {
 		executionContext.executionFunction = executionFunction
 	}
 }
 
-func WithDefinitionsLookup(definitions models.PipelineDefinitionsLookup) ExecutionContextOption {
+func WithDefinitionsLookup(definitions pipeline.PipelineDefinitionsLookup) ExecutionContextOption {
 	return func(executionContext *ExecutionContext) {
 		executionContext.Definitions = definitions
 	}
@@ -51,7 +51,7 @@ func WithActivityIndicator(activityIndicator logging.ActivityIndicator) Executio
 	}
 }
 
-func WithParser(parser *parsers.Parser) ExecutionContextOption {
+func WithParser(parser *parser.Parser) ExecutionContextOption {
 	return func(executionContext *ExecutionContext) {
 		executionContext.parser = parser
 	}
@@ -77,32 +77,32 @@ func WithUserPromptImplementation(implementation func(
 }
 
 type ExecutionContext struct {
-	PipelineFiles   []models.PipelineFile
-	Definitions     models.PipelineDefinitionsLookup
+	PipelineFiles   []pipeline.File
+	Definitions     pipeline.PipelineDefinitionsLookup
 	MiddlewareStack []Middleware
-	Defaults        models.DefaultSettings
-	Hooks           models.HookDefinitions
+	Defaults        pipeline.DefaultSettings
+	Hooks           pipeline.HookDefinitions
 
 	Log *logrus.Logger
 
 	ProjectPath  string
 	RootFileName string
 
-	rootRun *models.PipelineRun
+	rootRun *pipeline.Run
 
 	SelectableFiles []string
 
-	Runs []*models.PipelineRun
+	Runs []*pipeline.Run
 
 	errors *multierror.Error
 
 	ActivityIndicator logging.ActivityIndicator
 
-	preCallback       func(*models.PipelineRun)
-	postCallback      func(*models.PipelineRun)
-	executionFunction func(*models.PipelineRun)
+	preCallback       func(*pipeline.Run)
+	postCallback      func(*pipeline.Run)
+	executionFunction func(*pipeline.Run)
 
-	parser *parsers.Parser
+	parser *parser.Parser
 
 	UserPromptImplementation func(
 		label string,
@@ -116,11 +116,11 @@ type ExecutionContext struct {
 
 func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 	executionContext := &ExecutionContext{
-		parser:                   parsers.NewParser(),
+		parser:                   parser.NewParser(),
 		Log:                      logrus.New(),
 		UserPromptImplementation: defaultUserPrompt,
 	}
-	executionContext.executionFunction = func(run *models.PipelineRun) {
+	executionContext.executionFunction = func(run *pipeline.Run) {
 		executionContext.unwindStack(run, 0)
 	}
 	for _, option := range options {
@@ -140,10 +140,10 @@ func (executionContext *ExecutionContext) CancelAll() error {
 type FullRunOptions struct {
 	arguments          map[string]interface{}
 	logWriter          io.WriteCloser
-	parentRun          *models.PipelineRun
+	parentRun          *pipeline.Run
 	pipelineIdentifier *string
-	postCallback       func(*models.PipelineRun)
-	preCallback        func(*models.PipelineRun)
+	postCallback       func(*pipeline.Run)
+	preCallback        func(*pipeline.Run)
 }
 
 type FullRunOption func(*FullRunOptions)
@@ -154,7 +154,7 @@ func WithIdentifier(identifier *string) FullRunOption {
 	}
 }
 
-func WithParentRun(parentRun *models.PipelineRun) FullRunOption {
+func WithParentRun(parentRun *pipeline.Run) FullRunOption {
 	return func(options *FullRunOptions) {
 		options.parentRun = parentRun
 	}
@@ -172,138 +172,138 @@ func WithArguments(arguments map[string]interface{}) FullRunOption {
 	}
 }
 
-func WithSetupFunc(preCallback func(*models.PipelineRun)) FullRunOption {
+func WithSetupFunc(preCallback func(*pipeline.Run)) FullRunOption {
 	return func(options *FullRunOptions) {
 		options.preCallback = preCallback
 	}
 }
 
-func WithTearDownFunc(postCallback func(*models.PipelineRun)) FullRunOption {
+func WithTearDownFunc(postCallback func(*pipeline.Run)) FullRunOption {
 	return func(options *FullRunOptions) {
 		options.postCallback = postCallback
 	}
 }
 
-func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *models.PipelineRun {
+func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pipeline.Run {
 	runOptions := FullRunOptions{}
 	for _, option := range options {
 		option(&runOptions)
 	}
-	var pipelineDefinition *models.PipelineDefinition = nil
+	var pipelineDefinition *pipeline.PipelineDefinition = nil
 	if runOptions.pipelineIdentifier != nil {
 		if definition, ok := LookUpPipelineDefinition(executionContext.Definitions, *runOptions.pipelineIdentifier, executionContext.RootFileName); ok {
 			pipelineDefinition = definition
 		}
 	}
-	run, err := models.NewPipelineRun(runOptions.pipelineIdentifier, runOptions.arguments, pipelineDefinition, runOptions.parentRun)
+	pipelineRun, err := pipeline.NewPipelineRun(runOptions.pipelineIdentifier, runOptions.arguments, pipelineDefinition, runOptions.parentRun)
 	if err != nil {
 		panic(fmt.Errorf("failed to create pipeline run: %w", err))
 	}
-	run.Log.ErrorCallback = func(err error) {
+	pipelineRun.Log.ErrorCallback = func(err error) {
 		executionContext.errors = multierror.Append(executionContext.errors, err)
 	}
 	if runOptions.logWriter == nil {
 		if runOptions.parentRun != nil {
 			runOptions.parentRun.Log.DebugWithFields(
-				log_fields.Symbol("🏃"),
-				log_fields.Message("full run"),
-				log_fields.Info(run.String()),
-				log_fields.Color("cyan"),
+				fields.Symbol("🏃"),
+				fields.Message("full run"),
+				fields.Info(pipelineRun.String()),
+				fields.Color("cyan"),
 			)
-			runOptions.parentRun.Log.AddReaderEntry(run.Log.Reader())
+			runOptions.parentRun.Log.AddReaderEntry(pipelineRun.Log.Reader())
 		}
 	} else {
-		if run.Log.Level() >= logrus.DebugLevel {
-			indentation := custom_math.MaxInt(run.Log.Indentation-2, 0)
+		if pipelineRun.Log.Level() >= logrus.DebugLevel {
+			indentation := math.MaxInt(pipelineRun.Log.Indentation-2, 0)
 			initialLogData, _ := logging.CustomFormatter{}.Format(
-				log_fields.EntryWithFields(
-					log_fields.Symbol("🏃"),
-					log_fields.Message("full run"),
-					log_fields.Info(run.String()),
-					log_fields.Color("cyan"),
-					log_fields.Indentation(indentation),
+				fields.EntryWithFields(
+					fields.Symbol("🏃"),
+					fields.Message("full run"),
+					fields.Info(pipelineRun.String()),
+					fields.Color("cyan"),
+					fields.Indentation(indentation),
 				))
 			go func() {
 				_, _ = runOptions.logWriter.Write(initialLogData)
-				run.Wait()
-				_, _ = runOptions.logWriter.Write(run.Log.Bytes())
+				pipelineRun.Wait()
+				_, _ = runOptions.logWriter.Write(pipelineRun.Log.Bytes())
 				_ = runOptions.logWriter.Close()
 			}()
 		} else {
 			go func() {
-				run.Wait()
-				_, _ = runOptions.logWriter.Write(run.Log.Bytes())
+				pipelineRun.Wait()
+				_, _ = runOptions.logWriter.Write(pipelineRun.Log.Bytes())
 				_ = runOptions.logWriter.Close()
 			}()
 		}
 	}
-	run.Log.DebugWithFields(
-		log_fields.Message("starting"),
-		log_fields.Info(run.String()),
-		log_fields.Symbol("▶️"),
-		log_fields.Color("green"),
+	pipelineRun.Log.DebugWithFields(
+		fields.Message("starting"),
+		fields.Info(pipelineRun.String()),
+		fields.Symbol("▶️"),
+		fields.Color("green"),
 	)
 	if runOptions.parentRun == nil && executionContext.rootRun == nil {
-		executionContext.rootRun = run
+		executionContext.rootRun = pipelineRun
 	}
-	executionContext.Runs = append(executionContext.Runs, run)
+	executionContext.Runs = append(executionContext.Runs, pipelineRun)
 	if executionContext.ActivityIndicator != nil {
-		executionContext.ActivityIndicator.AddIndicator(run, run.Log.Indentation)
+		executionContext.ActivityIndicator.AddIndicator(pipelineRun, pipelineRun.Log.Indentation)
 	}
 	if runOptions.preCallback != nil {
-		runOptions.preCallback(run)
+		runOptions.preCallback(pipelineRun)
 	}
-	executionContext.executionFunction(run)
+	executionContext.executionFunction(pipelineRun)
 	if runOptions.postCallback != nil {
-		runOptions.postCallback(run)
+		runOptions.postCallback(pipelineRun)
 	}
 	// copy the stderr output after all other middleware has processed it
-	stderrCopy := run.Stderr.Copy()
+	stderrCopy := pipelineRun.Stderr.Copy()
 	// don't close the run's log until we are done writing to it
-	run.LogClosingWaitGroup.Add(1)
+	pipelineRun.LogClosingWaitGroup.Add(1)
 	go func() {
 		// read the entire remaining stderr
 		stderr, _ := ioutil.ReadAll(stderrCopy)
 		// if there is any output, log it!
 		if len(stderr) > 0 {
-			run.Log.StderrOutput(string(stderr))
+			pipelineRun.Log.StderrOutput(string(stderr))
 		}
 		// now the run can complete
-		run.LogClosingWaitGroup.Done()
+		pipelineRun.LogClosingWaitGroup.Done()
 	}()
-	run.LogClosingWaitGroup.Add(1)
+	pipelineRun.LogClosingWaitGroup.Add(1)
 	go func() {
-		run.Stdin.Wait()
-		stdin := run.Stdin.String()
+		pipelineRun.Stdin.Wait()
+		stdin := pipelineRun.Stdin.String()
 		if len(stdin) > 0 {
-			run.Log.TraceWithFields(
-				log_fields.Message("input"),
-				log_fields.Info(stdin),
-				log_fields.Symbol("↘️️"),
-				log_fields.Color("gray"),
+			pipelineRun.Log.TraceWithFields(
+				fields.Message("input"),
+				fields.Info(stdin),
+				fields.Symbol("↘️️"),
+				fields.Color("gray"),
 			)
 		}
-		run.LogClosingWaitGroup.Done()
+		pipelineRun.LogClosingWaitGroup.Done()
 	}()
-	run.LogClosingWaitGroup.Add(1)
+	pipelineRun.LogClosingWaitGroup.Add(1)
 	go func() {
-		run.Stdout.Wait()
-		stdout := run.Stdout.String()
+		pipelineRun.Stdout.Wait()
+		stdout := pipelineRun.Stdout.String()
 		if len(stdout) > 0 {
-			run.Log.TraceWithFields(
-				log_fields.Message("output"),
-				log_fields.Info(stdout),
-				log_fields.Symbol("↗️"),
-				log_fields.Color("gray"),
+			pipelineRun.Log.TraceWithFields(
+				fields.Message("output"),
+				fields.Info(stdout),
+				fields.Symbol("↗️"),
+				fields.Color("gray"),
 			)
 		}
-		run.LogClosingWaitGroup.Done()
+		pipelineRun.LogClosingWaitGroup.Done()
 	}()
-	run.Close()
-	return run
+	pipelineRun.Close()
+	return pipelineRun
 }
 
-func (executionContext *ExecutionContext) PipelineFileAtPath(path string) (*models.PipelineFile, error) {
+func (executionContext *ExecutionContext) PipelineFileAtPath(path string) (*pipeline.File, error) {
 	for _, file := range executionContext.PipelineFiles {
 		if file.FileName == path {
 			return &file, nil
@@ -312,7 +312,7 @@ func (executionContext *ExecutionContext) PipelineFileAtPath(path string) (*mode
 	return nil, fmt.Errorf("file not found")
 }
 
-func LookUpPipelineDefinition(definitionsLookup models.PipelineDefinitionsLookup, identifier string, rootFileName string) (*models.PipelineDefinition, bool) {
+func LookUpPipelineDefinition(definitionsLookup pipeline.PipelineDefinitionsLookup, identifier string, rootFileName string) (*pipeline.PipelineDefinition, bool) {
 	definitions, ok := definitionsLookup[identifier]
 	if !ok {
 		return nil, false
@@ -320,8 +320,8 @@ func LookUpPipelineDefinition(definitionsLookup models.PipelineDefinitionsLookup
 	// pipelines defined in the same file take precedence,
 	// then the first public pipeline
 	// private pipelines in other files will only be invoked if there is no public match
-	var firstPublicMatch *models.PipelineDefinition = nil
-	var firstPrivateMatch *models.PipelineDefinition = nil
+	var firstPublicMatch *pipeline.PipelineDefinition = nil
+	var firstPrivateMatch *pipeline.PipelineDefinition = nil
 	for _, definition := range definitions {
 		// need to copy here to prevent modification of saved result by for loop
 		definitionCopy := definition
@@ -342,12 +342,12 @@ func LookUpPipelineDefinition(definitionsLookup models.PipelineDefinitionsLookup
 }
 
 func (executionContext *ExecutionContext) unwindStack(
-	run *models.PipelineRun,
+	pipelineRun *pipeline.Run,
 	currentIndex int,
 ) {
 	if len(executionContext.MiddlewareStack) > currentIndex {
 		currentMiddleware := executionContext.MiddlewareStack[currentIndex]
-		currentMiddleware.Apply(run, func(newRun *models.PipelineRun) {
+		currentMiddleware.Apply(pipelineRun, func(newRun *pipeline.Run) {
 			executionContext.unwindStack(newRun, currentIndex+1)
 		}, executionContext)
 	}
@@ -403,7 +403,7 @@ func (executionContext *ExecutionContext) SetUpPipelines(args []string) error {
 
 	executionContext.SelectableFiles = localPipelineFilePaths
 	executionContext.Defaults = defaults
-	executionContext.Definitions = models.MergePipelineDefinitions(builtInPipelineDefinitions, userPipelineDefinitions)
+	executionContext.Definitions = pipeline.MergePipelineDefinitions(builtInPipelineDefinitions, userPipelineDefinitions)
 	executionContext.PipelineFiles = files
 
 	return nil
@@ -423,7 +423,7 @@ func defaultUserPrompt(
 		CursorPos: initialSelection,
 		Size:      size,
 		Stdin:     input,
-		Stdout:    custom_io.NewBellSkipper(output),
+		Stdout:    customio.NewBellSkipper(output),
 	}
 	return prompt.Run()
 }

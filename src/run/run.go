@@ -1,8 +1,9 @@
+// Implementation of the default shell command, selecting, parsing and executing pipelines
 package run
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/middleware/middleware_stack"
+	"github.com/Layer9Berlin/pipedream/src/middleware/stack"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"io"
@@ -26,7 +27,7 @@ func Cmd(_ *cobra.Command, args []string) {
 	projectPath, _ := filepath.EvalSymlinks(executableDir)
 	executionContext := executionContextFactory(
 		//middleware.WithActivityIndicator(logging.NewBarActivityIndicator(osStdout)),
-		middleware.WithMiddlewareStack(middleware_stack.SetUpMiddleware()),
+		middleware.WithMiddlewareStack(stack.SetUpMiddleware()),
 		middleware.WithProjectPath(projectPath),
 		middleware.WithLogger(Log),
 	)

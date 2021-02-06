@@ -1,3 +1,4 @@
+// PipeDream package for maintainable automation
 package main
 
 import (

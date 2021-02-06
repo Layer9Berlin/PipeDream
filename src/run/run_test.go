@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/parsers"
+	"github.com/Layer9Berlin/pipedream/src/parser"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
@@ -19,7 +19,7 @@ func TestRun_Cmd_noBuiltInPipelineFiles(t *testing.T) {
 	}()
 	buffer := new(bytes.Buffer)
 	executionContextFactory = func(options ...middleware.ExecutionContextOption) *middleware.ExecutionContext {
-		options = append(options, middleware.WithParser(parsers.NewParser(parsers.WithFindByGlobImplementation(func(_ string) ([]string, error) {
+		options = append(options, middleware.WithParser(parser.NewParser(parser.WithFindByGlobImplementation(func(_ string) ([]string, error) {
 			return []string{}, nil
 		}))))
 		executionContext := middleware.NewExecutionContext(options...)
@@ -40,14 +40,14 @@ func TestRun_Cmd_userPromptError(t *testing.T) {
 	buffer := new(bytes.Buffer)
 	executionContextFactory = func(options ...middleware.ExecutionContextOption) *middleware.ExecutionContext {
 		options = append(options, middleware.WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
-				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte{}, nil
 				}),
-				parsers.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+				parser.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 					return paths, nil
 				}),
 			)),
@@ -93,18 +93,18 @@ func TestRun_Cmd(t *testing.T) {
 	}()
 	executionContextFactory = func(options ...middleware.ExecutionContextOption) *middleware.ExecutionContext {
 		options = append(options, middleware.WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(_ string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(_ string) ([]string, error) {
 					return []string{"test1.pipe"}, nil
 				}),
-				parsers.WithReadFileImplementation(func(_ string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(_ string) ([]byte, error) {
 					return []byte(`
 public:
   test:
     arg: value
 `), nil
 				}),
-				parsers.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+				parser.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 					return []string{"test1.pipe"}, nil
 				}),
 			)))

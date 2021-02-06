@@ -2,7 +2,7 @@ package pipe
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -13,7 +13,7 @@ import (
 
 func TestPipe_Apply(t *testing.T) {
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"pipe": []interface{}{
 			map[string]interface{}{
 				"test1": map[string]interface{}{
@@ -28,10 +28,10 @@ func TestPipe_Apply(t *testing.T) {
 	waitGroup := &sync.WaitGroup{}
 	run.Stdin.Replace(strings.NewReader("test input"))
 	NewPipeMiddleware().Apply(run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 		},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				switch *childRun.Identifier {
 				case "test1":
 					stdinCopy := childRun.Stdin.Copy()
@@ -70,12 +70,12 @@ func TestPipe_Apply(t *testing.T) {
 
 func TestPipe_InvalidArguments(t *testing.T) {
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"pipe": "invalid",
 	}, nil, nil)
 
 	NewPipeMiddleware().Apply(run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
 		nil,
@@ -90,10 +90,10 @@ func TestPipe_InvalidArguments(t *testing.T) {
 
 func TestPipe_NotInvoked(t *testing.T) {
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, nil, nil, nil)
+	run, _ := pipeline.NewPipelineRun(&identifier, nil, nil, nil)
 
 	NewPipeMiddleware().Apply(run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
 		nil,
@@ -107,7 +107,7 @@ func TestPipe_NotInvoked(t *testing.T) {
 
 func TestPipe_InvalidReference(t *testing.T) {
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"pipe": []interface{}{
 			map[string]interface{}{
 				"test1": map[string]interface{}{
@@ -121,7 +121,7 @@ func TestPipe_InvalidReference(t *testing.T) {
 	}, nil, nil)
 
 	NewPipeMiddleware().Apply(run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
 		nil,
@@ -136,7 +136,7 @@ func TestPipe_InvalidReference(t *testing.T) {
 
 func TestPipe_AnonymousReference(t *testing.T) {
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"pipe": []interface{}{
 			map[*string]interface{}{
 				nil: map[string]interface{}{
@@ -149,11 +149,11 @@ func TestPipe_AnonymousReference(t *testing.T) {
 	run.Log.SetLevel(logrus.DebugLevel)
 	var fullRunCalled = false
 	NewPipeMiddleware().Apply(run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				fullRunCalled = true
 			}),
 		))

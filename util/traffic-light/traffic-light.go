@@ -1,3 +1,4 @@
+// Augment output with a green, amber or red status indicator
 package main
 
 import (

@@ -3,8 +3,9 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/datastream"
 	"github.com/Layer9Berlin/pipedream/src/logging"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/stretchr/testify/require"
@@ -35,8 +36,8 @@ func TestRun_Output_stopProgress(t *testing.T) {
 
 func TestRun_Output_outputResult(t *testing.T) {
 	buffer := new(bytes.Buffer)
-	outputResult(&models.PipelineRun{
-		Stdout: models.NewClosedComposableDataStreamFromBuffer(bytes.NewBuffer([]byte("test"))),
+	outputResult(&pipeline.Run{
+		Stdout: datastream.NewClosedComposableDataStreamFromBuffer(bytes.NewBuffer([]byte("test"))),
 	}, buffer)
 	require.Equal(t, fmt.Sprintln("===== RESULT =====")+fmt.Sprintln("test"), buffer.String())
 }
@@ -49,8 +50,8 @@ func TestRun_Output_outputResult_nil(t *testing.T) {
 
 func TestRun_outputLogs(t *testing.T) {
 	buffer := new(bytes.Buffer)
-	outputLogs(&models.PipelineRun{
-		Log: models.NewClosedPipelineRunLoggerWithResult(bytes.NewBuffer([]byte("test"))),
+	outputLogs(&pipeline.Run{
+		Log: pipeline.NewClosedPipelineRunLoggerWithResult(bytes.NewBuffer([]byte("test"))),
 	}, buffer)
 	require.Equal(t, fmt.Sprintln("====== LOGS ======")+fmt.Sprintln("test"), buffer.String())
 }

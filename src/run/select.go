@@ -3,14 +3,14 @@ package run
 import (
 	"errors"
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_strings"
+	"github.com/Layer9Berlin/pipedream/src/custom/strings"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io"
 	sort "sort"
 )
 
-func letUserSelectPipelineFile(executionContext *middleware.ExecutionContext, selectionWindowSize int, input io.ReadCloser, output io.WriteCloser) (*models.PipelineFile, error) {
+func letUserSelectPipelineFile(executionContext *middleware.ExecutionContext, selectionWindowSize int, input io.ReadCloser, output io.WriteCloser) (*pipeline.File, error) {
 	if FileFlag != "" {
 		return executionContext.PipelineFileAtPath(FileFlag)
 	}
@@ -27,7 +27,7 @@ func letUserSelectPipelineFile(executionContext *middleware.ExecutionContext, se
 	for _, pipelineFilePath := range pipelineFiles {
 		pipelineFile, err := executionContext.PipelineFileAtPath(pipelineFilePath)
 		if err == nil {
-			displayNames = append(displayNames, custom_strings.IdentifierToDisplayName(pipelineFile.FileName))
+			displayNames = append(displayNames, strings.IdentifierToDisplayName(pipelineFile.FileName))
 		}
 	}
 
@@ -81,7 +81,7 @@ func letUserSelectPipelineFileAndPipeline(
 	pipelineNames := make([]string, 0, len(pipelineIdentifiers))
 	initialSelection := 0
 	for index, pipelineIdentifier := range pipelineIdentifiers {
-		pipelineNames = append(pipelineNames, custom_strings.IdentifierToDisplayName(pipelineIdentifier))
+		pipelineNames = append(pipelineNames, strings.IdentifierToDisplayName(pipelineIdentifier))
 		if pipelineIdentifier == pipelineFile.Default.Command {
 			initialSelection = index
 		}

@@ -2,7 +2,7 @@ package dir
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -18,14 +18,14 @@ func TestDir_ChangeDir(t *testing.T) {
 		},
 	}
 	currentDir = "pre-test"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"dir": "changed",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	dirMiddleware.Apply(
 		run,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -43,12 +43,12 @@ func TestDir_DontChangeDir(t *testing.T) {
 		},
 	}
 	currentDir = "pre-test"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	dirMiddleware.Apply(
 		run,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -66,14 +66,14 @@ func TestDir_ErrorChangingDir(t *testing.T) {
 	}
 
 	currentDir = "pre-test"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"dir": "changed",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	dirMiddleware.Apply(
 		run,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	run.Close()

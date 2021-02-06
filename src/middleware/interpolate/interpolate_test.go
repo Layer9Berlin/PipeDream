@@ -3,7 +3,7 @@ package interpolate
 import (
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
@@ -14,7 +14,7 @@ import (
 
 func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "test @{arg}",
 		},
@@ -40,9 +40,9 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 	childIdentifier := ""
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				childRun.Log.Debug(logrus.WithField("message", "child run log entry"))
 				childIdentifier = *childRun.Identifier
 				runArguments = childRun.ArgumentsCopy()
@@ -76,7 +76,7 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 
 func TestInterpolate_SingleSubstitution(t *testing.T) {
 	identifier := "child identifier"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg":  "value",
 		"arg2": "@{arg}",
 	}, nil, nil)
@@ -87,9 +87,9 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 	childIdentifier := ""
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				childRun.Log.Debug(logrus.WithField("message", "child run log entry"))
 				childIdentifier = *childRun.Identifier
 				runArguments = childRun.ArgumentsCopy()
@@ -110,7 +110,7 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 
 func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg":  "value",
 		"arg2": "@{arg} $!!",
 	}, nil, nil)
@@ -122,9 +122,9 @@ func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 	runArguments := make(map[string]interface{}, 2)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				defer waitGroup.Done()
 				runArguments = childRun.ArgumentsCopy()
 			}),
@@ -144,7 +144,7 @@ func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 
 func TestInterpolate_Disabled(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"enable": false,
 		},
@@ -159,7 +159,7 @@ func TestInterpolate_Disabled(t *testing.T) {
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -181,7 +181,7 @@ func TestInterpolate_Disabled(t *testing.T) {
 
 func TestInterpolate_NoSubstitution(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg": "value",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("TestInput @{arg}"))
@@ -189,7 +189,7 @@ func TestInterpolate_NoSubstitution(t *testing.T) {
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 
@@ -201,7 +201,7 @@ func TestInterpolate_NoSubstitution(t *testing.T) {
 
 func TestInterpolate_InputReadError(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg": "$!!",
 	}, nil, nil)
 	run.Stdin.Replace(NewErrorReader(1))
@@ -212,9 +212,9 @@ func TestInterpolate_InputReadError(t *testing.T) {
 	runArguments := make(map[string]interface{}, 2)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				defer waitGroup.Done()
 				runArguments = childRun.ArgumentsCopy()
 			}),
@@ -232,7 +232,7 @@ func TestInterpolate_InputReadError(t *testing.T) {
 
 func TestInterpolate_ValueMissing(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg": "@{missing}",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("input"))
@@ -240,7 +240,7 @@ func TestInterpolate_ValueMissing(t *testing.T) {
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -255,7 +255,7 @@ func TestInterpolate_ValueMissing(t *testing.T) {
 
 func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg": "@{arg2}",
 		"arg2": map[string]interface{}{
 			"test": "not a valid substitution",
@@ -270,9 +270,9 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 	runArguments := make(map[string]interface{}, 2)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				defer waitGroup.Done()
 				runArguments = childRun.ArgumentsCopy()
 			}),
@@ -294,7 +294,7 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 
 func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"arg":  "@{arg2}",
 		"arg2": "test",
 		"arg3": "@{missing}",
@@ -307,9 +307,9 @@ func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 	runArguments := make(map[string]interface{}, 2)
 	NewInterpolateMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		middleware.NewExecutionContext(
-			middleware.WithExecutionFunction(func(childRun *models.PipelineRun) {
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
 				defer waitGroup.Done()
 				runArguments = childRun.ArgumentsCopy()
 			}),

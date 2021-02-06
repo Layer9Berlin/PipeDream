@@ -1,11 +1,12 @@
-package selectMiddleware
+// The `select` middleware shows selection prompts to the user
+package selectmiddleware
 
 import (
 	"bytes"
-	"github.com/Layer9Berlin/pipedream/src/helpers/custom_io"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	customio "github.com/Layer9Berlin/pipedream/src/custom/io"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io"
 	"io/ioutil"
 	"os"
@@ -27,7 +28,7 @@ func NewSelectMiddleware() SelectMiddleware {
 func NewSelectMiddlewareWithStdinAndStdout(stdin io.ReadCloser, stdout io.WriteCloser) SelectMiddleware {
 	return SelectMiddleware{
 		osStdin:  stdin,
-		osStdout: custom_io.NewBellSkipper(stdout),
+		osStdout: customio.NewBellSkipper(stdout),
 	}
 }
 
@@ -38,8 +39,8 @@ type selectMiddlewareArguments struct {
 }
 
 func (selectMiddleware SelectMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := selectMiddlewareArguments{
@@ -104,28 +105,28 @@ func (selectMiddleware SelectMiddleware) Apply(
 				}
 			}
 			run.Log.TraceWithFields(
-				log_fields.Symbol("👈"),
-				log_fields.Message("user selected pipeline"),
-				log_fields.Info(selectedPipelineIdentifier),
-				log_fields.Middleware(selectMiddleware),
+				fields.Symbol("👈"),
+				fields.Message("user selected pipeline"),
+				fields.Info(selectedPipelineIdentifier),
+				fields.Middleware(selectMiddleware),
 			)
 			executionContext.FullRun(
 				middleware.WithParentRun(run),
 				middleware.WithIdentifier(&selectedPipelineIdentifier),
 				middleware.WithArguments(selectedPipelineArguments),
-				middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
+				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
 					run.Log.TraceWithFields(
-						log_fields.DataStream(selectMiddleware, "copy parent stdin into child stdin")...,
+						fields.DataStream(selectMiddleware, "copy parent stdin into child stdin")...,
 					)
 					childRun.Stdin.MergeWith(bytes.NewReader(completeStdin))
 				}),
-				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
+				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 					run.Log.TraceWithFields(
-						log_fields.DataStream(selectMiddleware, "copy child stdout into parent stdout")...,
+						fields.DataStream(selectMiddleware, "copy child stdout into parent stdout")...,
 					)
 					childRun.Stdout.StartCopyingInto(stdoutWriter)
 					run.Log.TraceWithFields(
-						log_fields.DataStream(selectMiddleware, "copy child stderr into parent stderr")...,
+						fields.DataStream(selectMiddleware, "copy child stderr into parent stderr")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrWriter)
 					go func() {
@@ -142,5 +143,5 @@ func (selectMiddleware SelectMiddleware) Apply(
 
 type SaveMiddlewareEntry struct {
 	path []string
-	root *models.PipelineRun
+	root *pipeline.Run
 }

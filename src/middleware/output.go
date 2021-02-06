@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/hashicorp/go-multierror"
 	"github.com/logrusorgru/aurora/v3"
 	"io"
@@ -21,7 +21,7 @@ func stopProgress(executionContext *ExecutionContext) {
 	}
 }
 
-func outputResult(result *models.PipelineRun, writer io.Writer) {
+func outputResult(result *pipeline.Run, writer io.Writer) {
 	_, _ = fmt.Fprintln(writer, "===== RESULT =====")
 	if result == nil || result.Stdout.Len() == 0 {
 		_, _ = fmt.Fprintln(writer, aurora.Gray(12, "no result"))
@@ -31,7 +31,7 @@ func outputResult(result *models.PipelineRun, writer io.Writer) {
 	}
 }
 
-func outputLogs(run *models.PipelineRun, writer io.Writer) {
+func outputLogs(run *pipeline.Run, writer io.Writer) {
 	if run != nil && run.Log != nil {
 		logOutput := run.Log.String()
 		if len(logOutput) > 0 {

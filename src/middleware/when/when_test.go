@@ -1,21 +1,21 @@
 package when
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestWhen_TrueCondition(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"when": "8 in (7,8,9)",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewWhenMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -26,14 +26,14 @@ func TestWhen_TrueCondition(t *testing.T) {
 }
 
 func TestWhen_FalseCondition(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"when": "1 == 2",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewWhenMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -44,14 +44,14 @@ func TestWhen_FalseCondition(t *testing.T) {
 }
 
 func TestWhen_UnparseableCondition(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"when": "1 == '",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewWhenMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -63,12 +63,12 @@ func TestWhen_UnparseableCondition(t *testing.T) {
 }
 
 func TestWhen_WithoutCondition(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewWhenMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()

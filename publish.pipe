@@ -48,8 +48,7 @@ private:
       - publish::perform-upload:
           when: "'$!!' =~ 'clean'"
           each:
-            - publish::increment-version:
-                wait: true
+            - publish::increment-version
             - publish::push
       - print::message:
           when: "'$!!' !~ 'clean'"
@@ -63,7 +62,6 @@ private:
             run: "traffic-light"
 
   publish::increment-version:
-    wait: true
     each:
       - publish::create-new-version-string:
           shell:

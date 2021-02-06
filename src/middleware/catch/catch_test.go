@@ -2,7 +2,7 @@ package catch
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
@@ -12,13 +12,13 @@ import (
 )
 
 func TestCatch_Error(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	handlerCalled := false
-	NewCatchMiddleware().Apply(run, func(run *models.PipelineRun) {
+	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -36,7 +36,7 @@ func TestCatch_Error(t *testing.T) {
 			require.Nil(t, stderrIntercept.Close())
 		}()
 	}, middleware.NewExecutionContext(
-		middleware.WithExecutionFunction(func(errorRun *models.PipelineRun) {
+		middleware.WithExecutionFunction(func(errorRun *pipeline.Run) {
 			handlerCalled = true
 			require.Equal(t, "test-handler", *errorRun.Identifier)
 			errorRun.Stdout.Replace(strings.NewReader("handled"))
@@ -50,13 +50,13 @@ func TestCatch_Error(t *testing.T) {
 }
 
 func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerInvocations := 0
-	NewCatchMiddleware().Apply(run, func(run *models.PipelineRun) {
+	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -74,7 +74,7 @@ func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
 			require.Nil(t, stderrIntercept.Close())
 		}()
 	}, middleware.NewExecutionContext(
-		middleware.WithExecutionFunction(func(errorRun *models.PipelineRun) {
+		middleware.WithExecutionFunction(func(errorRun *pipeline.Run) {
 			handlerInvocations += 1
 			require.Equal(t, "test-handler", *errorRun.Identifier)
 			errorRun.Stdout.Replace(strings.NewReader("handled"))
@@ -89,12 +89,12 @@ func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
 }
 
 func TestCatch_HandlerNotInvoked(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewCatchMiddleware().Apply(run, func(run *models.PipelineRun) {
+	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -113,10 +113,10 @@ func TestCatch_HandlerNotInvoked(t *testing.T) {
 }
 
 func TestCatch_WithoutHandler(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewCatchMiddleware().Apply(run, func(run *models.PipelineRun) {
+	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -135,13 +135,13 @@ func TestCatch_WithoutHandler(t *testing.T) {
 }
 
 func TestCatch_HandlerThrowingError(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerCalled := false
-	NewCatchMiddleware().Apply(run, func(run *models.PipelineRun) {
+	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -161,7 +161,7 @@ func TestCatch_HandlerThrowingError(t *testing.T) {
 			require.Nil(t, stderrIntercept.Close())
 		}()
 	}, middleware.NewExecutionContext(
-		middleware.WithExecutionFunction(func(errorRun *models.PipelineRun) {
+		middleware.WithExecutionFunction(func(errorRun *pipeline.Run) {
 			handlerCalled = true
 			require.Equal(t, "test-handler", *errorRun.Identifier)
 			errorRun.Stdout.Replace(strings.NewReader("not properly handled"))

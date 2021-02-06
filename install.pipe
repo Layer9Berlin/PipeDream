@@ -4,7 +4,6 @@ version: 0.0.1
 public:
   install:
     description: Install
-    wait: true
     each:
       - install::setup:
           pipe:

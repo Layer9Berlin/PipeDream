@@ -1,10 +1,11 @@
+// The `each` middleware copies some input into several child pipes running simultaneously
 package each
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/helpers/string_map"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"strings"
 )
 
@@ -21,8 +22,8 @@ func NewEachMiddleware() EachMiddleware {
 }
 
 func (eachMiddleware EachMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := make([]middleware.PipelineReference, 0, 10)
@@ -35,7 +36,7 @@ func (eachMiddleware EachMiddleware) Apply(
 		for _, childReference := range arguments {
 			for pipelineIdentifier, pipelineArguments := range childReference {
 				childIdentifiers = append(childIdentifiers, pipelineIdentifier)
-				childArguments = append(childArguments, string_map.CopyMap(pipelineArguments))
+				childArguments = append(childArguments, stringmap.CopyMap(pipelineArguments))
 			}
 		}
 
@@ -48,10 +49,10 @@ func (eachMiddleware EachMiddleware) Apply(
 			}
 		}
 		run.Log.DebugWithFields(
-			log_fields.Symbol("🔢"),
-			log_fields.Message("each"),
-			log_fields.Info(strings.Join(info, ", ")),
-			log_fields.Middleware(eachMiddleware),
+			fields.Symbol("🔢"),
+			fields.Message("each"),
+			fields.Info(strings.Join(info, ", ")),
+			fields.Middleware(eachMiddleware),
 		)
 		for index, childIdentifier := range childIdentifiers {
 			arguments := childArguments[index]
@@ -60,19 +61,19 @@ func (eachMiddleware EachMiddleware) Apply(
 				middleware.WithParentRun(run),
 				middleware.WithIdentifier(identifier),
 				middleware.WithArguments(arguments),
-				middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
+				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
 					run.Log.TraceWithFields(
-						log_fields.DataStream(eachMiddleware, "copy parent stdin into child stdin")...,
+						fields.DataStream(eachMiddleware, "copy parent stdin into child stdin")...,
 					)
 					childRun.Stdin.MergeWith(run.Stdin.Copy())
 				}),
-				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
+				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 					run.Log.TraceWithFields(
-						log_fields.DataStream(eachMiddleware, "copy child stdout into parent stdout")...,
+						fields.DataStream(eachMiddleware, "copy child stdout into parent stdout")...,
 					)
 					run.Stdout.MergeWith(childRun.Stdout.Copy())
 					run.Log.TraceWithFields(
-						log_fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
+						fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
 					)
 					run.Stderr.MergeWith(childRun.Stderr.Copy())
 				}))

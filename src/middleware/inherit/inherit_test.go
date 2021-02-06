@@ -2,7 +2,7 @@ package inherit
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
@@ -10,7 +10,7 @@ import (
 )
 
 func TestInherit_ArgumentsFromParent(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"arg":       "value",
 		"arg2":      "another-value",
 		"arg-array": []interface{}{"line0", "line1", "line2"},
@@ -30,7 +30,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 		},
 	}, nil, nil)
 
-	childRun, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"inherit": []interface{}{
 			"arg",
 			"arg-array",
@@ -46,7 +46,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 	childRun.Log.SetLevel(logrus.TraceLevel)
 	NewInheritMiddleware().Apply(
 		childRun,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	childRun.Close()
@@ -84,7 +84,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 
 func TestInherit_WithoutParent(t *testing.T) {
 	identifier := "orphan"
-	orphanRun, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	orphanRun, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"inherit": []interface{}{
 			"arg",
 			"arg-array",
@@ -100,7 +100,7 @@ func TestInherit_WithoutParent(t *testing.T) {
 	orphanRun.Log.SetLevel(logrus.TraceLevel)
 	NewInheritMiddleware().Apply(
 		orphanRun,
-		func(invocation *models.PipelineRun) {},
+		func(invocation *pipeline.Run) {},
 		nil,
 	)
 	orphanRun.Close()

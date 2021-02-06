@@ -1,7 +1,7 @@
 package timer
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"testing"
@@ -33,7 +33,7 @@ func TestTimer_WithValidArguments_RecordsExecutionTime(t *testing.T) {
 	}
 
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"timer": map[string]interface{}{
 			"record": true,
 		},
@@ -41,7 +41,7 @@ func TestTimer_WithValidArguments_RecordsExecutionTime(t *testing.T) {
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewTimerMiddlewareWithProvider(timeProvider).Apply(run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -60,7 +60,7 @@ func TestTimer_WithInvalidArguments_ThrowsError(t *testing.T) {
 	}
 
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"timer": []string{
 			"invalid",
 		},
@@ -68,7 +68,7 @@ func TestTimer_WithInvalidArguments_ThrowsError(t *testing.T) {
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewTimerMiddlewareWithProvider(&timeProvider).Apply(run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -88,11 +88,11 @@ func TestTimer_NoArguments_DeactivateTimer(t *testing.T) {
 	}
 
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, nil, nil, nil)
+	run, _ := pipeline.NewPipelineRun(&identifier, nil, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewTimerMiddlewareWithProvider(&timeProvider).Apply(run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -104,7 +104,7 @@ func TestTimer_NoArguments_DeactivateTimer(t *testing.T) {
 
 func TestDefaultTimeProvider(t *testing.T) {
 	identifier := "test"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"timer": map[string]interface{}{
 			"record": true,
 		},
@@ -112,7 +112,7 @@ func TestDefaultTimeProvider(t *testing.T) {
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewTimerMiddleware().Apply(run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()

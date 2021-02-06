@@ -1,10 +1,11 @@
+// The `docker` middleware enables execution within a Docker (Compose) container
 package docker
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
 // Docker Executor
@@ -20,8 +21,8 @@ func NewDockerMiddleware() DockerMiddleware {
 }
 
 func (dockerMiddleware DockerMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	arguments := struct {
@@ -31,10 +32,10 @@ func (dockerMiddleware DockerMiddleware) Apply(
 
 	if arguments.Service != nil {
 		run.Log.DebugWithFields(
-			log_fields.Symbol("🐳"),
-			log_fields.Message("docker-compose exec"),
-			log_fields.Info(arguments.Service),
-			log_fields.Middleware(dockerMiddleware),
+			fields.Symbol("🐳"),
+			fields.Message("docker-compose exec"),
+			fields.Info(arguments.Service),
+			fields.Middleware(dockerMiddleware),
 		)
 		prefixWithService(run, *arguments.Service)
 	}
@@ -42,7 +43,7 @@ func (dockerMiddleware DockerMiddleware) Apply(
 	next(run)
 }
 
-func prefixWithService(run *models.PipelineRun, service string) {
+func prefixWithService(run *pipeline.Run, service string) {
 	path := []string{"shell", "run"}
 	// get the existing value - the shell -> run argument is not inheritable
 	existingValue, err := run.ArgumentAtPath(path...)

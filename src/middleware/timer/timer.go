@@ -1,9 +1,10 @@
+// The `timer` middleware records execution time
 package timer
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"time"
 )
 
@@ -46,8 +47,8 @@ func NewTimerMiddlewareWithProvider(timeProvider TimeProvider) TimerMiddleware {
 }
 
 func (timerMiddleware TimerMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	arguments := timerMiddlewareArguments{
@@ -57,18 +58,18 @@ func (timerMiddleware TimerMiddleware) Apply(
 
 	if arguments.Record {
 		run.Log.TraceWithFields(
-			log_fields.Symbol("🕑"),
-			log_fields.Message("starting execution timer..."),
-			log_fields.Middleware(timerMiddleware),
+			fields.Symbol("🕑"),
+			fields.Message("starting execution timer..."),
+			fields.Middleware(timerMiddleware),
 		)
 		start := timerMiddleware.timeProvider.Now()
 		next(run)
 		recordDuration := timerMiddleware.timeProvider.Since(start)
 		run.Log.DebugWithFields(
-			log_fields.Symbol("🕑"),
-			log_fields.Message("execution time"),
-			log_fields.Info(recordDuration),
-			log_fields.Middleware(timerMiddleware),
+			fields.Symbol("🕑"),
+			fields.Message("execution time"),
+			fields.Info(recordDuration),
+			fields.Middleware(timerMiddleware),
 		)
 	} else {
 		next(run)

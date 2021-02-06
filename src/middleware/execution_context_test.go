@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/logging"
-	"github.com/Layer9Berlin/pipedream/src/models"
-	"github.com/Layer9Berlin/pipedream/src/parsers"
+	"github.com/Layer9Berlin/pipedream/src/parser"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
@@ -13,7 +13,7 @@ import (
 
 func TestExecutionContext_CancelAll(t *testing.T) {
 	executionContext := NewExecutionContext()
-	executionContext.Runs = []*models.PipelineRun{{}, {}}
+	executionContext.Runs = []*pipeline.Run{{}, {}}
 	err := executionContext.CancelAll()
 	require.Nil(t, err)
 	require.True(t, executionContext.Runs[0].Cancelled())
@@ -31,7 +31,7 @@ func TestExecutionContext_FullRun_WithDefinitionsLookupOption(t *testing.T) {
 	arguments := map[string]interface{}{
 		"key": "value",
 	}
-	executionContext := NewExecutionContext(WithDefinitionsLookup(map[string][]models.PipelineDefinition{
+	executionContext := NewExecutionContext(WithDefinitionsLookup(map[string][]pipeline.PipelineDefinition{
 		"test": {
 			{
 				DefinitionArguments: arguments,
@@ -57,7 +57,7 @@ func TestExecutionContext_FullRun_WithUnmergeableArguments(t *testing.T) {
 		"key": map[string]interface{}{},
 	}
 	executionContext := ExecutionContext{
-		Definitions: map[string][]models.PipelineDefinition{
+		Definitions: map[string][]pipeline.PipelineDefinition{
 			"test": {
 				{
 					DefinitionArguments: arguments1,
@@ -80,7 +80,7 @@ func TestExecutionContext_FullRun_WithActivityIndicator(t *testing.T) {
 
 func TestExecutionContext_FullRun_WithSetupFunction(t *testing.T) {
 	setupCalled := false
-	setupFunc := func(run *models.PipelineRun) {
+	setupFunc := func(run *pipeline.Run) {
 		setupCalled = true
 	}
 	executionContext := NewExecutionContext()
@@ -111,7 +111,7 @@ func TestExecutionContext_UnwindStack(t *testing.T) {
 
 func TestExecutionContext_PipelineFileAtPath(t *testing.T) {
 	executionContext := ExecutionContext{
-		PipelineFiles: []models.PipelineFile{
+		PipelineFiles: []pipeline.File{
 			{
 				FileName: "test1",
 			},
@@ -130,7 +130,7 @@ func TestExecutionContext_PipelineFileAtPath(t *testing.T) {
 
 func TestExecutionContext_PipelineFileAtPath_NotFound(t *testing.T) {
 	executionContext := ExecutionContext{
-		PipelineFiles: []models.PipelineFile{
+		PipelineFiles: []pipeline.File{
 			{
 				FileName: "test1",
 			},
@@ -148,7 +148,7 @@ func TestExecutionContext_PipelineFileAtPath_NotFound(t *testing.T) {
 }
 
 func TestExecutionContext_LookUpPipelineDefinition(t *testing.T) {
-	definitionsLookup := map[string][]models.PipelineDefinition{
+	definitionsLookup := map[string][]pipeline.PipelineDefinition{
 		"test1": {
 			{
 				FileName: "test1.file",
@@ -198,15 +198,15 @@ func TestExecutionContext_Execute(t *testing.T) {
 func TestExecutionContext_SetUpPipelines(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(
 					func(pattern string) ([]string, error) {
 						return []string{
 							"test1.pipe",
 							"test2.pipe",
 						}, nil
 					}),
-				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte(""), nil
 				}))))
 	buffer := new(bytes.Buffer)
@@ -222,8 +222,8 @@ func TestExecutionContext_SetUpPipelines(t *testing.T) {
 func TestExecutionContext_SetUpPipelines_BuiltInPipelineFilePathsError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{}, fmt.Errorf("test error")
 				}),
 			)))
@@ -236,11 +236,11 @@ func TestExecutionContext_SetUpPipelines_BuiltInPipelineFilePathsError(t *testin
 func TestExecutionContext_SetUpPipelines_ParseBuiltInPipelineFilesError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
-				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return nil, fmt.Errorf("test error")
 				}),
 			)))
@@ -253,14 +253,14 @@ func TestExecutionContext_SetUpPipelines_ParseBuiltInPipelineFilesError(t *testi
 func TestExecutionContext_SetUpPipelines_UserPipelineFilePathsError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					if strings.Contains(pattern, "pipes/**") {
 						return []string{"test.file"}, nil
 					}
 					return []string{}, fmt.Errorf("test error")
 				}),
-				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte{}, nil
 				}),
 			)))
@@ -273,14 +273,14 @@ func TestExecutionContext_SetUpPipelines_UserPipelineFilePathsError(t *testing.T
 func TestExecutionContext_SetUpPipelines_RecursivelyAddImportsError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
-				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte{}, nil
 				}),
-				parsers.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+				parser.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 					return nil, fmt.Errorf("test error")
 				}),
 			)))
@@ -293,17 +293,17 @@ func TestExecutionContext_SetUpPipelines_RecursivelyAddImportsError(t *testing.T
 func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parsers.NewParser(
-				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parser.NewParser(
+				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test1"}, nil
 				}),
-				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					if filename == "test.file" {
 						return nil, fmt.Errorf("test error")
 					}
 					return []byte{}, nil
 				}),
-				parsers.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+				parser.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
 			)))
@@ -338,7 +338,7 @@ func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 //	err := executionContext.SetUpPipelines([]string{"test1"})
 //	require.NotNil(t, err)
 //	require.Contains(t, err.Error(), "test error")
-//	require.Equal(t, []models.PipelineFile{}, executionContext.PipelineFiles)
+//	require.Equal(t, []models.File{}, executionContext.PipelineFiles)
 //}
 
 //func TestRun_PipelineSetupHelper_setUpPipelines(t *testing.T) {
@@ -356,7 +356,7 @@ func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 //	)
 //	err := executionContext.SetUpPipelines([]string{"test1"})
 //	require.Nil(t, err)
-//	require.Equal(t, []models.PipelineFile{}, executionContext.PipelineFiles)
+//	require.Equal(t, []models.File{}, executionContext.PipelineFiles)
 //}
 
 type FakeMiddleware struct {
@@ -374,8 +374,8 @@ func (fakeMiddleware *FakeMiddleware) String() string {
 }
 
 func (fakeMiddleware *FakeMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *ExecutionContext,
 ) {
 	fakeMiddleware.CallCount += 1

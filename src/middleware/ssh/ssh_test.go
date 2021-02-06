@@ -1,14 +1,14 @@
 package ssh
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestRunningViaSsh(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"ssh": map[string]interface{}{
 			"host": "test-host",
 		},
@@ -20,7 +20,7 @@ func TestRunningViaSsh(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewSshMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -32,13 +32,13 @@ func TestRunningViaSsh(t *testing.T) {
 }
 
 func TestNestedPipelines(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"ssh": map[string]interface{}{
 			"host": "test-host",
 		},
 	}, nil, nil)
 
-	childRun, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "test",
 		},
@@ -47,7 +47,7 @@ func TestNestedPipelines(t *testing.T) {
 	childRun.Log.SetLevel(logrus.TraceLevel)
 	NewSshMiddleware().Apply(
 		childRun,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	childRun.Close()
@@ -59,7 +59,7 @@ func TestNestedPipelines(t *testing.T) {
 }
 
 func TestMissingHostArgument(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"ssh": map[string]interface{}{
 			"test": "not-a-host-arg",
 		},
@@ -71,7 +71,7 @@ func TestMissingHostArgument(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewSshMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -84,7 +84,7 @@ func TestMissingHostArgument(t *testing.T) {
 }
 
 func TestNilArgument(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "test",
 		},
@@ -93,7 +93,7 @@ func TestNilArgument(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewSshMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -105,7 +105,7 @@ func TestNilArgument(t *testing.T) {
 }
 
 func TestMalformedArgument(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"ssh": map[string]interface{}{
 			"test": []interface{}{
 				"invalid",
@@ -119,7 +119,7 @@ func TestMalformedArgument(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewSshMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {},
+		func(run *pipeline.Run) {},
 		nil,
 	)
 	run.Close()

@@ -1,10 +1,11 @@
+// The `env` middleware manipulates environment variables
 package env
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/ryankurte/go-structparse"
 	"os"
 )
@@ -39,8 +40,8 @@ func NewEnvMiddlewareWithProvider(
 }
 
 func (envMiddleware EnvMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	arguments := envMiddlewareArguments{
@@ -69,17 +70,17 @@ func (envMiddleware EnvMiddleware) Apply(
 	case 0:
 	case 1:
 		run.Log.DebugWithFields(
-			log_fields.Symbol("💲"),
-			log_fields.Message("made 1 env var substitution"),
-			log_fields.Info(interpolator.Substitutions),
-			log_fields.Middleware(envMiddleware),
+			fields.Symbol("💲"),
+			fields.Message("made 1 env var substitution"),
+			fields.Info(interpolator.Substitutions),
+			fields.Middleware(envMiddleware),
 		)
 	default:
 		run.Log.DebugWithFields(
-			log_fields.Symbol("💲"),
-			log_fields.Message(fmt.Sprintf("made %v env var substitutions", len(interpolator.Substitutions))),
-			log_fields.Info(interpolator.Substitutions),
-			log_fields.Middleware(envMiddleware),
+			fields.Symbol("💲"),
+			fields.Message(fmt.Sprintf("made %v env var substitutions", len(interpolator.Substitutions))),
+			fields.Info(interpolator.Substitutions),
+			fields.Middleware(envMiddleware),
 		)
 	}
 
@@ -98,10 +99,10 @@ func (envMiddleware EnvMiddleware) Apply(
 			run.LogClosingWaitGroup.Done()
 		}()
 		run.Log.DebugWithFields(
-			log_fields.Symbol("💲"),
-			log_fields.Message(fmt.Sprintf("saving output")),
-			log_fields.Info("$"+*arguments.Save),
-			log_fields.Middleware(envMiddleware),
+			fields.Symbol("💲"),
+			fields.Message(fmt.Sprintf("saving output")),
+			fields.Info("$"+*arguments.Save),
+			fields.Middleware(envMiddleware),
 		)
 	}
 }

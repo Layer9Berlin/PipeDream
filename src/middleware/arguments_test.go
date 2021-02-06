@@ -1,16 +1,16 @@
 package middleware
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
 func TestParseArgumentsIncludingParents(t *testing.T) {
-	parentRun, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	parentRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{"test"},
 	}, nil, nil)
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, parentRun)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, parentRun)
 	reference := make([]interface{}, 0, 1)
 	require.Equal(t, true, ParseArgumentsIncludingParents(&reference, "test", run))
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -22,7 +22,7 @@ func TestParseArguments_NilMiddlewareArguments(t *testing.T) {
 }
 
 func TestParseArguments_WithMalformedArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": "test",
 	}, nil, nil)
 	require.Equal(t, false, ParseArguments(&[]interface{}{}, "test", run))
@@ -31,12 +31,12 @@ func TestParseArguments_WithMalformedArguments(t *testing.T) {
 }
 
 func TestParseArguments_WithoutArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 	require.Equal(t, false, ParseArguments(&[]PipelineReference{}, "test", run))
 }
 
 func TestParseArguments_WithValidArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{"test"},
 	}, nil, nil)
 	reference := make([]interface{}, 0, 1)
@@ -46,7 +46,7 @@ func TestParseArguments_WithValidArguments(t *testing.T) {
 }
 
 func TestParsePipelineReferences_WithInvalidReference_MapWithNilKey(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[interface{}]interface{}{
 				nil: map[string]interface{}{
@@ -64,7 +64,7 @@ func TestParsePipelineReferences_WithInvalidReference_MapWithNilKey(t *testing.T
 }
 
 func TestParsePipelineReferences_WithInvalidReference_StringMap(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[string]interface{}{
 				"test1": map[string]interface{}{},
@@ -80,7 +80,7 @@ func TestParsePipelineReferences_WithInvalidReference_StringMap(t *testing.T) {
 func TestParsePipelineReferences_WithInvalidReference_StringPointerMap(t *testing.T) {
 	testKey := "test1"
 	otherTestKey := "test2"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[*string]interface{}{
 				&testKey:      map[string]interface{}{},
@@ -94,7 +94,7 @@ func TestParsePipelineReferences_WithInvalidReference_StringPointerMap(t *testin
 }
 
 func TestParsePipelineReferences_WithInvalidReference_UnknownType(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			[]interface{}{
 				"test",
@@ -107,7 +107,7 @@ func TestParsePipelineReferences_WithInvalidReference_UnknownType(t *testing.T) 
 }
 
 func TestParsePipelineReferences_WithMalformedArguments_MapWithNilKey(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[interface{}]interface{}{
 				nil: "test",
@@ -120,7 +120,7 @@ func TestParsePipelineReferences_WithMalformedArguments_MapWithNilKey(t *testing
 }
 
 func TestParsePipelineReferences_WithMalformedArguments_StringMap(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[string]interface{}{
 				"test": "test",
@@ -134,7 +134,7 @@ func TestParsePipelineReferences_WithMalformedArguments_StringMap(t *testing.T) 
 
 func TestParsePipelineReferences_WithMalformedArguments_StringPointerMap(t *testing.T) {
 	testKey := "test"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[*string]interface{}{
 				&testKey: "test",
@@ -151,19 +151,19 @@ func TestParsePipelineReferences_WithNilMiddlewareArguments(t *testing.T) {
 }
 
 func TestParsePipelineReferences_WithNonArrayArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": "test",
 	}, nil, nil)
 	require.Equal(t, false, ParseArguments(&[]PipelineReference{}, "test", run))
 }
 
 func TestParsePipelineReferences_WithoutArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 	require.Equal(t, false, ParseArguments(&[]PipelineReference{}, "test", run))
 }
 
 func TestParsePipelineReferences_WithValidReference_MapWithNilKey(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[interface{}]interface{}{
 				nil: map[string]interface{}{},
@@ -177,7 +177,7 @@ func TestParsePipelineReferences_WithValidReference_MapWithNilKey(t *testing.T) 
 }
 
 func TestParsePipelineReferences_WithValidReference_String(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			"another_test",
 		},
@@ -189,7 +189,7 @@ func TestParsePipelineReferences_WithValidReference_String(t *testing.T) {
 }
 
 func TestParsePipelineReferences_WithValidReference_StringMap(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[string]interface{}{
 				"test1": map[string]interface{}{},
@@ -204,7 +204,7 @@ func TestParsePipelineReferences_WithValidReference_StringMap(t *testing.T) {
 
 func TestParsePipelineReferences_WithValidReference_StringPointerMap(t *testing.T) {
 	test := "test"
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[*string]interface{}{
 				&test: map[string]interface{}{},

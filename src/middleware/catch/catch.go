@@ -1,10 +1,11 @@
+// The `catch` middleware enables graceful handling of stderr output
 package catch
 
 import (
 	"bytes"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io/ioutil"
 )
 
@@ -21,8 +22,8 @@ func NewCatchMiddleware() CatchMiddleware {
 }
 
 func (catchMiddleware CatchMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	var argument middleware.PipelineReference = nil
@@ -41,11 +42,11 @@ func (catchMiddleware CatchMiddleware) Apply(
 		}
 
 		run.Log.TraceWithFields(
-			log_fields.DataStream(catchMiddleware, "creating stdout writer")...,
+			fields.DataStream(catchMiddleware, "creating stdout writer")...,
 		)
 		stdoutAppender := run.Stdout.WriteCloser()
 		run.Log.TraceWithFields(
-			log_fields.DataStream(catchMiddleware, "intercepting stderr")...,
+			fields.DataStream(catchMiddleware, "intercepting stderr")...,
 		)
 		stderrIntercept := run.Stderr.Intercept()
 		go func() {
@@ -58,19 +59,19 @@ func (catchMiddleware CatchMiddleware) Apply(
 					middleware.WithParentRun(run),
 					middleware.WithIdentifier(catchIdentifier),
 					middleware.WithArguments(catchArguments),
-					middleware.WithSetupFunc(func(errorRun *models.PipelineRun) {
+					middleware.WithSetupFunc(func(errorRun *pipeline.Run) {
 						run.Log.TraceWithFields(
-							log_fields.DataStream(catchMiddleware, "merging parent stderr into child stdin")...,
+							fields.DataStream(catchMiddleware, "merging parent stderr into child stdin")...,
 						)
 						errorRun.Stdin.MergeWith(bytes.NewReader(errInput))
 					}),
-					middleware.WithTearDownFunc(func(errorRun *models.PipelineRun) {
+					middleware.WithTearDownFunc(func(errorRun *pipeline.Run) {
 						run.Log.TraceWithFields(
-							log_fields.DataStream(catchMiddleware, "merging child stdout into parent stdout")...,
+							fields.DataStream(catchMiddleware, "merging child stdout into parent stdout")...,
 						)
 						errorRun.Stdout.StartCopyingInto(stdoutAppender)
 						run.Log.TraceWithFields(
-							log_fields.DataStream(catchMiddleware, "replacing parent stderr with child stderr")...,
+							fields.DataStream(catchMiddleware, "replacing parent stderr with child stderr")...,
 						)
 						errorRun.Stderr.StartCopyingInto(stderrIntercept)
 						go func() {

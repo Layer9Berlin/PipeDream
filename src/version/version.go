@@ -1,3 +1,4 @@
+// Implementation of the version command, providing information about the current pipedream command line tool installation
 package version
 
 import (

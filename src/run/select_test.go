@@ -3,7 +3,7 @@ package run
 import (
 	"bytes"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	pipeline2 "github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
@@ -22,9 +22,9 @@ func TestSelect_letUserSelectPipelineFile_noFiles(t *testing.T) {
 }
 
 func TestSelect_letUserSelectPipelineFile_singleFile(t *testing.T) {
-	testFile := models.PipelineFile{FileName: "test"}
+	testFile := pipeline2.File{FileName: "test"}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile,
 	}
 	executionContext.SelectableFiles = []string{
@@ -42,10 +42,10 @@ func TestSelect_letUserSelectPipelineFile_singleFile(t *testing.T) {
 }
 
 func TestSelect_letUserSelectPipelineFile_userSelection(t *testing.T) {
-	testFile1 := models.PipelineFile{FileName: "test1.pipe"}
-	testFile2 := models.PipelineFile{FileName: "test2.pipe"}
+	testFile1 := pipeline2.File{FileName: "test1.pipe"}
+	testFile2 := pipeline2.File{FileName: "test2.pipe"}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 		testFile2,
 	}
@@ -76,10 +76,10 @@ func TestSelect_letUserSelectPipelineFile_userSelection(t *testing.T) {
 }
 
 func TestSelect_letUserSelectPipelineFile_fileSelectionError(t *testing.T) {
-	testFile1 := models.PipelineFile{FileName: "test1.pipe"}
-	testFile2 := models.PipelineFile{FileName: "test2.pipe"}
+	testFile1 := pipeline2.File{FileName: "test1.pipe"}
+	testFile2 := pipeline2.File{FileName: "test2.pipe"}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 		testFile2,
 	}
@@ -109,7 +109,7 @@ func TestSelect_letUserSelectPipelineFile_fileSelectionError(t *testing.T) {
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_noFiles(t *testing.T) {
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{}
+	executionContext.PipelineFiles = []pipeline2.File{}
 	pipeline, file, err := letUserSelectPipelineFileAndPipeline(
 		executionContext,
 		10,
@@ -121,9 +121,9 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_noFiles(t *testing.T) {
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_noSelectableFiles(t *testing.T) {
-	testFile1 := models.PipelineFile{FileName: "test1.pipe"}
+	testFile1 := pipeline2.File{FileName: "test1.pipe"}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 	}
 	_, _, err := letUserSelectPipelineFileAndPipeline(
@@ -136,9 +136,9 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_noSelectableFiles(t *testin
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_pipelineSelectionError(t *testing.T) {
-	testFile1 := models.PipelineFile{FileName: "test1.pipe"}
+	testFile1 := pipeline2.File{FileName: "test1.pipe"}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 	}
 	executionContext.SelectableFiles = []string{
@@ -154,14 +154,14 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_pipelineSelectionError(t *t
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_singleFile(t *testing.T) {
-	testFile1 := models.PipelineFile{
+	testFile1 := pipeline2.File{
 		FileName: "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test": nil,
 		},
 	}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.Definitions = map[string][]models.PipelineDefinition{
+	executionContext.Definitions = map[string][]pipeline2.PipelineDefinition{
 		"test": {
 			{
 				DefinitionArguments: map[string]interface{}{
@@ -170,7 +170,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singleFile(t *testing.T) {
 			},
 		},
 	}
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 	}
 	executionContext.SelectableFiles = []string{
@@ -188,7 +188,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singleFile(t *testing.T) {
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_singlePipeline(t *testing.T) {
-	testFile1 := models.PipelineFile{
+	testFile1 := pipeline2.File{
 		FileName: "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test_public": nil,
@@ -198,7 +198,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singlePipeline(t *testing.T
 		},
 	}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 	}
 	executionContext.SelectableFiles = []string{
@@ -216,7 +216,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singlePipeline(t *testing.T
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_userSelectsPipeline(t *testing.T) {
-	testFile1 := models.PipelineFile{
+	testFile1 := pipeline2.File{
 		FileName: "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test_public_1": nil,
@@ -227,7 +227,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_userSelectsPipeline(t *test
 		},
 	}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 	}
 	executionContext.SelectableFiles = []string{
@@ -255,8 +255,8 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_userSelectsPipeline(t *test
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_defaultPreselection(t *testing.T) {
-	testFile1 := models.PipelineFile{
-		Default: models.DefaultSettings{
+	testFile1 := pipeline2.File{
+		Default: pipeline2.DefaultSettings{
 			Command: "test_public_2",
 		},
 		FileName: "test1.pipe",
@@ -269,7 +269,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_defaultPreselection(t *test
 		},
 	}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.PipelineFiles = []models.PipelineFile{
+	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
 	}
 	executionContext.SelectableFiles = []string{

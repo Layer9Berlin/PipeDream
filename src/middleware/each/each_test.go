@@ -3,7 +3,7 @@ package each
 import (
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
@@ -13,7 +13,7 @@ import (
 )
 
 func TestEach_Apply(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"each": []interface{}{
 			map[string]interface{}{"pipe1": map[string]interface{}{
 				"arg": "value",
@@ -34,11 +34,11 @@ func TestEach_Apply(t *testing.T) {
 	run.Stdout.Replace(strings.NewReader("output of parent pipe\n"))
 	NewEachMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 		},
 		middleware.NewExecutionContext(
 			middleware.WithExecutionFunction(
-				func(childRun *models.PipelineRun) {
+				func(childRun *pipeline.Run) {
 					stdinCopy := childRun.Stdin.Copy()
 					waitGroup.Add(1)
 					go func() {
@@ -66,7 +66,7 @@ func TestEach_Apply(t *testing.T) {
 }
 
 func TestEach_ApplyWithInvalidArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"each": []interface{}{
 			map[string]interface{}{"pipe1": interface{}(
 				"invalid",
@@ -77,7 +77,7 @@ func TestEach_ApplyWithInvalidArguments(t *testing.T) {
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewEachMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))
 			run.Stdout.Replace(strings.NewReader("output\n"))
 		},
@@ -93,12 +93,12 @@ func TestEach_ApplyWithInvalidArguments(t *testing.T) {
 }
 
 func TestEach_Inactive(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, nil, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, nil, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewEachMiddleware().Apply(
 		run,
-		func(pipelineRun *models.PipelineRun) {
+		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))
 			run.Stdout.Replace(strings.NewReader("output of parent pipe\n"))
 		},

@@ -1,11 +1,12 @@
+// The `interpolate` middleware substitutes arguments or inputs into other arguments
 package interpolate
 
 import (
 	"bytes"
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/hashicorp/go-multierror"
 	"github.com/ryankurte/go-structparse"
 	"io/ioutil"
@@ -34,8 +35,8 @@ func NewInterpolateMiddleware() InterpolateMiddleware {
 }
 
 func (interpolateMiddleware InterpolateMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := interpolateMiddlewareArguments{
@@ -59,29 +60,29 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
 				if !arguments.IgnoreWarnings {
 					run.Log.WarnWithFields(
-						log_fields.Symbol("⚠️"),
-						log_fields.Message("warning"),
-						log_fields.Info(interpolator.Errors.Errors),
-						log_fields.Middleware(interpolateMiddleware),
+						fields.Symbol("⚠️"),
+						fields.Message("warning"),
+						fields.Info(interpolator.Errors.Errors),
+						fields.Middleware(interpolateMiddleware),
 					)
 				}
 			} else {
 				run.Log.DebugWithFields(
-					log_fields.Symbol("💤"),
-					log_fields.Message("input interpolation used, need to wait for input to complete..."),
-					log_fields.Middleware(interpolateMiddleware),
+					fields.Symbol("💤"),
+					fields.Message("input interpolation used, need to wait for input to complete..."),
+					fields.Middleware(interpolateMiddleware),
 				)
 			}
 			run.Log.TraceWithFields(
-				log_fields.DataStream(interpolateMiddleware, "copying stdin")...,
+				fields.DataStream(interpolateMiddleware, "copying stdin")...,
 			)
 			stdinCopy := run.Stdin.CopyOrResult()
 			run.Log.TraceWithFields(
-				log_fields.DataStream(interpolateMiddleware, "creating stdout writer")...,
+				fields.DataStream(interpolateMiddleware, "creating stdout writer")...,
 			)
 			stdoutAppender := run.Stdout.WriteCloser()
 			run.Log.TraceWithFields(
-				log_fields.DataStream(interpolateMiddleware, "creating stderr writer")...,
+				fields.DataStream(interpolateMiddleware, "creating stderr writer")...,
 			)
 			stderrAppender := run.Stdout.WriteCloser()
 			// we return immediately and wait for the previous input to be available
@@ -96,21 +97,21 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 					middleware.WithParentRun(run),
 					middleware.WithLogWriter(parentLogWriter),
 					middleware.WithArguments(interpolatedArguments),
-					middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
+					middleware.WithSetupFunc(func(childRun *pipeline.Run) {
 						interpolator.log(childRun.Log, interpolateMiddleware)
 						childRun.Log.PossibleErrorWithExplanation(inputErr, "unable to find value for previous output")
 						childRun.Log.TraceWithFields(
-							log_fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
+							fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 						)
 						childRun.Stdin.MergeWith(bytes.NewReader(input))
 					}),
-					middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
+					middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 						childRun.Log.TraceWithFields(
-							log_fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout")...,
+							fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout")...,
 						)
 						childRun.Stdout.StartCopyingInto(stdoutAppender)
 						childRun.Log.TraceWithFields(
-							log_fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr")...,
+							fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr")...,
 						)
 						childRun.Stderr.StartCopyingInto(stderrAppender)
 						go func() {
@@ -127,30 +128,30 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 		interpolator.log(run.Log, interpolateMiddleware)
 		if len(interpolator.Substitutions) > 0 {
 			run.Log.TraceWithFields(
-				log_fields.DataStream(interpolateMiddleware, "creating parent stdout writer")...,
+				fields.DataStream(interpolateMiddleware, "creating parent stdout writer")...,
 			)
 			stdoutAppender := run.Stdout.WriteCloser()
 			run.Log.TraceWithFields(
-				log_fields.DataStream(interpolateMiddleware, "creating parent stderr writer")...,
+				fields.DataStream(interpolateMiddleware, "creating parent stderr writer")...,
 			)
 			stderrAppender := run.Stderr.WriteCloser()
 			executionContext.FullRun(
 				middleware.WithIdentifier(run.Identifier),
 				middleware.WithParentRun(run),
 				middleware.WithArguments(interpolatedArguments),
-				middleware.WithSetupFunc(func(childRun *models.PipelineRun) {
+				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
 					childRun.Log.TraceWithFields(
-						log_fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
+						fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 					)
 					childRun.Stdin.MergeWith(run.Stdin.CopyOrResult())
 				}),
-				middleware.WithTearDownFunc(func(childRun *models.PipelineRun) {
+				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 					childRun.Log.TraceWithFields(
-						log_fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout writer")...,
+						fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout writer")...,
 					)
 					childRun.Stdout.StartCopyingInto(stdoutAppender)
 					childRun.Log.TraceWithFields(
-						log_fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr writer")...,
+						fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr writer")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrAppender)
 					go func() {
@@ -251,8 +252,6 @@ func (interpolator *Interpolator) interpolateArguments(value string) (string, er
 		// allow unsetting of parent options using `null`
 		if haveArgument && argument != nil {
 			replacement = "true"
-		} else {
-			replacement = "false"
 		}
 		interpolator.Substitutions[fmt.Sprintf("have %v", key)] = replacement
 		value = strings.Replace(value, match[0], replacement, 1)
@@ -302,14 +301,14 @@ func (interpolator *Interpolator) interpolateArguments(value string) (string, er
 	return value, nil
 }
 
-func (interpolator *Interpolator) log(logger *models.PipelineRunLogger, interpolateMiddleware InterpolateMiddleware) {
+func (interpolator *Interpolator) log(logger *pipeline.PipelineRunLogger, interpolateMiddleware InterpolateMiddleware) {
 	if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
 		if !interpolator.MiddlewareArguments.IgnoreWarnings {
 			logger.WarnWithFields(
-				log_fields.Symbol("⚠️"),
-				log_fields.Message("warning"),
-				log_fields.Info(interpolator.Errors.Errors),
-				log_fields.Middleware(interpolateMiddleware),
+				fields.Symbol("⚠️"),
+				fields.Message("warning"),
+				fields.Info(interpolator.Errors.Errors),
+				fields.Middleware(interpolateMiddleware),
 			)
 		}
 	} else {
@@ -317,17 +316,17 @@ func (interpolator *Interpolator) log(logger *models.PipelineRunLogger, interpol
 		case 0:
 		case 1:
 			logger.DebugWithFields(
-				log_fields.Symbol("⎆"),
-				log_fields.Message("made 1 substitution"),
-				log_fields.Info(interpolator.Substitutions),
-				log_fields.Middleware(interpolateMiddleware),
+				fields.Symbol("⎆"),
+				fields.Message("made 1 substitution"),
+				fields.Info(interpolator.Substitutions),
+				fields.Middleware(interpolateMiddleware),
 			)
 		default:
 			logger.DebugWithFields(
-				log_fields.Symbol("⎆"),
-				log_fields.Message(fmt.Sprintf("made %v substitutions", len(interpolator.Substitutions))),
-				log_fields.Info(interpolator.Substitutions),
-				log_fields.Middleware(interpolateMiddleware),
+				fields.Symbol("⎆"),
+				fields.Message(fmt.Sprintf("made %v substitutions", len(interpolator.Substitutions))),
+				fields.Info(interpolator.Substitutions),
+				fields.Middleware(interpolateMiddleware),
 			)
 		}
 	}

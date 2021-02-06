@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io"
@@ -14,7 +14,7 @@ import (
 )
 
 func TestShell_NonRunnable(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
 
 	testWaitGroup := &sync.WaitGroup{}
 	testWaitGroup.Add(1)
@@ -22,7 +22,7 @@ func TestShell_NonRunnable(t *testing.T) {
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewShellMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
 			nextExecuted = true
 		},
@@ -39,7 +39,7 @@ func TestShell_NonRunnable(t *testing.T) {
 
 func TestShell_ChangeDir(t *testing.T) {
 	identifier := "command-identifier"
-	run, _ := models.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"dir": "test",
 			"run": "something",
@@ -53,7 +53,7 @@ func TestShell_ChangeDir(t *testing.T) {
 	executor, shellMiddleware := NewTestShellMiddleware()
 	shellMiddleware.Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
 			nextExecuted = true
 		},
@@ -74,7 +74,7 @@ func TestShell_ChangeDir(t *testing.T) {
 }
 
 func TestShell_RunWithArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"args": []interface{}{
 				map[string]interface{}{
@@ -113,7 +113,7 @@ func TestShell_RunWithArguments(t *testing.T) {
 	executor, shellMiddleware := NewTestShellMiddleware()
 	shellMiddleware.Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
 			nextExecuted = true
 		},
@@ -131,7 +131,7 @@ func TestShell_RunWithArguments(t *testing.T) {
 }
 
 func TestShell_InvalidArguments(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"args": []interface{}{
 				[]interface{}{
@@ -146,7 +146,7 @@ func TestShell_InvalidArguments(t *testing.T) {
 	_, shellMiddleware := NewTestShellMiddleware()
 	shellMiddleware.Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			require.Fail(t, "not expected to be called")
 		},
 		nil,
@@ -160,7 +160,7 @@ func TestShell_InvalidArguments(t *testing.T) {
 }
 
 func TestShell_Login(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"login": true,
 			"run":   "something",
@@ -174,7 +174,7 @@ func TestShell_Login(t *testing.T) {
 	executor, shellMiddleware := NewTestShellMiddleware()
 	shellMiddleware.Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
 			nextExecuted = true
 		},
@@ -191,7 +191,7 @@ func TestShell_Login(t *testing.T) {
 }
 
 func TestShell_NonZeroExitCode(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"login": true,
 			"run":   "something",
@@ -206,7 +206,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 	executor.WaitError = &exec.ExitError{}
 	shellMiddleware.Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
 			nextExecuted = true
 		},
@@ -284,7 +284,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 //	}()
 //	shellMiddleware.Apply(
 //		run,
-//		func(nextRun *models.PipelineRun) {
+//		func(nextRun *models.Run) {
 //			// the input might come from a previous pipe
 //			nextRun.Stdin.Replace(strings.NewReader("Please confirm (Y/n):\n"))
 //			//this could be set by other middleware
@@ -315,7 +315,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 //}
 
 func TestShell_WaitError(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "something",
 		},
@@ -331,7 +331,7 @@ func TestShell_WaitError(t *testing.T) {
 	}
 	shellMiddleware.Apply(
 		run,
-		func(nextRun *models.PipelineRun) {},
+		func(nextRun *pipeline.Run) {},
 		nil,
 	)
 	run.Close()
@@ -342,7 +342,7 @@ func TestShell_WaitError(t *testing.T) {
 }
 
 func TestShell_UnmockedCommand(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "echo \"Test\"",
 		},
@@ -354,7 +354,7 @@ func TestShell_UnmockedCommand(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewShellMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
 			nextExecuted = true
 		},
@@ -371,7 +371,7 @@ func TestShell_UnmockedCommand(t *testing.T) {
 }
 
 func TestShell_CancelHook(t *testing.T) {
-	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "read",
 		},
@@ -380,7 +380,7 @@ func TestShell_CancelHook(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewShellMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 		},
 		nil,
 	)
@@ -395,7 +395,7 @@ func TestShell_CancelHook(t *testing.T) {
 }
 
 func TestShell_PrintfRun(t *testing.T) {
-	run, err := models.NewPipelineRun(
+	run, err := pipeline.NewPipelineRun(
 		nil,
 		map[string]interface{}{
 			"shell": map[string]interface{}{
@@ -410,7 +410,7 @@ func TestShell_PrintfRun(t *testing.T) {
 	run.Log.SetLevel(logrus.TraceLevel)
 	NewShellMiddleware().Apply(
 		run,
-		func(run *models.PipelineRun) {
+		func(run *pipeline.Run) {
 		},
 		nil,
 	)

@@ -1,3 +1,4 @@
+// Parse and compare two or more semantic versions
 package main
 
 import (

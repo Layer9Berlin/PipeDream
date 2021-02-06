@@ -1,9 +1,10 @@
+// The `inherit` middleware passes arguments from a parent to its children
 package inherit
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/logging/log_fields"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
-	"github.com/Layer9Berlin/pipedream/src/models"
+	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
 // Arguments Propagator
@@ -19,8 +20,8 @@ func NewInheritMiddleware() InheritMiddleware {
 }
 
 func (inheritMiddleware InheritMiddleware) Apply(
-	run *models.PipelineRun,
-	next func(*models.PipelineRun),
+	run *pipeline.Run,
+	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
 	arguments := make([]string, 0, 10)
@@ -41,10 +42,10 @@ func (inheritMiddleware InheritMiddleware) Apply(
 		}
 		if len(substitutions) > 0 {
 			run.Log.DebugWithFields(
-				log_fields.Symbol("👪"),
-				log_fields.Message("inherited arguments"),
-				log_fields.Info(substitutions),
-				log_fields.Middleware(inheritMiddleware),
+				fields.Symbol("👪"),
+				fields.Message("inherited arguments"),
+				fields.Info(substitutions),
+				fields.Middleware(inheritMiddleware),
 			)
 		}
 	}
