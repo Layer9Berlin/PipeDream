@@ -1,4 +1,4 @@
-// The `catch` middleware enables graceful handling of stderr output
+// Package catch provides a middleware for graceful handling of stderr output
 package catch
 
 import (

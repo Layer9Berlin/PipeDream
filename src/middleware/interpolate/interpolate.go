@@ -1,4 +1,4 @@
-// The `interpolate` middleware substitutes arguments or inputs into other arguments
+// Package interpolate provides a middleware to substitute arguments or inputs into other arguments
 package interpolate
 
 import (

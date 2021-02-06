@@ -1,4 +1,4 @@
-// The `dir` middleware allows for changing the current working directory
+// Package dir provides a middleware for changing the current working directory
 package dir
 
 import (

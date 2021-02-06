@@ -1,4 +1,4 @@
-// The `output` middleware overwrites a pipe's output directly
+// Package output provides a middleware to overwrite a pipe's output directly
 package outputmiddleware
 
 import (

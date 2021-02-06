@@ -1,4 +1,4 @@
-// The `catchEach` middleware enables graceful handling of stderr output based on regex patterns
+// Package catcheach provides a middleware for graceful handling of stderr output based on regex patterns
 package catcheach
 
 import (

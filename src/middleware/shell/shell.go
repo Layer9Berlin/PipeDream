@@ -1,4 +1,4 @@
-// The `shell` middleware executes commands in a shell
+// Package shell provides a middleware to execute commands in a shell
 package shell
 
 import (

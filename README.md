@@ -1,6 +1,6 @@
 <p align="center">
     <img src="docs/assets/PipeDream.png" width="360" height="234">
-    <p align="center">Maintainable automation.</p>
+    <h2 align="center">Maintainable automation.</h2>
 </p>
 
 [![Release](https://img.shields.io/github/v/release/Layer9Berlin/PipeDream.svg?style=for-the-badge)](https://github.com/Layer9Berlin/PipeDream/releases/latest)

@@ -1,4 +1,4 @@
-// Defines a list of middleware items to be executed when a pipeline is run
+// Package stack defines a list of middleware items to be executed when a pipeline is run
 package stack
 
 import (
@@ -16,7 +16,7 @@ import (
 	selectmiddleware "github.com/Layer9Berlin/pipedream/src/middleware/select"
 	"github.com/Layer9Berlin/pipedream/src/middleware/shell"
 	"github.com/Layer9Berlin/pipedream/src/middleware/ssh"
-	syncMiddleware "github.com/Layer9Berlin/pipedream/src/middleware/sync"
+	syncmiddleware "github.com/Layer9Berlin/pipedream/src/middleware/sync"
 	"github.com/Layer9Berlin/pipedream/src/middleware/timer"
 	"github.com/Layer9Berlin/pipedream/src/middleware/when"
 )
@@ -30,7 +30,7 @@ func SetUpMiddleware() []middleware.Middleware {
 		env.NewEnvMiddleware(),
 		catch.NewCatchMiddleware(),
 		when.NewWhenMiddleware(),
-		syncMiddleware.NewSyncMiddleware(),
+		syncmiddleware.NewSyncMiddleware(),
 		pipe.NewPipeMiddleware(),
 		each.NewEachMiddleware(),
 		shell.NewShellMiddleware(),

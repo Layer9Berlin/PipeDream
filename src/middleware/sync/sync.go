@@ -1,5 +1,5 @@
-// The `sync` middleware defers execution until a condition is fulfilled
-package sync_middleware
+// Package sync provides a middleware to defer execution until a condition is fulfilled
+package syncmiddleware
 
 import (
 	"fmt"

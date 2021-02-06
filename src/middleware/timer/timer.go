@@ -1,4 +1,4 @@
-// The `timer` middleware records execution time
+// Package timer provides a middleware that records execution time
 package timer
 
 import (

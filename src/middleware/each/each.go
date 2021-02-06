@@ -1,4 +1,4 @@
-// The `each` middleware copies some input into several child pipes running simultaneously
+// Package each provides a middleware that copies some input into several child pipes running simultaneously
 package each
 
 import (

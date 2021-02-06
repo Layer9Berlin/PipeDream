@@ -1,4 +1,4 @@
-// The `pipe` middleware executes several commands in sequence
+// Package pipe provides a middleware to execute several commands in sequence
 package pipe
 
 import (

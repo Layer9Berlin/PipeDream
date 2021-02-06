@@ -1,4 +1,4 @@
-// The `inherit` middleware passes arguments from a parent to its children
+// Package inherit provides a middleware that passes arguments from a parent to its children
 package inherit
 
 import (

@@ -1,4 +1,4 @@
-// The `env` middleware manipulates environment variables
+// Package env provides a middleware handling environment variables
 package env
 
 import (

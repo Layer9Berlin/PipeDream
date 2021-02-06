@@ -1,4 +1,4 @@
-// The `input` middleware overwrites a pipe's input directly
+// Package input provides a middleware to overwrite a pipe's input directly
 package inputmiddleware
 
 import (

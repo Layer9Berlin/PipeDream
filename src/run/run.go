@@ -1,4 +1,4 @@
-// Implementation of the default shell command, selecting, parsing and executing pipelines
+// Package run contains the implementation of the default `pipedream` shell command, selecting, parsing and executing pipelines
 package run
 
 import (

@@ -1,4 +1,4 @@
-// The `docker` middleware enables execution within a Docker (Compose) container
+// Package docker provides a middleware for execution within a Docker (Compose) container
 package docker
 
 import (

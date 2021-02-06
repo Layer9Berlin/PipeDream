@@ -1,2 +1,2 @@
-// Provides custom logging and activity indication
+// Package logging provides custom logging and activity indication
 package logging

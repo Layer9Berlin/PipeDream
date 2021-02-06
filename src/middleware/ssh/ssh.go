@@ -1,4 +1,4 @@
-// The `ssh` middleware enables remote command execution via SSH
+// Package ssh provides a middleware enabling remote command execution via SSH
 package ssh
 
 import (

@@ -1,4 +1,4 @@
-// The `select` middleware shows selection prompts to the user
+// Package select provides a middleware that shows a selection prompt to the user
 package selectmiddleware
 
 import (

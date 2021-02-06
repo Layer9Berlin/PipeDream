@@ -1,4 +1,4 @@
-// The `with` middleware extracts and processes input patterns
+// Package with provides a middleware that extracts and processes input patterns
 package with
 
 import (

@@ -1,1 +1,1 @@
-package sync_middleware
+package syncmiddleware

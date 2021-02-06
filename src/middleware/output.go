@@ -26,9 +26,9 @@ func outputResult(result *pipeline.Run, writer io.Writer) {
 	if result == nil || result.Stdout.Len() == 0 {
 		_, _ = fmt.Fprintln(writer, aurora.Gray(12, "no result"))
 		return
-	} else {
-		_, _ = fmt.Fprintln(writer, result.Stdout.String())
 	}
+
+	_, _ = fmt.Fprintln(writer, result.Stdout.String())
 }
 
 func outputLogs(run *pipeline.Run, writer io.Writer) {

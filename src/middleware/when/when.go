@@ -1,4 +1,4 @@
-// The `when` middleware enables conditional execution
+// Package when provides a middleware that enables conditional execution
 package when
 
 import (
