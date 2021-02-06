@@ -9,29 +9,29 @@ import (
 func TestImports_AlreadyProcessedIsIgnored(t *testing.T) {
 	importedFiles := []string{}
 	parser := NewParser(
-		WithReadFileImplementation(func (filename string) ([]byte, error) {
-		importedFiles = append(importedFiles, filename)
-		switch filename {
-		case "test1.file":
-			return []byte(`
+		WithReadFileImplementation(func(filename string) ([]byte, error) {
+			importedFiles = append(importedFiles, filename)
+			switch filename {
+			case "test1.file":
+				return []byte(`
 version: 0.0.1
 
 import:
  - test2.file
  - test3.file
 `), nil
-		case "test2.file":
-			return []byte(`
+			case "test2.file":
+				return []byte(`
 version: 0.0.1
 `), nil
-		case "test3.file":
-			return []byte(`
+			case "test3.file":
+				return []byte(`
 version: 0.0.1
 `), nil
-		}
-		require.Fail(t, "unexpected import")
-		return nil, nil
-	}))
+			}
+			require.Fail(t, "unexpected import")
+			return nil, nil
+		}))
 
 	imports, err := parser.RecursivelyAddImports([]string{
 		"test1.file",
@@ -52,9 +52,9 @@ version: 0.0.1
 
 func TestImports_FileReadError(t *testing.T) {
 	parser := NewParser(
-		WithReadFileImplementation(func (filename string) ([]byte, error) {
-		return nil, fmt.Errorf("file read error")
-	}))
+		WithReadFileImplementation(func(filename string) ([]byte, error) {
+			return nil, fmt.Errorf("file read error")
+		}))
 	imports, err := parser.RecursivelyAddImports([]string{
 		"test1.file",
 		"test2.file",
@@ -66,11 +66,11 @@ func TestImports_FileReadError(t *testing.T) {
 
 func TestImports_InvalidYaml(t *testing.T) {
 	parser := NewParser(
-		WithReadFileImplementation(func (filename string) ([]byte, error) {
-		return []byte(`
+		WithReadFileImplementation(func(filename string) ([]byte, error) {
+			return []byte(`
  - invalid - yaml
 `), nil
-	}))
+		}))
 	imports, err := parser.RecursivelyAddImports([]string{
 		"test1.file",
 		"test2.file",

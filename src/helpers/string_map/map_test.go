@@ -171,7 +171,7 @@ func TestGetValueInMap_Nested(t *testing.T) {
 					"test4": "test5",
 				},
 			},
-			},
+		},
 	}
 	value, err := GetValueInMap(vector, "test1", "test2", "test3", "test4")
 	require.Nil(t, err)
@@ -179,8 +179,7 @@ func TestGetValueInMap_Nested(t *testing.T) {
 }
 
 func TestGetValueInMap_NotExisting(t *testing.T) {
-	vector := map[string]interface{}{
-	}
+	vector := map[string]interface{}{}
 	_, err := GetValueInMap(vector, "impossible")
 	require.NotNil(t, err)
 	require.Equal(t, "value does not exist at path", err.Error())
@@ -207,8 +206,7 @@ func TestSetValueInMap_InvalidMap(t *testing.T) {
 func TestSetValueInMap_NonExistentLeaf(t *testing.T) {
 	vector := map[string]interface{}{
 		"test1": map[string]interface{}{
-			"test2": map[string]interface{}{
-			},
+			"test2": map[string]interface{}{},
 		},
 	}
 	err := SetValueInMap(vector, "test5", "test1", "test2", "test3", "test4")

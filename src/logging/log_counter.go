@@ -3,23 +3,22 @@ package logging
 import "github.com/sirupsen/logrus"
 
 type LogCounterHook struct {
-	level logrus.Level
+	level   logrus.Level
 	counter *int
 }
 
 func NewLogCounterHook(level logrus.Level, counter *int) *LogCounterHook {
 	return &LogCounterHook{
-		level: level,
+		level:   level,
 		counter: counter,
 	}
 }
 
-
-func (counterHook *LogCounterHook)Fire(*logrus.Entry) error {
+func (counterHook *LogCounterHook) Fire(*logrus.Entry) error {
 	*counterHook.counter = *counterHook.counter + 1
 	return nil
 }
 
-func (counterHook *LogCounterHook)Levels() []logrus.Level {
+func (counterHook *LogCounterHook) Levels() []logrus.Level {
 	return []logrus.Level{counterHook.level}
 }

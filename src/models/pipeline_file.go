@@ -1,6 +1,5 @@
 package models
 
-
 type PipelineFileImportSkeleton struct {
 	Import []string
 }

@@ -30,7 +30,7 @@ var rootCmd = &cobra.Command{
 	Use:   "semver-compare",
 	Short: "SemVer Compare",
 	Long:  `Compare semantic versions`,
-	Run: runFunction,
+	Run:   runFunction,
 }
 
 var runFunction = func(cmd *cobra.Command, args []string) {

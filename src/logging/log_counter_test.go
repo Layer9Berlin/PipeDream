@@ -20,4 +20,3 @@ func TestLogCounterHook_Levels(t *testing.T) {
 	hook := NewLogCounterHook(logrus.ErrorLevel, &counter)
 	require.Equal(t, []logrus.Level{logrus.ErrorLevel}, hook.Levels())
 }
-

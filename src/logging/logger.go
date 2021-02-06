@@ -105,7 +105,6 @@ func extractFields(entry *logrus.Entry, keys ...string) string {
 	return strings.Join(fields, " | ")
 }
 
-
 func prettyPrint(info interface{}, maxLength int) string {
 	infoMap, ok := info.(map[string]interface{})
 	if ok {
@@ -143,7 +142,7 @@ func PrettyPrintMap(mapToPrint map[string]interface{}, maxLength int) string {
 				if len(result) > 2 {
 					result = result + ", "
 				}
-				maxComponentLength := int(math.Floor(float64(maxLength - 4) / 2))
+				maxComponentLength := int(math.Floor(float64(maxLength-4) / 2))
 				result = result + fmt.Sprintf("%v: `%v`", ShortenString(key, maxComponentLength), ShortenString(stringValue, maxComponentLength))
 			}
 		}

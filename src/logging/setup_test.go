@@ -9,7 +9,7 @@ import (
 
 func TestRoot_SetUpLogs(t *testing.T) {
 	log := logrus.New()
-	buffer :=  bytes.NewBuffer([]byte{})
+	buffer := bytes.NewBuffer([]byte{})
 
 	err := SetUpLogs(log, "", buffer)
 	require.Nil(t, err)
@@ -46,7 +46,7 @@ func TestRoot_SetUpLogs_InvalidLevel(t *testing.T) {
 	log := logrus.New()
 	UserPipeLogLevel = logrus.InfoLevel
 
-	buffer :=  bytes.NewBuffer([]byte{})
+	buffer := bytes.NewBuffer([]byte{})
 	err := SetUpLogs(log, "bedug", buffer)
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "not a valid logrus Level")

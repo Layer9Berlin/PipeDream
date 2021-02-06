@@ -5,6 +5,7 @@
 
 [![Release](https://img.shields.io/github/v/release/Layer9Berlin/PipeDream.svg?style=for-the-badge)](https://github.com/Layer9Berlin/PipeDream/releases/latest)
 [![Software License](https://img.shields.io/badge/license-GPL--3.0-brightgreen.svg?style=for-the-badge)](/LICENSE.txt)
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/Layer9Berlin/pipedream/PipeDream%20release?style=for-the-badge)](https://github.com/Layer9Berlin/pipedream/actions?query=workflow%3A%22PipeDream+release%22)
 [![Codecov branch](https://img.shields.io/codecov/c/github/Layer9Berlin/PipeDream/main.svg?style=for-the-badge)](https://codecov.io/gh/Layer9Berlin/PipeDream)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=for-the-badge)](http://godoc.org/github.com/Layer9Berlin/pipedream)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)

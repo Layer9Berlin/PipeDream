@@ -77,7 +77,7 @@ func NewErrorReader(counter int) *ErrorReader {
 	}
 }
 
-func (errorWriter *ErrorReader)Read(p []byte) (int, error) {
+func (errorWriter *ErrorReader) Read(p []byte) (int, error) {
 	if errorWriter.counter <= 0 {
 		return 0, io.EOF
 	}

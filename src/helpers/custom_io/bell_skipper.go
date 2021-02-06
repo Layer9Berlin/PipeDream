@@ -2,7 +2,7 @@ package custom_io
 
 import "io"
 
-type BellSkipper struct{
+type BellSkipper struct {
 	baseOutput io.WriteCloser
 }
 
