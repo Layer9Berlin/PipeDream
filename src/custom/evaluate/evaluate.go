@@ -1,4 +1,4 @@
-// Custom functions extending the `govaluate` package
+// Package evaluate provides custom functions extending the `govaluate` package
 package evaluate
 
 import (
@@ -6,6 +6,7 @@ import (
 	"gopkg.in/Knetic/govaluate.v2"
 )
 
+// Evaluate an expression that is assumed to be boolean
 func EvaluateBool(condition string) (bool, error) {
 	expression, err := govaluate.NewEvaluableExpression(condition)
 	if err != nil {
@@ -20,7 +21,7 @@ func EvaluateBool(condition string) (bool, error) {
 
 	evaluatedBoolean, ok := evaluationResult.(bool)
 	if !ok {
-		return false, fmt.Errorf("condition %q does not custom_evaluate to boolean", condition)
+		return false, fmt.Errorf("condition %q does not evaluate to boolean", condition)
 	}
 
 	return evaluatedBoolean, nil

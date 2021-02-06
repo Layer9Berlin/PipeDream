@@ -23,35 +23,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
+      <change afterPath="$PROJECT_DIR$/src/parsing/option.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logging/logging.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/logging/logging.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/catch/catch.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/catch/catch.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/catcheach/catcheach.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/catcheach/catcheach.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/dir/dir.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/dir/dir.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/docker/docker.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/docker/docker.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/each/each.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/each/each.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/env/env.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/env/env.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/inherit/inherit.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/inherit/inherit.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/input/input.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/input/input.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/middleware.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/output/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/select/select.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/ssh/ssh.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/ssh/ssh.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/stack/stack.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/stack/stack.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/sync/sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/sync/sync.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/sync/sync_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/sync/sync_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/timer/timer.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/timer/timer.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/when/when.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/when/when.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/with/with.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/with/with.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/src.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/src.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/version/version.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/version/version.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/coverage.out" beforeDir="false" afterPath="$PROJECT_DIR$/test/coverage.out" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/custom/evaluate/evaluate.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom/evaluate/evaluate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser/imports.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/imports.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser/imports_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/imports_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser/parser_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/parser_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser/pipelines.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/pipelines.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parser/pipelines_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/pipelines_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/run/run_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -289,9 +272,10 @@
     <MESSAGE value="chore: clean up dependencies" />
     <MESSAGE value="docs: add build status badge to README" />
     <MESSAGE value="style: fix formatting" />
-    <MESSAGE value="docs: improve documentation" />
     <MESSAGE value="docs: add goreport badge to README" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: add goreport badge to README" />
+    <MESSAGE value="docs: improve documentation" />
+    <MESSAGE value="test: update coverage" />
+    <option name="LAST_COMMIT_MESSAGE" value="test: update coverage" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -318,28 +302,28 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="432" key="GridCell.Tab.0.bottom" timestamp="1612620670921">
+    <state width="1638" height="540" key="GridCell.Tab.0.bottom" timestamp="1612620697938">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="432" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612620670921" />
+    <state width="1638" height="540" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697938" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="432" key="GridCell.Tab.0.center" timestamp="1612620670919">
+    <state width="1638" height="540" key="GridCell.Tab.0.center" timestamp="1612620697937">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="432" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612620670919" />
+    <state width="1638" height="540" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697937" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="432" key="GridCell.Tab.0.left" timestamp="1612620670919">
+    <state width="1638" height="540" key="GridCell.Tab.0.left" timestamp="1612620697936">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="432" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612620670919" />
+    <state width="1638" height="540" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697936" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="432" key="GridCell.Tab.0.right" timestamp="1612620670920">
+    <state width="1638" height="540" key="GridCell.Tab.0.right" timestamp="1612620697938">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="432" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612620670920" />
+    <state width="1638" height="540" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697938" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
     <state width="1638" height="447" key="GridCell.Tab.1.bottom" timestamp="1612513762276">
@@ -400,7 +384,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/parser/parser_test.go</url>
+          <url>file://$PROJECT_DIR$/src/parsing/parser_test.go</url>
           <line>13</line>
           <option name="timeStamp" value="18" />
         </line-breakpoint>

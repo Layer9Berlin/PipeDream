@@ -1,5 +1,5 @@
-// Provides a parser for pipeline yaml files
-package parser
+// Package parsing provides a parser for pipeline yaml files
+package parsing
 
 import (
 	"fmt"
@@ -9,30 +9,10 @@ import (
 	"path/filepath"
 )
 
-type ParserOption func(parser *Parser)
-
 type Parser struct {
 	readFile              func(filename string) ([]byte, error)
 	findByGlob            func(pattern string) ([]string, error)
 	RecursivelyAddImports func(paths []string) ([]string, error)
-}
-
-func WithReadFileImplementation(readFile func(filename string) ([]byte, error)) ParserOption {
-	return func(parser *Parser) {
-		parser.readFile = readFile
-	}
-}
-
-func WithFindByGlobImplementation(findByGlob func(pattern string) ([]string, error)) ParserOption {
-	return func(parser *Parser) {
-		parser.findByGlob = findByGlob
-	}
-}
-
-func WithRecursivelyAddImportsImplementation(recursivelyAddImports func(paths []string) ([]string, error)) ParserOption {
-	return func(parser *Parser) {
-		parser.RecursivelyAddImports = recursivelyAddImports
-	}
 }
 
 func NewParser(options ...ParserOption) *Parser {

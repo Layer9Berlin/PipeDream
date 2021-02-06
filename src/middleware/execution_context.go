@@ -6,7 +6,7 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/custom/math"
 	"github.com/Layer9Berlin/pipedream/src/logging"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
-	"github.com/Layer9Berlin/pipedream/src/parser"
+	"github.com/Layer9Berlin/pipedream/src/parsing"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/hashicorp/go-multierror"
 	"github.com/manifoldco/promptui"
@@ -51,7 +51,7 @@ func WithActivityIndicator(activityIndicator logging.ActivityIndicator) Executio
 	}
 }
 
-func WithParser(parser *parser.Parser) ExecutionContextOption {
+func WithParser(parser *parsing.Parser) ExecutionContextOption {
 	return func(executionContext *ExecutionContext) {
 		executionContext.parser = parser
 	}
@@ -102,7 +102,7 @@ type ExecutionContext struct {
 	postCallback      func(*pipeline.Run)
 	executionFunction func(*pipeline.Run)
 
-	parser *parser.Parser
+	parser *parsing.Parser
 
 	UserPromptImplementation func(
 		label string,
@@ -116,7 +116,7 @@ type ExecutionContext struct {
 
 func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 	executionContext := &ExecutionContext{
-		parser:                   parser.NewParser(),
+		parser:                   parsing.NewParser(),
 		Log:                      logrus.New(),
 		UserPromptImplementation: defaultUserPrompt,
 	}

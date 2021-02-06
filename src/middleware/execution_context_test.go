@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/logging"
-	"github.com/Layer9Berlin/pipedream/src/parser"
+	"github.com/Layer9Berlin/pipedream/src/parsing"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/stretchr/testify/require"
 	"strings"
@@ -198,15 +198,15 @@ func TestExecutionContext_Execute(t *testing.T) {
 func TestExecutionContext_SetUpPipelines(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parser.NewParser(
-				parser.WithFindByGlobImplementation(
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(
 					func(pattern string) ([]string, error) {
 						return []string{
 							"test1.pipe",
 							"test2.pipe",
 						}, nil
 					}),
-				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parsing.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte(""), nil
 				}))))
 	buffer := new(bytes.Buffer)
@@ -222,8 +222,8 @@ func TestExecutionContext_SetUpPipelines(t *testing.T) {
 func TestExecutionContext_SetUpPipelines_BuiltInPipelineFilePathsError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parser.NewParser(
-				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{}, fmt.Errorf("test error")
 				}),
 			)))
@@ -236,11 +236,11 @@ func TestExecutionContext_SetUpPipelines_BuiltInPipelineFilePathsError(t *testin
 func TestExecutionContext_SetUpPipelines_ParseBuiltInPipelineFilesError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parser.NewParser(
-				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
-				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parsing.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return nil, fmt.Errorf("test error")
 				}),
 			)))
@@ -253,14 +253,14 @@ func TestExecutionContext_SetUpPipelines_ParseBuiltInPipelineFilesError(t *testi
 func TestExecutionContext_SetUpPipelines_UserPipelineFilePathsError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parser.NewParser(
-				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					if strings.Contains(pattern, "pipes/**") {
 						return []string{"test.file"}, nil
 					}
 					return []string{}, fmt.Errorf("test error")
 				}),
-				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parsing.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte{}, nil
 				}),
 			)))
@@ -273,14 +273,14 @@ func TestExecutionContext_SetUpPipelines_UserPipelineFilePathsError(t *testing.T
 func TestExecutionContext_SetUpPipelines_RecursivelyAddImportsError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parser.NewParser(
-				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
-				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parsing.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					return []byte{}, nil
 				}),
-				parser.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+				parsing.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 					return nil, fmt.Errorf("test error")
 				}),
 			)))
@@ -293,17 +293,17 @@ func TestExecutionContext_SetUpPipelines_RecursivelyAddImportsError(t *testing.T
 func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 	executionContext := NewExecutionContext(
 		WithParser(
-			parser.NewParser(
-				parser.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 					return []string{"test1"}, nil
 				}),
-				parser.WithReadFileImplementation(func(filename string) ([]byte, error) {
+				parsing.WithReadFileImplementation(func(filename string) ([]byte, error) {
 					if filename == "test.file" {
 						return nil, fmt.Errorf("test error")
 					}
 					return []byte{}, nil
 				}),
-				parser.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+				parsing.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 					return []string{"test.file"}, nil
 				}),
 			)))
