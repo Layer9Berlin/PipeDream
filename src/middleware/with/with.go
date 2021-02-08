@@ -35,7 +35,7 @@ func (withMiddleware WithMiddleware) Apply(
 	argument := withMiddlewareArguments{
 		Pattern: "",
 	}
-	middleware.ParseArguments(&argument, "with", run)
+	pipeline.ParseArguments(&argument, "with", run)
 
 	next(run)
 

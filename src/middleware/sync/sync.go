@@ -1,4 +1,4 @@
-// Package sync provides a middleware to defer execution until a condition is fulfilled
+// Package syncmiddleware provides a middleware to defer execution until a condition is fulfilled
 package syncmiddleware
 
 import (
@@ -36,7 +36,7 @@ func (syncMiddleware SyncMiddleware) Apply(
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := SyncMiddlewareArguments{}
-	middleware.ParseArguments(&arguments, "sync", run)
+	pipeline.ParseArguments(&arguments, "sync", run)
 
 	if arguments.Pipes != nil {
 		for _, pipelineIdentifier := range arguments.Pipes {

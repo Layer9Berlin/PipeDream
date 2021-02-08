@@ -54,7 +54,7 @@ func (timerMiddleware TimerMiddleware) Apply(
 	arguments := timerMiddlewareArguments{
 		Record: false,
 	}
-	middleware.ParseArguments(&arguments, "timer", run)
+	pipeline.ParseArguments(&arguments, "timer", run)
 
 	if arguments.Record {
 		run.Log.TraceWithFields(

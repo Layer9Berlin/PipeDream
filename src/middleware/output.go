@@ -9,18 +9,6 @@ import (
 	"strings"
 )
 
-func startProgress(executionContext *ExecutionContext, writer io.Writer) {
-	if executionContext.ActivityIndicator != nil {
-		_, _ = fmt.Fprintln(writer, "==== PROGRESS ====")
-	}
-}
-
-func stopProgress(executionContext *ExecutionContext) {
-	if executionContext.ActivityIndicator != nil {
-		executionContext.ActivityIndicator.Wait()
-	}
-}
-
 func outputResult(result *pipeline.Run, writer io.Writer) {
 	_, _ = fmt.Fprintln(writer, "===== RESULT =====")
 	if result == nil || result.Stdout.Len() == 0 {
@@ -43,7 +31,6 @@ func outputLogs(run *pipeline.Run, writer io.Writer) {
 
 func outputErrors(errors *multierror.Error, writer io.Writer) {
 	if errors != nil && errors.Len() > 0 {
-		_, _ = fmt.Fprintln(writer, "===== ERRORS =====")
 		errorMessages := make([]string, 0, errors.Len())
 		for _, err := range errors.Errors {
 			errorMessages = append(errorMessages, err.Error())

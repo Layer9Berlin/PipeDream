@@ -26,8 +26,8 @@ func (pipeMiddleware PipeMiddleware) Apply(
 	next func(pipelineRun *pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	arguments := make([]middleware.PipelineReference, 0, 10)
-	middleware.ParseArguments(&arguments, "pipe", run)
+	arguments := make([]pipeline.PipelineReference, 0, 10)
+	pipeline.ParseArguments(&arguments, "pipe", run)
 
 	haveChildren := len(arguments) > 0
 	if haveChildren {

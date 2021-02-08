@@ -3,7 +3,6 @@ package middleware
 import (
 	"bytes"
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/logging"
 	"github.com/Layer9Berlin/pipedream/src/parsing"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/stretchr/testify/require"
@@ -68,14 +67,6 @@ func TestExecutionContext_FullRun_WithUnmergeableArguments(t *testing.T) {
 	identifier := "test"
 	run := executionContext.FullRun(WithIdentifier(&identifier), WithArguments(arguments2))
 	require.Nil(t, run)
-}
-
-func TestExecutionContext_FullRun_WithActivityIndicator(t *testing.T) {
-	executionContext := NewExecutionContext(WithActivityIndicator(logging.NewNestedActivityIndicator()))
-	identifier := "test"
-	run := executionContext.FullRun(WithIdentifier(&identifier))
-	require.NotNil(t, run)
-	require.Equal(t, 1, executionContext.ActivityIndicator.Len())
 }
 
 func TestExecutionContext_FullRun_WithSetupFunction(t *testing.T) {
@@ -189,10 +180,9 @@ func TestExecutionContext_LookUpPipelineDefinition(t *testing.T) {
 func TestExecutionContext_Execute(t *testing.T) {
 	buffer := new(bytes.Buffer)
 	executionContext := NewExecutionContext()
-	executionContext.Execute("test", buffer)
+	executionContext.Execute("test", buffer, new(bytes.Buffer))
 	require.NotContains(t, buffer.String(), "====== LOGS ======")
 	require.Contains(t, buffer.String(), "===== RESULT =====")
-	require.NotContains(t, buffer.String(), "===== ERRORS =====")
 }
 
 func TestExecutionContext_SetUpPipelines(t *testing.T) {

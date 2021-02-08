@@ -64,8 +64,9 @@ func TestPipe_Apply(t *testing.T) {
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, "test2 output", run.Stdout.String())
-	require.Contains(t, run.Log.String(), "test1 log entry")
-	require.Contains(t, run.Log.String(), "test2 log entry")
+	logString := run.Log.String()
+	require.Contains(t, logString, "test1 log entry")
+	require.Contains(t, logString, "test2 log entry")
 }
 
 func TestPipe_InvalidArguments(t *testing.T) {

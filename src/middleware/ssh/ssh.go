@@ -28,7 +28,7 @@ func (sshMiddleware SshMiddleware) Apply(
 	arguments := struct {
 		Host *string
 	}{}
-	middleware.ParseArgumentsIncludingParents(&arguments, "ssh", run)
+	pipeline.ParseArgumentsIncludingParents(&arguments, "ssh", run)
 
 	if arguments.Host != nil {
 		run.Log.DebugWithFields(

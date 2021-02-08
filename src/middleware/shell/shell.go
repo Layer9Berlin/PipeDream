@@ -66,10 +66,10 @@ func NewShellMiddlewareArguments() ShellMiddlewareArguments {
 func (shellMiddleware ShellMiddleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
-	executionContext *middleware.ExecutionContext,
+	_ *middleware.ExecutionContext,
 ) {
 	arguments := NewShellMiddlewareArguments()
-	middleware.ParseArguments(&arguments, "shell", run)
+	pipeline.ParseArguments(&arguments, "shell", run)
 
 	if arguments.Run == nil {
 		next(run)
@@ -109,8 +109,6 @@ func (shellMiddleware ShellMiddleware) Apply(
 		cmdStdin := executor.CmdStdin()
 		var stdinIntercept io.ReadWriteCloser = nil
 		if arguments.Interactive {
-			executionContext.ActivityIndicator.SetVisible(false)
-
 			// in interactive mode, we want to be ready to read user input
 			// and show all output in the console
 			stdinIntercept = run.Stdin.Intercept()

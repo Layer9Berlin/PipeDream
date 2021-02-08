@@ -54,15 +54,10 @@ func TestPipelineRunLogger_Close(t *testing.T) {
 	logger := NewPipelineRunLogger(nil, 0)
 
 	require.False(t, logger.Closed())
-	require.False(t, logger.Completed())
 
 	logger.Close()
 
 	require.True(t, logger.Closed())
-
-	logger.Wait()
-
-	require.True(t, logger.Completed())
 }
 
 func TestPipelineRunLogger_PossibleErrorWithExplanation(t *testing.T) {
@@ -122,20 +117,21 @@ func TestPipelineRunLogger_Output(t *testing.T) {
 	logger.Close()
 	logger.Wait()
 
+	logString := logger.String()
 	require.Equal(t, fmt.Sprint(
 		aurora.Red("🛑 test error"), "\n",
 		aurora.Yellow("test warning"), "\n",
 		aurora.Blue("test info"), "\n",
 		aurora.Gray(12, "test debug"), "\n",
 		aurora.Gray(18, "test trace"), "\n",
-	), logger.String())
-	require.Equal(t, []byte(fmt.Sprint(
+	), logString)
+	require.Equal(t, fmt.Sprint(
 		aurora.Red("🛑 test error"), "\n",
 		aurora.Yellow("test warning"), "\n",
 		aurora.Blue("test info"), "\n",
 		aurora.Gray(12, "test debug"), "\n",
 		aurora.Gray(18, "test trace"), "\n",
-	)), logger.Bytes())
+	), logString)
 }
 
 func TestPipelineRunLogger_WriteToReader_TraceLevel(t *testing.T) {
@@ -247,8 +243,8 @@ func TestPipelineRunLogger_NestedReaders(t *testing.T) {
 	logger2.SetLevel(logrus.InfoLevel)
 	logger3.SetLevel(logrus.InfoLevel)
 
-	logger.AddReaderEntry(logger2.Reader())
-	logger2.AddReaderEntry(logger3.Reader())
+	logger.AddReaderEntry(logger2)
+	logger2.AddReaderEntry(logger3)
 
 	logger.Info(logrus.WithField("message", "logger test entry"))
 	logger2.Info(logrus.WithField("message", "logger2 test entry"))

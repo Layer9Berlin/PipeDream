@@ -1,4 +1,4 @@
-// Package output provides a middleware to overwrite a pipe's output directly
+// Package outputmiddleware provides a middleware to overwrite a pipe's output directly
 package outputmiddleware
 
 import (
@@ -33,10 +33,10 @@ func NewOutputMiddlewareArguments() OutputMiddlewareArguments {
 func (outputMiddleware OutputMiddleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
-	executionContext *middleware.ExecutionContext,
+	_ *middleware.ExecutionContext,
 ) {
 	arguments := NewOutputMiddlewareArguments()
-	middleware.ParseArguments(&arguments, "output", run)
+	pipeline.ParseArguments(&arguments, "output", run)
 
 	next(run)
 

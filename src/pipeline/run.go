@@ -42,7 +42,7 @@ type Run struct {
 	Stderr   *datastream.ComposableDataStream
 	ExitCode *int
 
-	Log *PipelineRunLogger
+	Log *Logger
 
 	Parent *Run
 

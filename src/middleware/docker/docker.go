@@ -28,7 +28,7 @@ func (dockerMiddleware DockerMiddleware) Apply(
 	arguments := struct {
 		Service *string
 	}{}
-	middleware.ParseArgumentsIncludingParents(&arguments, "docker", run)
+	pipeline.ParseArgumentsIncludingParents(&arguments, "docker", run)
 
 	if arguments.Service != nil {
 		run.Log.DebugWithFields(

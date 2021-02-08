@@ -1,4 +1,4 @@
-// Package input provides a middleware to overwrite a pipe's input directly
+// Package inputmiddleware provides a middleware to overwrite a pipe's input directly
 package inputmiddleware
 
 import (
@@ -33,10 +33,10 @@ func NewOutputMiddlewareArguments() InputMiddlewareArguments {
 func (inputMiddleware InputMiddleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
-	executionContext *middleware.ExecutionContext,
+	_ *middleware.ExecutionContext,
 ) {
 	arguments := NewOutputMiddlewareArguments()
-	middleware.ParseArguments(&arguments, "input", run)
+	pipeline.ParseArguments(&arguments, "input", run)
 
 	next(run)
 

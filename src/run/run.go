@@ -20,6 +20,7 @@ var FileFlag string
 var executionContextFactory = middleware.NewExecutionContext
 var osStdin io.ReadCloser = os.Stdin
 var osStdout io.WriteCloser = os.Stdout
+var osStderr io.WriteCloser = os.Stderr
 
 func Cmd(_ *cobra.Command, args []string) {
 	executableLocation, _ := os.Executable()
@@ -44,5 +45,5 @@ func Cmd(_ *cobra.Command, args []string) {
 	}
 	executionContext.RootFileName = fileName
 
-	executionContext.Execute(pipelineIdentifier, osStdout)
+	executionContext.Execute(pipelineIdentifier, osStdout, osStderr)
 }

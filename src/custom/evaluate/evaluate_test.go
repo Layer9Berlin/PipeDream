@@ -20,7 +20,7 @@ func TestNonEvaluableCondition(t *testing.T) {
 func TestNonBooleanCondition(t *testing.T) {
 	_, err := EvaluateBool("\"test\"")
 	require.NotNil(t, err)
-	require.Contains(t, err.Error(), "does not custom_evaluate to boolean")
+	require.Contains(t, err.Error(), "does not evaluate to boolean")
 }
 
 func TestBooleanCondition(t *testing.T) {

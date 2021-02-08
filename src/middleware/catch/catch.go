@@ -26,8 +26,8 @@ func (catchMiddleware CatchMiddleware) Apply(
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	var argument middleware.PipelineReference = nil
-	middleware.ParseArguments(&argument, "catch", run)
+	var argument pipeline.PipelineReference = nil
+	pipeline.ParseArguments(&argument, "catch", run)
 
 	if argument != nil {
 

@@ -32,7 +32,7 @@ func (dirMiddleware DirMiddleware) Apply(
 	_ *middleware.ExecutionContext,
 ) {
 	dirArgument := ""
-	middleware.ParseArgumentsIncludingParents(&dirArgument, "dir", run)
+	pipeline.ParseArgumentsIncludingParents(&dirArgument, "dir", run)
 
 	if dirArgument != "" {
 		run.Log.DebugWithFields(

@@ -69,9 +69,10 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 		"arg12": "",
 	}, runArguments)
 	require.Equal(t, "child identifier with @{arg} (not interpolated)", childIdentifier)
-	require.Contains(t, run.Log.String(), "child run log entry")
+	logString := run.Log.String()
+	require.Contains(t, logString, "child run log entry")
 	require.Equal(t, "TestInput @{arg}", run.Stdin.String())
-	require.Contains(t, run.Log.String(), "made 6 substitutions")
+	require.Contains(t, logString, "made 6 substitutions")
 }
 
 func TestInterpolate_SingleSubstitution(t *testing.T) {
@@ -104,8 +105,9 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 		"arg2": "value",
 	}, runArguments)
 	require.Equal(t, "child identifier", childIdentifier)
-	require.Contains(t, run.Log.String(), "child run log entry")
-	require.Contains(t, run.Log.String(), "made 1 substitution")
+	logString := run.Log.String()
+	require.Contains(t, logString, "child run log entry")
+	require.Contains(t, logString, "made 1 substitution")
 }
 
 func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
@@ -337,7 +339,7 @@ func NewErrorReader(counter int) *ErrorReader {
 	}
 }
 
-func (errorWriter *ErrorReader) Read(p []byte) (int, error) {
+func (errorWriter *ErrorReader) Read(_ []byte) (int, error) {
 	if errorWriter.counter <= 0 {
 		return 0, io.EOF
 	}

@@ -65,12 +65,13 @@ func TestShell_ChangeDir(t *testing.T) {
 
 	require.True(t, nextExecuted)
 	require.Equal(t, 0, run.Log.ErrorCount())
-	require.Contains(t, run.Log.String(), "something")
+	logString := run.Log.String()
+	require.Contains(t, logString, "something")
 	require.Equal(t, "sh", executor.StartCommand)
 	require.Equal(t, []string{"-c", "cd test && something"}, executor.StartArgs)
-	require.Contains(t, run.Log.String(), "shell")
-	require.Contains(t, run.Log.String(), "cd test")
-	require.Contains(t, run.Log.String(), "Command Identifier")
+	require.Contains(t, logString, "shell")
+	require.Contains(t, logString, "cd test")
+	require.Contains(t, logString, "Command Identifier")
 }
 
 func TestShell_RunWithArguments(t *testing.T) {
@@ -155,8 +156,9 @@ func TestShell_InvalidArguments(t *testing.T) {
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
-	require.Contains(t, run.Log.String(), "anonymous")
-	require.Contains(t, run.Log.String(), "shell")
+	logString := run.Log.String()
+	require.Contains(t, logString, "anonymous")
+	require.Contains(t, logString, "shell")
 }
 
 func TestShell_Login(t *testing.T) {

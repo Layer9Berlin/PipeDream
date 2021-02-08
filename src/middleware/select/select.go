@@ -1,4 +1,4 @@
-// Package select provides a middleware that shows a selection prompt to the user
+// Package selectmiddleware provides a middleware that shows a selection prompt to the user
 package selectmiddleware
 
 import (
@@ -34,7 +34,7 @@ func NewSelectMiddlewareWithStdinAndStdout(stdin io.ReadCloser, stdout io.WriteC
 
 type selectMiddlewareArguments struct {
 	Initial int
-	Options []middleware.PipelineReference
+	Options []pipeline.PipelineReference
 	Prompt  *string
 }
 
@@ -43,21 +43,21 @@ func (selectMiddleware SelectMiddleware) Apply(
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	arguments := selectMiddlewareArguments{
+	middlewareArguments := selectMiddlewareArguments{
 		Initial: 0,
-		Options: make([]middleware.PipelineReference, 0, 16),
+		Options: make([]pipeline.PipelineReference, 0, 16),
 	}
-	middleware.ParseArguments(&arguments, "select", run)
+	pipeline.ParseArguments(&middlewareArguments, "select", run)
 
 	next(run)
 
-	if len(arguments.Options) > 0 {
+	if len(middlewareArguments.Options) > 0 {
 		label := "Please select an option"
-		if arguments.Prompt != nil {
-			label = *arguments.Prompt
+		if middlewareArguments.Prompt != nil {
+			label = *middlewareArguments.Prompt
 		}
-		items := make([]string, 0, len(arguments.Options))
-		for _, referenceOption := range arguments.Options {
+		items := make([]string, 0, len(middlewareArguments.Options))
+		for _, referenceOption := range middlewareArguments.Options {
 			for pipelineIdentifier, pipelineArguments := range referenceOption {
 				identifier := "-"
 				if description, ok := pipelineArguments["description"]; ok {
@@ -74,8 +74,6 @@ func (selectMiddleware SelectMiddleware) Apply(
 			}
 		}
 
-		executionContext.ActivityIndicator.SetVisible(false)
-
 		stdinCopy := run.Stdin.Copy()
 		stdoutWriter := run.Stdout.WriteCloser()
 		stderrWriter := run.Stderr.WriteCloser()
@@ -88,14 +86,14 @@ func (selectMiddleware SelectMiddleware) Apply(
 			selectionIndex, _, err := executionContext.UserPromptImplementation(
 				label,
 				items,
-				arguments.Initial,
+				middlewareArguments.Initial,
 				5,
 				selectMiddleware.osStdin,
 				selectMiddleware.osStdout,
 			)
 			run.Log.PossibleError(err)
 
-			selectedPipelineReference := arguments.Options[selectionIndex]
+			selectedPipelineReference := middlewareArguments.Options[selectionIndex]
 			selectedPipelineIdentifier := ""
 			selectedPipelineArguments := make(map[string]interface{}, 12)
 			for pipelineIdentifier, pipelineArguments := range selectedPipelineReference {

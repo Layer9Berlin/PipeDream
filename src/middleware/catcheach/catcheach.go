@@ -28,7 +28,7 @@ func (catchEachMiddleware CatchEachMiddleware) Apply(
 	executionContext *middleware.ExecutionContext,
 ) {
 	argument := ""
-	middleware.ParseArguments(&argument, "catchEach", run)
+	pipeline.ParseArguments(&argument, "catchEach", run)
 
 	if argument != "" {
 		next(run)

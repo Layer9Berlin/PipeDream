@@ -61,8 +61,9 @@ func TestEach_Apply(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, []string{"bla\nbla\nend\n", "bla\nbla\nend\n", "bla\nbla\nend\n"}, allInputs)
 	require.Equal(t, "output of parent pipe\noutput of pipeline `pipe1`\noutput of pipeline `pipe2`\noutput of pipeline `anonymous`\n", run.Stdout.String())
-	require.Contains(t, run.Log.String(), "each")
-	require.Contains(t, run.Log.String(), "pipe1, pipe2, ~")
+	logString := run.Log.String()
+	require.Contains(t, logString, "each")
+	require.Contains(t, logString, "pipe1, pipe2, ~")
 }
 
 func TestEach_ApplyWithInvalidArguments(t *testing.T) {

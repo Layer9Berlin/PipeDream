@@ -45,7 +45,7 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 		IgnoreWarnings: false,
 		Quote:          "none",
 	}
-	middleware.ParseArguments(&arguments, "interpolate", run)
+	pipeline.ParseArguments(&arguments, "interpolate", run)
 
 	if arguments.Enable {
 		interpolator := NewInterpolator(run.ArgumentsCopy(), arguments)
@@ -301,7 +301,7 @@ func (interpolator *Interpolator) interpolateArguments(value string) (string, er
 	return value, nil
 }
 
-func (interpolator *Interpolator) log(logger *pipeline.PipelineRunLogger, interpolateMiddleware InterpolateMiddleware) {
+func (interpolator *Interpolator) log(logger *pipeline.Logger, interpolateMiddleware InterpolateMiddleware) {
 	if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
 		if !interpolator.MiddlewareArguments.IgnoreWarnings {
 			logger.WarnWithFields(

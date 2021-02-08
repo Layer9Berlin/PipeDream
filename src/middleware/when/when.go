@@ -27,7 +27,7 @@ func (whenMiddleware WhenMiddleware) Apply(
 	_ *middleware.ExecutionContext,
 ) {
 	argument := ""
-	middleware.ParseArguments(&argument, "when", run)
+	pipeline.ParseArguments(&argument, "when", run)
 
 	if argument == "" {
 		next(run)

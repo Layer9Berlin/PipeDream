@@ -19,50 +19,6 @@ import (
 	"syscall"
 )
 
-type ExecutionContextOption func(*ExecutionContext)
-
-func WithExecutionFunction(executionFunction func(run *pipeline.Run)) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.executionFunction = executionFunction
-	}
-}
-
-func WithDefinitionsLookup(definitions pipeline.PipelineDefinitionsLookup) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.Definitions = definitions
-	}
-}
-
-func WithProjectPath(projectPath string) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.ProjectPath = projectPath
-	}
-}
-
-func WithMiddlewareStack(stack []Middleware) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.MiddlewareStack = stack
-	}
-}
-
-func WithActivityIndicator(activityIndicator logging.ActivityIndicator) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.ActivityIndicator = activityIndicator
-	}
-}
-
-func WithParser(parser *parsing.Parser) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.parser = parser
-	}
-}
-
-func WithLogger(logger *logrus.Logger) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.Log = logger
-	}
-}
-
 func WithUserPromptImplementation(implementation func(
 	label string,
 	items []string,
@@ -95,8 +51,6 @@ type ExecutionContext struct {
 	Runs []*pipeline.Run
 
 	errors *multierror.Error
-
-	ActivityIndicator logging.ActivityIndicator
 
 	preCallback       func(*pipeline.Run)
 	postCallback      func(*pipeline.Run)
@@ -137,53 +91,6 @@ func (executionContext *ExecutionContext) CancelAll() error {
 	return err.ErrorOrNil()
 }
 
-type FullRunOptions struct {
-	arguments          map[string]interface{}
-	logWriter          io.WriteCloser
-	parentRun          *pipeline.Run
-	pipelineIdentifier *string
-	postCallback       func(*pipeline.Run)
-	preCallback        func(*pipeline.Run)
-}
-
-type FullRunOption func(*FullRunOptions)
-
-func WithIdentifier(identifier *string) FullRunOption {
-	return func(options *FullRunOptions) {
-		options.pipelineIdentifier = identifier
-	}
-}
-
-func WithParentRun(parentRun *pipeline.Run) FullRunOption {
-	return func(options *FullRunOptions) {
-		options.parentRun = parentRun
-	}
-}
-
-func WithLogWriter(logWriter io.WriteCloser) FullRunOption {
-	return func(options *FullRunOptions) {
-		options.logWriter = logWriter
-	}
-}
-
-func WithArguments(arguments map[string]interface{}) FullRunOption {
-	return func(options *FullRunOptions) {
-		options.arguments = arguments
-	}
-}
-
-func WithSetupFunc(preCallback func(*pipeline.Run)) FullRunOption {
-	return func(options *FullRunOptions) {
-		options.preCallback = preCallback
-	}
-}
-
-func WithTearDownFunc(postCallback func(*pipeline.Run)) FullRunOption {
-	return func(options *FullRunOptions) {
-		options.postCallback = postCallback
-	}
-}
-
 func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pipeline.Run {
 	runOptions := FullRunOptions{}
 	for _, option := range options {
@@ -210,7 +117,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 				fields.Info(pipelineRun.String()),
 				fields.Color("cyan"),
 			)
-			runOptions.parentRun.Log.AddReaderEntry(pipelineRun.Log.Reader())
+			runOptions.parentRun.Log.AddReaderEntry(pipelineRun.Log)
 		}
 	} else {
 		if pipelineRun.Log.Level() >= logrus.DebugLevel {
@@ -226,13 +133,13 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 			go func() {
 				_, _ = runOptions.logWriter.Write(initialLogData)
 				pipelineRun.Wait()
-				_, _ = runOptions.logWriter.Write(pipelineRun.Log.Bytes())
+				_, _ = io.Copy(runOptions.logWriter, pipelineRun.Log)
 				_ = runOptions.logWriter.Close()
 			}()
 		} else {
 			go func() {
 				pipelineRun.Wait()
-				_, _ = runOptions.logWriter.Write(pipelineRun.Log.Bytes())
+				_, _ = io.Copy(runOptions.logWriter, pipelineRun.Log)
 				_ = runOptions.logWriter.Close()
 			}()
 		}
@@ -247,9 +154,6 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 		executionContext.rootRun = pipelineRun
 	}
 	executionContext.Runs = append(executionContext.Runs, pipelineRun)
-	if executionContext.ActivityIndicator != nil {
-		executionContext.ActivityIndicator.AddIndicator(pipelineRun, pipelineRun.Log.Indentation)
-	}
 	if runOptions.preCallback != nil {
 		runOptions.preCallback(pipelineRun)
 	}
@@ -353,9 +257,8 @@ func (executionContext *ExecutionContext) unwindStack(
 	}
 }
 
-func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, writer io.Writer) {
+func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, stdoutWriter io.Writer, stderrWriter io.Writer) {
 
-	startProgress(executionContext, writer)
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
 	setUpCancelHandler(func() {
@@ -364,12 +267,13 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, wri
 			fmt.Printf("Failed to cancel: %v", err)
 		}
 	})
+	go func() {
+		_, _ = io.Copy(stdoutWriter, fullRun.Log)
+	}()
 	fullRun.Wait()
-	stopProgress(executionContext)
 
-	outputLogs(fullRun, writer)
-	outputResult(fullRun, writer)
-	outputErrors(executionContext.errors, writer)
+	outputResult(fullRun, stdoutWriter)
+	outputErrors(executionContext.errors, stderrWriter)
 }
 
 func (executionContext *ExecutionContext) SetUpPipelines(args []string) error {

@@ -23,18 +23,48 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
-      <change afterPath="$PROJECT_DIR$/src/parsing/option.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/middleware/execution_context_option.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/middleware/full_run_options.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/custom/evaluate/evaluate.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom/evaluate/evaluate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/custom/evaluate/evaluate_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/custom/evaluate/evaluate_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logging/activity_indicator.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logging/bar_activity_indicator.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logging/nested_activity_indicator.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logging/nested_activity_indicator_test.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logging/simple_activity_indicator.go" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/arguments.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/arguments.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/arguments_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/arguments_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/catch/catch.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/catch/catch.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/catcheach/catcheach.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/catcheach/catcheach.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/dir/dir.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/dir/dir.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/docker/docker.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/docker/docker.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/each/each.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/each/each.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/each/each_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/each/each_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/env/env.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/env/env.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/execution_context_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/imports.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/imports.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/imports_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/imports_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/parser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/parser_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/parser_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/pipelines.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/pipelines.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parser/pipelines_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/pipelines_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/run_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/inherit/inherit.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/inherit/inherit.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/input/input.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/input/input.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/interpolate/interpolate.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/interpolate/interpolate_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/interpolate/interpolate_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/output/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/output_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/pipe/pipe.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/pipe/pipe_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/pipe/pipe_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/select/select.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/shell/shell_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/shell/shell_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/ssh/ssh.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/ssh/ssh.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/sync/sync.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/sync/sync.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/timer/timer.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/timer/timer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/when/when.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/when/when.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/with/with.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/with/with.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pipeline/logger.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/logger.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pipeline/logger_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/logger_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pipeline/run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/run.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/run/run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/coverage.out" beforeDir="false" afterPath="$PROJECT_DIR$/test/coverage.out" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,11 +114,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/middleware" />
+      <recent name="$PROJECT_DIR$/src/middleware/stack" />
       <recent name="$PROJECT_DIR$/src/pipeline" />
-      <recent name="$PROJECT_DIR$/src/pipeline/run" />
-      <recent name="$PROJECT_DIR$/src/pipeline/file" />
-      <recent name="$PROJECT_DIR$/src/datastream" />
-      <recent name="$PROJECT_DIR$/src" />
+      <recent name="$PROJECT_DIR$/src/arguments" />
+      <recent name="$PROJECT_DIR$/src/executioncontext" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/logging" />
@@ -98,12 +128,12 @@
       <recent name="$PROJECT_DIR$/src/middleware/docker" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.go test src">
+  <component name="RunManager" selected="Go Build.go build pipedream">
     <configuration name="go build pipedream" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
-      <parameters value="-f install.pipe -v debug" />
+      <parameters value="-f install.pipe" />
       <kind value="PACKAGE" />
       <filePath value="$PROJECT_DIR$" />
       <package value="github.com/Layer9Berlin/pipedream" />
@@ -121,6 +151,28 @@
       <pattern value="^\QTestParsers_Pipelines_UserPipelineFilePaths_noArgs_noMatches\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="TestPipelineRunLogger_Output in github.com/Layer9Berlin/pipedream/src/pipeline" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="PipeDream" />
+      <working_directory value="$PROJECT_DIR$/src/pipeline" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/Layer9Berlin/pipedream/src/pipeline" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestPipelineRunLogger_Output\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="TestPipelineRunLogger_WriteToReader_TraceLevel in github.com/Layer9Berlin/pipedream/src/pipeline" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="PipeDream" />
+      <working_directory value="$PROJECT_DIR$/src/pipeline" />
+      <framework value="gotest" />
+      <kind value="PACKAGE" />
+      <package value="github.com/Layer9Berlin/pipedream/src/pipeline" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <pattern value="^\QTestPipelineRunLogger_WriteToReader_TraceLevel\E$" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestRun_Cmd_noPipelineFiles in pipedream/src/run" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$/src/run" />
@@ -130,28 +182,6 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <pattern value="^\QTestRun_Cmd_noPipelineFiles\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestSelect_letUserSelectPipelineFileAndPipeline_noFiles in pipedream/src/run" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="PipeDream" />
-      <working_directory value="$PROJECT_DIR$/src/run" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="pipedream/src/run" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestSelect_letUserSelectPipelineFileAndPipeline_noFiles\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestShell_CancelHook in pipedream/src/middleware/shell" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="PipeDream" />
-      <working_directory value="$PROJECT_DIR$/src/middleware/shell" />
-      <framework value="gotest" />
-      <kind value="PACKAGE" />
-      <package value="pipedream/src/middleware/shell" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <pattern value="^\QTestShell_CancelHook\E$" />
       <method v="2" />
     </configuration>
     <configuration name="TestVersion_Cmd in pipedream/src/version" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -203,19 +233,19 @@
       <item itemvalue="Go Test.go test src" />
       <item itemvalue="Go Test.TestRun_Cmd_noPipelineFiles in pipedream/src/run" />
       <item itemvalue="Go Test.go test pipedream/src/run" />
-      <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFileAndPipeline_noFiles in pipedream/src/run" />
-      <item itemvalue="Go Test.TestShell_CancelHook in pipedream/src/middleware/shell" />
       <item itemvalue="Go Test.TestParsers_Pipelines_UserPipelineFilePaths_noArgs_noMatches in pipedream/src/parsers" />
       <item itemvalue="Go Test.TestVersion_Cmd in pipedream/src/version" />
       <item itemvalue="Go Test.TestWith_Pattern in pipedream/src/middleware/with" />
+      <item itemvalue="Go Test.TestPipelineRunLogger_Output in github.com/Layer9Berlin/pipedream/src/pipeline" />
+      <item itemvalue="Go Test.TestPipelineRunLogger_WriteToReader_TraceLevel in github.com/Layer9Berlin/pipedream/src/pipeline" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestPipelineRunLogger_WriteToReader_TraceLevel in github.com/Layer9Berlin/pipedream/src/pipeline" />
+        <item itemvalue="Go Test.TestPipelineRunLogger_Output in github.com/Layer9Berlin/pipedream/src/pipeline" />
         <item itemvalue="Go Test.TestWith_Pattern in pipedream/src/middleware/with" />
         <item itemvalue="Go Test.TestVersion_Cmd in pipedream/src/version" />
         <item itemvalue="Go Test.TestParsers_Pipelines_UserPipelineFilePaths_noArgs_noMatches in pipedream/src/parsers" />
-        <item itemvalue="Go Test.TestShell_CancelHook in pipedream/src/middleware/shell" />
-        <item itemvalue="Go Test.TestSelect_letUserSelectPipelineFileAndPipeline_noFiles in pipedream/src/run" />
       </list>
     </recent_temporary>
   </component>
@@ -273,9 +303,10 @@
     <MESSAGE value="docs: add build status badge to README" />
     <MESSAGE value="style: fix formatting" />
     <MESSAGE value="docs: add goreport badge to README" />
-    <MESSAGE value="docs: improve documentation" />
     <MESSAGE value="test: update coverage" />
-    <option name="LAST_COMMIT_MESSAGE" value="test: update coverage" />
+    <MESSAGE value="docs: improve documentation" />
+    <MESSAGE value="refactor: remove activity indicators &amp; stream logs instead" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: remove activity indicators &amp; stream logs instead" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -285,10 +316,10 @@
       <screen x="0" y="25" width="1680" height="947" />
     </state>
     <state x="640" y="336" key="#Go_Modules/0.25.1680.947@0.25.1680.947" timestamp="1610618862086" />
-    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612515457908">
+    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612807825478">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612515457908" />
+    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612807825478" />
     <state x="304" y="157" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1680.947@0.25.1680.947" timestamp="1610618907474" />
     <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1611742292074">
       <screen x="0" y="0" width="1680" height="1050" />
@@ -302,49 +333,49 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="540" key="GridCell.Tab.0.bottom" timestamp="1612620697938">
+    <state width="1638" height="219" key="GridCell.Tab.0.bottom" timestamp="1612808020020">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="540" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697938" />
+    <state width="1638" height="219" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612808020020" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="540" key="GridCell.Tab.0.center" timestamp="1612620697937">
+    <state width="1638" height="219" key="GridCell.Tab.0.center" timestamp="1612808020019">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="540" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697937" />
+    <state width="1638" height="219" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612808020019" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="540" key="GridCell.Tab.0.left" timestamp="1612620697936">
+    <state width="1638" height="219" key="GridCell.Tab.0.left" timestamp="1612808020019">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="540" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697936" />
+    <state width="1638" height="219" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612808020019" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="540" key="GridCell.Tab.0.right" timestamp="1612620697938">
+    <state width="1638" height="219" key="GridCell.Tab.0.right" timestamp="1612808020020">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="540" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612620697938" />
+    <state width="1638" height="219" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612808020020" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
-    <state width="1638" height="447" key="GridCell.Tab.1.bottom" timestamp="1612513762276">
+    <state width="1638" height="392" key="GridCell.Tab.1.bottom" timestamp="1612807065728">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="447" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612513762276" />
+    <state width="1638" height="392" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1612807065728" />
     <state width="1638" height="449" key="GridCell.Tab.1.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
-    <state width="1638" height="447" key="GridCell.Tab.1.center" timestamp="1612513762276">
+    <state width="1638" height="392" key="GridCell.Tab.1.center" timestamp="1612807065720">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="447" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612513762276" />
+    <state width="1638" height="392" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1612807065720" />
     <state width="1638" height="449" key="GridCell.Tab.1.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795917" />
-    <state width="1638" height="447" key="GridCell.Tab.1.left" timestamp="1612513762275">
+    <state width="1638" height="392" key="GridCell.Tab.1.left" timestamp="1612807065716">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="447" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612513762275" />
+    <state width="1638" height="392" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1612807065716" />
     <state width="1638" height="449" key="GridCell.Tab.1.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795916" />
-    <state width="1638" height="447" key="GridCell.Tab.1.right" timestamp="1612513762276">
+    <state width="1638" height="392" key="GridCell.Tab.1.right" timestamp="1612807065724">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="447" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612513762276" />
+    <state width="1638" height="392" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1612807065724" />
     <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
     <state x="349" y="161" key="SettingsEditor" timestamp="1612610769609">
       <screen x="0" y="0" width="1680" height="1050" />
@@ -358,10 +389,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="440" y="262" key="Vcs.Push.Dialog.v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612611749340" />
-    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1612437160658">
+    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1612806724104">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1612437160658" />
+    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1612806724104" />
     <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612436421238">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -370,14 +401,14 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612451414315" />
-    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1612617748380">
+    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1612800588469">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612617748380" />
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1612619047960">
+    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612800588469" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1612805743339">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612619047960" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612805743339" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup/0.25.1680.947@0.25.1680.947" timestamp="1610619078061" />
   </component>
   <component name="XDebuggerManager">
@@ -389,12 +420,7 @@
           <option name="timeStamp" value="18" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/logging/bar_activity_indicator.go</url>
-          <line>71</line>
-          <option name="timeStamp" value="152" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/middleware/arguments.go</url>
+          <url>file://$PROJECT_DIR$/src/pipeline/arguments.go</url>
           <line>67</line>
           <option name="timeStamp" value="157" />
         </line-breakpoint>

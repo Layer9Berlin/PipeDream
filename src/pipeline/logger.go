@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"bytes"
+	"container/list"
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/logging"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
@@ -9,12 +10,20 @@ import (
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"io"
+	"io/ioutil"
 	"strings"
 	"sync"
 )
 
-type PipelineRunLogger struct {
-	logEntries []*logrus.Entry
+// To keep track of log entries while several pipeline runs might be executing asynchronously,
+// each run has its own logger. It needs to:
+// - implement the io.Reader interface
+// - be non-blocking, even when its output is not yet being read
+// - keep a running total of the number of log entries at each log level, as well as all errors
+// - be nestable in the sense that the output of another logger can be slotted in
+// - preserve the order of log entries, including those slotted in
+type Logger struct {
+	logEntries list.List
 
 	baseLogger  *logrus.Logger
 	run         *Run
@@ -36,9 +45,11 @@ type PipelineRunLogger struct {
 	completionWaitGroup *sync.WaitGroup
 
 	ErrorCallback func(error)
+
+	unreadBuffer []byte
 }
 
-func NewPipelineRunLogger(run *Run, indentation int) *PipelineRunLogger {
+func NewPipelineRunLogger(run *Run, indentation int) *Logger {
 	logger := logrus.New()
 	logger.Formatter = logging.CustomFormatter{}
 	logger.SetLevel(logging.UserPipeLogLevel)
@@ -52,7 +63,7 @@ func NewPipelineRunLogger(run *Run, indentation int) *PipelineRunLogger {
 	completionWaitGroup := &sync.WaitGroup{}
 	completionWaitGroup.Add(1)
 
-	return &PipelineRunLogger{
+	return &Logger{
 		baseLogger:  logger,
 		run:         run,
 		Indentation: indentation,
@@ -70,72 +81,40 @@ func NewPipelineRunLogger(run *Run, indentation int) *PipelineRunLogger {
 		completionWaitGroup: completionWaitGroup,
 		closureMutex:        &sync.Mutex{},
 		closed:              false,
+
+		unreadBuffer: make([]byte, 0, 1024),
 	}
 }
 
-func NewClosedPipelineRunLoggerWithResult(buffer *bytes.Buffer) *PipelineRunLogger {
+func NewClosedPipelineRunLoggerWithResult(buffer *bytes.Buffer) *Logger {
 	completionWaitGroup := &sync.WaitGroup{}
-	return &PipelineRunLogger{
+	return &Logger{
 		completed:           true,
 		completionWaitGroup: completionWaitGroup,
 		closed:              true,
-		logBuffer:           buffer,
+		unreadBuffer:        buffer.Bytes(),
 	}
 }
 
-func NewClosedPipelineRunLoggerWithErrors(errors *multierror.Error) *PipelineRunLogger {
-	completionWaitGroup := &sync.WaitGroup{}
-	return &PipelineRunLogger{
-		completed:           true,
-		completionWaitGroup: completionWaitGroup,
-		closed:              true,
-		logCountError:       errors.Len(),
-		errors:              errors,
-	}
-}
-
-func (logger *PipelineRunLogger) Close() {
-	logger.closureMutex.Lock()
+func (logger *Logger) Close() {
 	defer logger.closureMutex.Unlock()
+	logger.closureMutex.Lock()
 	if logger.closed {
 		return
 	}
 	logger.closed = true
-
-	// we don't expect any more inputs
-	go func() {
-		defer logger.completionWaitGroup.Done()
-		for _, logEntry := range logger.logEntries {
-			logEntry.Logger = logger.baseLogger
-			indentation := logger.Indentation
-			//if indentationField, haveIndentationField := logEntry.Data["indentation"]; haveIndentationField {
-			//	if indentationAsInt, indentationIsInt := indentationField.(int); indentationIsInt {
-			//		indentation = indentationAsInt
-			//	}
-			//}
-			if logger.baseLogger.Level <= logrus.InfoLevel {
-				// we don't indent at this log level, as there are too few messages to make it worthwhile
-				indentation = 0
-			}
-			logEntry.WithField("indentation", indentation).Log(logEntry.Level)
-		}
-		logger.completed = true
-	}()
+	logger.completionWaitGroup.Done()
 }
 
-func (logger *PipelineRunLogger) Closed() bool {
+func (logger *Logger) Closed() bool {
 	return logger.closed
 }
 
-func (logger *PipelineRunLogger) Wait() {
+func (logger *Logger) Wait() {
 	logger.completionWaitGroup.Wait()
 }
 
-func (logger *PipelineRunLogger) Completed() bool {
-	return logger.completed
-}
-
-func (logger *PipelineRunLogger) Summary() string {
+func (logger *Logger) Summary() string {
 	components := make([]string, 0, 2)
 	if logger.logCountWarning > 0 {
 		components = append(components, fmt.Sprint(aurora.Yellow(fmt.Sprint("⚠️", logger.logCountWarning))))
@@ -146,44 +125,44 @@ func (logger *PipelineRunLogger) Summary() string {
 	return strings.Join(components, "  ")
 }
 
-func (logger *PipelineRunLogger) SetLevel(level logrus.Level) {
+func (logger *Logger) SetLevel(level logrus.Level) {
 	logger.baseLogger.SetLevel(level)
 }
 
-func (logger *PipelineRunLogger) Level() logrus.Level {
+func (logger *Logger) Level() logrus.Level {
 	return logger.baseLogger.Level
 }
 
-func (logger *PipelineRunLogger) AddReaderEntry(reader io.Reader) {
+func (logger *Logger) AddReaderEntry(reader io.Reader) {
 	logEntry := fields.EntryWithFields(
 		fields.Indentation(logger.Indentation+2),
 		fields.WithReader(reader),
 	)
 	logEntry.Level = logrus.ErrorLevel
-	logger.logEntries = append(logger.logEntries, logEntry)
+	logger.logEntries.PushBack(logEntry)
 }
 
-func (logger *PipelineRunLogger) AddWriteCloserEntry() io.WriteCloser {
+func (logger *Logger) AddWriteCloserEntry() io.WriteCloser {
 	pipeReader, pipeWriter := io.Pipe()
 	logger.AddReaderEntry(pipeReader)
 	return pipeWriter
 }
 
-func (logger *PipelineRunLogger) PossibleError(err error) {
+func (logger *Logger) PossibleError(err error) {
 	if err == nil {
 		return
 	}
 	logger.Error(err)
 }
 
-func (logger *PipelineRunLogger) PossibleErrorWithExplanation(err error, explanation string) {
+func (logger *Logger) PossibleErrorWithExplanation(err error, explanation string) {
 	if err == nil {
 		return
 	}
 	logger.Error(fmt.Errorf(explanation+" %w", err))
 }
 
-func (logger *PipelineRunLogger) StderrOutput(message string, logFields ...fields.LogEntryField) {
+func (logger *Logger) StderrOutput(message string, logFields ...fields.LogEntryField) {
 	logger.logCountError += 1
 	logger.errors = multierror.Append(logger.errors, fmt.Errorf("stderr: %v", message))
 	logEntry := logrus.WithFields(logrus.Fields{
@@ -195,10 +174,10 @@ func (logger *PipelineRunLogger) StderrOutput(message string, logFields ...field
 		logEntry = withField(logEntry)
 	}
 	logEntry.Level = logrus.ErrorLevel
-	logger.logEntries = append(logger.logEntries, logEntry)
+	logger.logEntries.PushBack(logEntry)
 }
 
-func (logger *PipelineRunLogger) Error(err error, logFields ...fields.LogEntryField) {
+func (logger *Logger) Error(err error, logFields ...fields.LogEntryField) {
 	logger.logCountError += 1
 	logger.errors = multierror.Append(logger.errors, err)
 	logEntry := logrus.WithFields(logrus.Fields{
@@ -210,7 +189,7 @@ func (logger *PipelineRunLogger) Error(err error, logFields ...fields.LogEntryFi
 		logEntry = withField(logEntry)
 	}
 	logEntry.Level = logrus.ErrorLevel
-	logger.logEntries = append(logger.logEntries, logEntry)
+	logger.logEntries.PushBack(logEntry)
 	if logger.ErrorCallback != nil {
 		if logger.run.Identifier == nil {
 			logger.ErrorCallback(fmt.Errorf("%v:\n%w\n", "anonymous", err))
@@ -220,98 +199,97 @@ func (logger *PipelineRunLogger) Error(err error, logFields ...fields.LogEntryFi
 	}
 }
 
-func (logger *PipelineRunLogger) WarnWithFields(logFields ...fields.LogEntryField) {
+func (logger *Logger) WarnWithFields(logFields ...fields.LogEntryField) {
 	logger.logCountWarning += 1
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.WarnLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) Warn(entry *logrus.Entry) {
+func (logger *Logger) Warn(entry *logrus.Entry) {
 	logger.logCountWarning += 1
 	entry.Level = logrus.WarnLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) Info(entry *logrus.Entry) {
+func (logger *Logger) Info(entry *logrus.Entry) {
 	logger.logCountInfo += 1
 	entry.Level = logrus.InfoLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) InfoWithFields(logFields ...fields.LogEntryField) {
+func (logger *Logger) InfoWithFields(logFields ...fields.LogEntryField) {
 	logger.logCountInfo += 1
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.InfoLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) Debug(entry *logrus.Entry) {
+func (logger *Logger) Debug(entry *logrus.Entry) {
 	logger.logCountDebug += 1
 	entry.Level = logrus.DebugLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) DebugWithFields(logFields ...fields.LogEntryField) {
+func (logger *Logger) DebugWithFields(logFields ...fields.LogEntryField) {
 	logger.logCountDebug += 1
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.DebugLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) Trace(entry *logrus.Entry) {
+func (logger *Logger) Trace(entry *logrus.Entry) {
 	logger.logCountTrace += 1
 	entry.Level = logrus.TraceLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) TraceWithFields(logFields ...fields.LogEntryField) {
+func (logger *Logger) TraceWithFields(logFields ...fields.LogEntryField) {
 	logger.logCountTrace += 1
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.TraceLevel
-	logger.logEntries = append(logger.logEntries, entry)
+	logger.logEntries.PushBack(entry)
 }
 
-func (logger *PipelineRunLogger) TraceCount() int {
+func (logger *Logger) TraceCount() int {
 	return logger.logCountTrace
 }
 
-func (logger *PipelineRunLogger) DebugCount() int {
+func (logger *Logger) DebugCount() int {
 	return logger.logCountDebug
 }
-func (logger *PipelineRunLogger) InfoCount() int {
+func (logger *Logger) InfoCount() int {
 	return logger.logCountInfo
 }
-func (logger *PipelineRunLogger) WarnCount() int {
+func (logger *Logger) WarnCount() int {
 	return logger.logCountWarning
 }
 
-func (logger *PipelineRunLogger) ErrorCount() int {
+func (logger *Logger) ErrorCount() int {
 	return logger.logCountError
 }
 
-func (logger *PipelineRunLogger) Bytes() []byte {
-	logger.Wait()
-	return logger.logBuffer.Bytes()
+func (logger *Logger) Bytes() []byte {
+	result, _ := ioutil.ReadAll(logger)
+	return result
 }
 
-func (logger *PipelineRunLogger) String() string {
-	logger.Wait()
-	return logger.logBuffer.String()
+func (logger *Logger) String() string {
+	return string(logger.Bytes())
 }
 
-func (logger *PipelineRunLogger) LastError() error {
+func (logger *Logger) LastError() error {
 	if logger.errors == nil || logger.errors.Len() == 0 {
 		return nil
 	}
 	return logger.errors.WrappedErrors()[logger.errors.Len()-1]
 }
 
-func (logger *PipelineRunLogger) AllErrorMessages() []string {
+func (logger *Logger) AllErrorMessages() []string {
 	result := make([]string, 0, logger.errors.Len())
 	for _, err := range logger.errors.WrappedErrors() {
 		result = append(result, err.Error())
@@ -319,18 +297,75 @@ func (logger *PipelineRunLogger) AllErrorMessages() []string {
 	return result
 }
 
-func (logger *PipelineRunLogger) Reader() io.Reader {
-	pipeReader, pipeWriter := io.Pipe()
-	go func() {
-		logger.Wait()
-		_, err := pipeWriter.Write(logger.Bytes())
-		if err != nil {
-			panic(err)
+func (logger *Logger) Read(p []byte) (int, error) {
+	if logger.unreadBuffer != nil && len(logger.unreadBuffer) > 0 {
+		return logger.readFromUnreadBuffer(p)
+	}
+	firstItem := logger.logEntries.Front()
+	if firstItem != nil {
+		if logEntry, ok := firstItem.Value.(*logrus.Entry); ok {
+			readerDataEntry := logEntry.Data["reader"]
+			if readerDataEntry != nil {
+				return logger.readFromNestedReader(p, readerDataEntry)
+			} else {
+				return logger.readFromLogEntry(p, logEntry)
+			}
+		} else {
+			panic("unknown log entry type")
 		}
-		err = pipeWriter.Close()
-		if err != nil {
-			panic(err)
+	}
+	if logger.Closed() {
+		return 0, io.EOF
+	}
+	return 0, nil
+}
+
+func (logger *Logger) readFromUnreadBuffer(p []byte) (int, error) {
+	result := logger.unreadBuffer
+	if len(logger.unreadBuffer) > len(p) {
+		result, logger.unreadBuffer = result[:len(p)], result[len(p):]
+	} else {
+		logger.unreadBuffer = make([]byte, 0)
+	}
+	copy(p, result)
+	return len(result), nil
+}
+
+func (logger *Logger) readFromNestedReader(p []byte, readerDataEntry interface{}) (int, error) {
+	if reader, ok := readerDataEntry.(io.Reader); ok {
+		n, err := reader.Read(p)
+		if err == io.EOF {
+			logger.logEntries.Remove(logger.logEntries.Front())
+			err = nil
 		}
-	}()
-	return pipeReader
+		return n, err
+	} else {
+		return 0, fmt.Errorf("invalid type for `reader` data field")
+	}
+}
+
+func (logger *Logger) readFromLogEntry(p []byte, logEntry *logrus.Entry) (int, error) {
+	// discard entries whose log level is above (i.e. of lower severity) than the logger's level
+	if logEntry.Level > logger.Level() {
+		logger.logEntries.Remove(logger.logEntries.Front())
+		return 0, nil
+	}
+	logEntry.Logger = logger.baseLogger
+	indentation := logger.Indentation
+	if logger.baseLogger.Level <= logrus.InfoLevel {
+		// we don't indent at this log level, as there are too few messages to make it worthwhile
+		indentation = 0
+	}
+	indentedLogEntry := logEntry.WithField("indentation", indentation)
+	indentedLogEntry.Level = logEntry.Level
+	result, logErr := logging.CustomFormatter{}.Format(indentedLogEntry)
+	if logErr != nil {
+		logger.Error(logErr)
+	}
+	if len(result) > len(p) {
+		result, logger.unreadBuffer = result[:len(p)], result[len(p):]
+	}
+	copy(p, result)
+	logger.logEntries.Remove(logger.logEntries.Front())
+	return len(result), nil
 }

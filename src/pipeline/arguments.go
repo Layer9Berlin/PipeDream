@@ -1,8 +1,7 @@
-package middleware
+package pipeline
 
 import (
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/mitchellh/mapstructure"
 	"reflect"
 )
@@ -47,7 +46,7 @@ func pipelineReferenceDecodeHook(
 func ParseArguments(
 	middlewareArguments interface{},
 	middlewareIdentifier string,
-	run *pipeline.Run,
+	run *Run,
 ) bool {
 	if middlewareArguments == nil {
 		return false
@@ -74,7 +73,7 @@ func ParseArguments(
 func ParseArgumentsIncludingParents(
 	middlewareArguments interface{},
 	middlewareIdentifier string,
-	run *pipeline.Run,
+	run *Run,
 ) bool {
 	currentRun := run
 	for currentRun != nil && !ParseArguments(middlewareArguments, middlewareIdentifier, currentRun) {

@@ -25,7 +25,7 @@ func (inheritMiddleware InheritMiddleware) Apply(
 	_ *middleware.ExecutionContext,
 ) {
 	arguments := make([]string, 0, 10)
-	middleware.ParseArguments(&arguments, "inherit", run)
+	pipeline.ParseArguments(&arguments, "inherit", run)
 
 	if run.Parent != nil {
 		substitutions := make(map[string]interface{}, len(arguments))

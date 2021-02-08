@@ -48,7 +48,7 @@ func (envMiddleware EnvMiddleware) Apply(
 		Interpolate: "shallow",
 		Save:        nil,
 	}
-	middleware.ParseArguments(&arguments, "env", run)
+	pipeline.ParseArguments(&arguments, "env", run)
 
 	interpolator := NewInterpolator(envMiddleware)
 	interpolatedArguments := run.ArgumentsCopy()
