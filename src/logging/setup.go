@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// SetUpLogs configures the log levels based on the desired verbosity
 func SetUpLogs(log *logrus.Logger, verbosity string, out io.Writer) error {
 	log.SetOutput(out)
 	if verbosity == "" {

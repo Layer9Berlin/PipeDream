@@ -9,19 +9,26 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
-// Conditional Executor
-type WhenMiddleware struct {
+// Middleware is a conditional executor
+type Middleware struct {
 }
 
-func (whenMiddleware WhenMiddleware) String() string {
+// String is a human-readable description
+func (whenMiddleware Middleware) String() string {
 	return "when"
 }
 
-func NewWhenMiddleware() WhenMiddleware {
-	return WhenMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (whenMiddleware WhenMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (whenMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -34,14 +41,14 @@ func (whenMiddleware WhenMiddleware) Apply(
 		return
 	}
 
-	shouldExecute, err := evaluate.EvaluateBool(argument)
+	shouldExecute, err := evaluate.Bool(argument)
 	if err != nil {
 		run.Log.Error(err)
 		return
 	}
 
 	if shouldExecute {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("?"),
 			fields.Message("satisfied"),
 			fields.Info(fmt.Sprintf("%q", argument)),
@@ -49,7 +56,7 @@ func (whenMiddleware WhenMiddleware) Apply(
 		)
 		next(run)
 	} else {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("?"),
 			fields.Message("not satisfied"),
 			fields.Info(fmt.Sprintf("%q", argument)),

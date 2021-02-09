@@ -11,23 +11,30 @@ import (
 	"sync"
 )
 
-// Pattern Extractor
-type WithMiddleware struct {
+// Middleware is a pattern extractor
+type Middleware struct {
 }
 
-func (withMiddleware WithMiddleware) String() string {
+// String is a human-readable description
+func (withMiddleware Middleware) String() string {
 	return "with"
 }
 
-func NewWithMiddleware() WithMiddleware {
-	return WithMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
 type withMiddlewareArguments struct {
 	Pattern string
 }
 
-func (withMiddleware WithMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (withMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
@@ -40,7 +47,7 @@ func (withMiddleware WithMiddleware) Apply(
 	next(run)
 
 	if argument.Pattern != "" {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("／"),
 			fields.Middleware(withMiddleware),
 			fields.Message("pattern"),
@@ -53,19 +60,19 @@ func (withMiddleware WithMiddleware) Apply(
 			return
 		}
 
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.Symbol("⎇"),
 			fields.Message("copying stdin"),
 			fields.Middleware(withMiddleware),
 		)
 		stdinCopy := run.Stdin.Copy()
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.Symbol("⎇"),
 			fields.Message("intercepting stdout"),
 			fields.Middleware(withMiddleware),
 		)
 		stdoutIntercept := run.Stdout.Intercept()
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.Symbol("⎇"),
 			fields.Message("creating stderr writer"),
 			fields.Middleware(withMiddleware),
@@ -85,7 +92,7 @@ func (withMiddleware WithMiddleware) Apply(
 					middleware.WithIdentifier(run.Identifier),
 					middleware.WithArguments(run.ArgumentsCopy()),
 					middleware.WithSetupFunc(func(matchRun *pipeline.Run) {
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.Symbol("⎇"),
 							fields.Message("replacing stdin with regex match"),
 							fields.Middleware(withMiddleware),
@@ -93,7 +100,7 @@ func (withMiddleware WithMiddleware) Apply(
 						matchRun.Stdin.Replace(bytes.NewBuffer(match[0]))
 					}),
 					middleware.WithTearDownFunc(func(matchRun *pipeline.Run) {
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.Symbol("⎇"),
 							fields.Message("copying child stderr into parent stderr"),
 							fields.Middleware(withMiddleware),

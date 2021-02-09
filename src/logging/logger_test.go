@@ -44,11 +44,6 @@ func TestLogger_Map(t *testing.T) {
 	require.Equal(t, "{ key1: `value1`, key2: `value2` }\n", string(result))
 }
 
-func TestLogger_ShortenString(t *testing.T) {
-	require.Equal(t, "extrem…", ShortenString("extremely long string 1234732 237482 347657943543534657 3240524523", 6))
-	require.Equal(t, "test1⇤\xef\xb8…", ShortenString("test1\r\ntest2\r\n", 10))
-}
-
 func TestLogger_MessageAndInfo(t *testing.T) {
 	logger := logrus.New()
 	log, err := CustomFormatter{}.Format(logrus.NewEntry(logger).

@@ -10,19 +10,26 @@ import (
 	"sync"
 )
 
-// Line-Based Error Handler
-type CatchEachMiddleware struct {
+// Middleware is a line-based error handler
+type Middleware struct {
 }
 
-func (_ CatchEachMiddleware) String() string {
+// String is a human-readable description
+func (Middleware) String() string {
 	return "catchEach"
 }
 
-func NewCatchEachMiddleware() CatchEachMiddleware {
-	return CatchEachMiddleware{}
+// NewMiddleware creates a new Middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (catchEachMiddleware CatchEachMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (catchEachMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
@@ -33,11 +40,11 @@ func (catchEachMiddleware CatchEachMiddleware) Apply(
 	if argument != "" {
 		next(run)
 
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.DataStream(catchEachMiddleware, "create stdout writer")...,
 		)
 		stdoutAppender := run.Stdout.WriteCloser()
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.DataStream(catchEachMiddleware, "intercept stderr")...,
 		)
 		stderrIntercept := run.Stderr.Intercept()
@@ -52,17 +59,17 @@ func (catchEachMiddleware CatchEachMiddleware) Apply(
 					middleware.WithParentRun(run),
 					middleware.WithIdentifier(&argument),
 					middleware.WithSetupFunc(func(errorRun *pipeline.Run) {
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.DataStream(catchEachMiddleware, "merge regex match from parent stderr into child stdin")...,
 						)
 						errorRun.Stdin.MergeWith(bytes.NewReader(scanner.Bytes()))
 					}),
 					middleware.WithTearDownFunc(func(errorRun *pipeline.Run) {
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.DataStream(catchEachMiddleware, "merge child stdout into parent stdout")...,
 						)
 						errorRun.Stdout.StartCopyingInto(stdoutAppender)
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.DataStream(catchEachMiddleware, "replace parent stderr with child stderr")...,
 						)
 						errorRun.Stderr.StartCopyingInto(stderrIntercept)

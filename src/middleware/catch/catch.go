@@ -9,24 +9,31 @@ import (
 	"io/ioutil"
 )
 
-// Error Handler
-type CatchMiddleware struct {
+// Middleware implements a handler for stderr output
+type Middleware struct {
 }
 
-func (_ CatchMiddleware) String() string {
+// String is a human-readable description
+func (Middleware) String() string {
 	return "catch"
 }
 
-func NewCatchMiddleware() CatchMiddleware {
-	return CatchMiddleware{}
+// NewMiddleware creates a new Middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (catchMiddleware CatchMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (catchMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	var argument pipeline.PipelineReference = nil
+	var argument pipeline.Reference = nil
 	pipeline.ParseArguments(&argument, "catch", run)
 
 	if argument != nil {
@@ -41,11 +48,11 @@ func (catchMiddleware CatchMiddleware) Apply(
 			break
 		}
 
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.DataStream(catchMiddleware, "creating stdout writer")...,
 		)
 		stdoutAppender := run.Stdout.WriteCloser()
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.DataStream(catchMiddleware, "intercepting stderr")...,
 		)
 		stderrIntercept := run.Stderr.Intercept()
@@ -60,17 +67,17 @@ func (catchMiddleware CatchMiddleware) Apply(
 					middleware.WithIdentifier(catchIdentifier),
 					middleware.WithArguments(catchArguments),
 					middleware.WithSetupFunc(func(errorRun *pipeline.Run) {
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.DataStream(catchMiddleware, "merging parent stderr into child stdin")...,
 						)
 						errorRun.Stdin.MergeWith(bytes.NewReader(errInput))
 					}),
 					middleware.WithTearDownFunc(func(errorRun *pipeline.Run) {
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.DataStream(catchMiddleware, "merging child stdout into parent stdout")...,
 						)
 						errorRun.Stdout.StartCopyingInto(stdoutAppender)
-						run.Log.TraceWithFields(
+						run.Log.Trace(
 							fields.DataStream(catchMiddleware, "replacing parent stderr with child stderr")...,
 						)
 						errorRun.Stderr.StartCopyingInto(stderrIntercept)

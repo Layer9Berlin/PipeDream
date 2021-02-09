@@ -9,24 +9,31 @@ import (
 	"strings"
 )
 
-// Input Duplicator
-type EachMiddleware struct {
+// Middleware is an input duplicator
+type Middleware struct {
 }
 
-func (_ EachMiddleware) String() string {
+// String is a human-readable description
+func (Middleware) String() string {
 	return "each"
 }
 
-func NewEachMiddleware() EachMiddleware {
-	return EachMiddleware{}
+// NewMiddleware creates a new Middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (eachMiddleware EachMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (eachMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	arguments := make([]pipeline.PipelineReference, 0, 10)
+	arguments := make([]pipeline.Reference, 0, 10)
 	pipeline.ParseArguments(&arguments, "each", run)
 
 	haveChildren := len(arguments) > 0
@@ -48,7 +55,7 @@ func (eachMiddleware EachMiddleware) Apply(
 				info = append(info, *identifier)
 			}
 		}
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("🔢"),
 			fields.Message("each"),
 			fields.Info(strings.Join(info, ", ")),
@@ -62,17 +69,17 @@ func (eachMiddleware EachMiddleware) Apply(
 				middleware.WithIdentifier(identifier),
 				middleware.WithArguments(arguments),
 				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
-					run.Log.TraceWithFields(
+					run.Log.Trace(
 						fields.DataStream(eachMiddleware, "copy parent stdin into child stdin")...,
 					)
 					childRun.Stdin.MergeWith(run.Stdin.Copy())
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
-					run.Log.TraceWithFields(
+					run.Log.Trace(
 						fields.DataStream(eachMiddleware, "copy child stdout into parent stdout")...,
 					)
 					run.Stdout.MergeWith(childRun.Stdout.Copy())
-					run.Log.TraceWithFields(
+					run.Log.Trace(
 						fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
 					)
 					run.Stderr.MergeWith(childRun.Stderr.Copy())

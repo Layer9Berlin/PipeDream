@@ -8,12 +8,12 @@ import (
 )
 
 func TestWhen_TrueCondition(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"when": "8 in (7,8,9)",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewWhenMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {},
 		nil,
@@ -26,12 +26,12 @@ func TestWhen_TrueCondition(t *testing.T) {
 }
 
 func TestWhen_FalseCondition(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"when": "1 == 2",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewWhenMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {},
 		nil,
@@ -44,12 +44,12 @@ func TestWhen_FalseCondition(t *testing.T) {
 }
 
 func TestWhen_UnparseableCondition(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"when": "1 == '",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewWhenMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {},
 		nil,
@@ -63,10 +63,10 @@ func TestWhen_UnparseableCondition(t *testing.T) {
 }
 
 func TestWhen_WithoutCondition(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewWhenMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {},
 		nil,

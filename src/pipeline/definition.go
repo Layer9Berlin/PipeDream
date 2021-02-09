@@ -1,23 +1,27 @@
-// Provides a model representing a pipeline definition that defines default arguments for a pipeline identifier
 package pipeline
 
+// HookDefinitions are not currently used
 type HookDefinitions = map[string][]string
-type PipelineDefinitionsLookup = map[string][]PipelineDefinition
 
-type PipelineDefinition struct {
+// DefinitionsLookup maps identifiers to their definitions
+type DefinitionsLookup = map[string][]Definition
+
+// Definition defines default arguments for a pipeline identifier
+type Definition struct {
 	BuiltIn             bool
 	DefinitionArguments map[string]interface{}
 	FileName            string
 	Public              bool
 }
 
-func NewPipelineDefinition(
+// NewDefinition creates a new Definition
+func NewDefinition(
 	arguments map[string]interface{},
 	pipelineFileName string,
 	isPublic bool,
 	isBuiltIn bool,
-) *PipelineDefinition {
-	return &PipelineDefinition{
+) *Definition {
+	return &Definition{
 		BuiltIn:             isBuiltIn,
 		DefinitionArguments: arguments,
 		FileName:            pipelineFileName,
@@ -25,8 +29,9 @@ func NewPipelineDefinition(
 	}
 }
 
-func MergePipelineDefinitions(definition1 PipelineDefinitionsLookup, definition2 PipelineDefinitionsLookup) PipelineDefinitionsLookup {
-	result := PipelineDefinitionsLookup{}
+// MergePipelineDefinitions merges two definition lookups into a single one
+func MergePipelineDefinitions(definition1 DefinitionsLookup, definition2 DefinitionsLookup) DefinitionsLookup {
+	result := DefinitionsLookup{}
 	for key, value := range definition1 {
 		result[key] = value
 	}

@@ -12,13 +12,13 @@ import (
 )
 
 func TestCatch_Error(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	handlerCalled := false
-	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -50,13 +50,13 @@ func TestCatch_Error(t *testing.T) {
 }
 
 func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerInvocations := 0
-	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -75,7 +75,7 @@ func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
 		}()
 	}, middleware.NewExecutionContext(
 		middleware.WithExecutionFunction(func(errorRun *pipeline.Run) {
-			handlerInvocations += 1
+			handlerInvocations++
 			require.Equal(t, "test-handler", *errorRun.Identifier)
 			errorRun.Stdout.Replace(strings.NewReader("handled"))
 		})))
@@ -89,12 +89,12 @@ func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
 }
 
 func TestCatch_HandlerNotInvoked(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -113,10 +113,10 @@ func TestCatch_HandlerNotInvoked(t *testing.T) {
 }
 
 func TestCatch_WithoutHandler(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -135,13 +135,13 @@ func TestCatch_WithoutHandler(t *testing.T) {
 }
 
 func TestCatch_HandlerThrowingError(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catch": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerCalled := false
-	NewCatchMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)

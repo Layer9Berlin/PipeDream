@@ -16,24 +16,27 @@ import (
 	"strings"
 )
 
-// Shell Command Runner
-type ShellMiddleware struct {
-	ExecutorCreator func() CommandExecutor
+// Middleware is a shell command runner
+type Middleware struct {
+	ExecutorCreator func() commandExecutor
 	osStdin         io.Reader
 	osStdout        io.ReadWriter
 	osStderr        io.ReadWriter
 }
 
-func (shellMiddleware ShellMiddleware) String() string {
+// String is a human-readable description
+func (shellMiddleware Middleware) String() string {
 	return "shell"
 }
 
-func NewShellMiddleware() ShellMiddleware {
-	return NewShellMiddlewareWithExecutorCreator(func() CommandExecutor { return NewDefaultCommandExecutor() })
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return NewMiddlewareWithExecutorCreator(func() commandExecutor { return newDefaultCommandExecutor() })
 }
 
-func NewShellMiddlewareWithExecutorCreator(executorCreator func() CommandExecutor) ShellMiddleware {
-	return ShellMiddleware{
+// NewMiddlewareWithExecutorCreator creates a new middleware instance with the specified executor creation function
+func NewMiddlewareWithExecutorCreator(executorCreator func() commandExecutor) Middleware {
+	return Middleware{
 		ExecutorCreator: executorCreator,
 		osStdin:         os.Stdin,
 		osStdout:        os.Stdout,
@@ -41,7 +44,7 @@ func NewShellMiddlewareWithExecutorCreator(executorCreator func() CommandExecuto
 	}
 }
 
-type ShellMiddlewareArguments struct {
+type middlewareArguments struct {
 	Args        []interface{}
 	Dir         *string
 	Exec        string
@@ -52,8 +55,8 @@ type ShellMiddlewareArguments struct {
 	Quote       string
 }
 
-func NewShellMiddlewareArguments() ShellMiddlewareArguments {
-	return ShellMiddlewareArguments{
+func newMiddlewareArguments() middlewareArguments {
+	return middlewareArguments{
 		Args:        make([]interface{}, 0, 10),
 		Exec:        "sh",
 		Indefinite:  false,
@@ -63,12 +66,17 @@ func NewShellMiddlewareArguments() ShellMiddlewareArguments {
 	}
 }
 
-func (shellMiddleware ShellMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (shellMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
-	arguments := NewShellMiddlewareArguments()
+	arguments := newMiddlewareArguments()
 	pipeline.ParseArguments(&arguments, "shell", run)
 
 	if arguments.Run == nil {
@@ -81,10 +89,10 @@ func (shellMiddleware ShellMiddleware) Apply(
 				fields.Middleware(shellMiddleware),
 			)
 			return
-		} else {
-			if len(shellArgumentsAsArray) > 0 {
-				*arguments.Run = fmt.Sprintf("%v %v", *arguments.Run, strings.Join(shellArgumentsAsArray, " "))
-			}
+		}
+
+		if len(shellArgumentsAsArray) > 0 {
+			*arguments.Run = fmt.Sprintf("%v %v", *arguments.Run, strings.Join(shellArgumentsAsArray, " "))
 		}
 
 		if arguments.Dir != nil {
@@ -134,14 +142,12 @@ func (shellMiddleware ShellMiddleware) Apply(
 			run.Stderr.MergeWith(cmdStderr)
 			run.Stderr.StartCopyingInto(shellMiddleware.osStderr)
 		} else {
-			if !run.Synchronous {
-				run.Stdin.StartCopyingInto(cmdStdin)
-			}
+			run.Stdin.StartCopyingInto(cmdStdin)
 			run.Stdout.MergeWith(executor.CmdStdout())
 			run.Stderr.MergeWith(executor.CmdStderr())
 		}
 
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol(">_"),
 			fields.Message(executor.String()),
 			fields.Middleware(shellMiddleware),
@@ -153,7 +159,7 @@ func (shellMiddleware ShellMiddleware) Apply(
 		}()
 
 		run.AddCancelHook(func() error {
-			run.Log.WarnWithFields(
+			run.Log.Warn(
 				fields.Symbol("⎋"),
 				fields.Message("cancelled"),
 				fields.Info(executor.String()),
@@ -191,7 +197,7 @@ func (shellMiddleware ShellMiddleware) Apply(
 	}
 }
 
-func shellCommandArguments(pipeArguments ShellMiddlewareArguments) ([]string, error) {
+func shellCommandArguments(pipeArguments middlewareArguments) ([]string, error) {
 	middlewareArguments := make([]string, 0, 10)
 	for _, argumentItem := range pipeArguments.Args {
 		switch typedArgument := argumentItem.(type) {
@@ -232,67 +238,4 @@ func convertMapToStringArray(values map[string]interface{}, quoteType string) []
 	// sort alphabetically for predictable results
 	sort.StringSlice.Sort(stringResults)
 	return stringResults
-}
-
-type CommandExecutor interface {
-	Init(name string, arg ...string)
-	Kill() error
-	CmdStdin() io.WriteCloser
-	CmdStdout() io.Reader
-	CmdStderr() io.Reader
-	Start() error
-	String() string
-	Wait() error
-}
-
-type DefaultCommandExecutor struct {
-	command *exec.Cmd
-	env     []string
-	stopped bool
-}
-
-func NewDefaultCommandExecutor() *DefaultCommandExecutor {
-	return &DefaultCommandExecutor{
-		env:     os.Environ(),
-		stopped: false,
-	}
-}
-
-func (executor *DefaultCommandExecutor) Init(name string, arg ...string) {
-	executor.command = exec.Command(name, arg...)
-	executor.command.Env = executor.env
-}
-
-func (executor *DefaultCommandExecutor) Start() error {
-	return executor.command.Start()
-}
-
-func (executor *DefaultCommandExecutor) CmdStdin() io.WriteCloser {
-	stdin, _ := executor.command.StdinPipe()
-	return stdin
-}
-
-func (executor *DefaultCommandExecutor) CmdStdout() io.Reader {
-	stdout, _ := executor.command.StdoutPipe()
-	return stdout
-}
-
-func (executor *DefaultCommandExecutor) CmdStderr() io.Reader {
-	stderr, _ := executor.command.StderrPipe()
-	return stderr
-}
-
-func (executor *DefaultCommandExecutor) Wait() error {
-	return executor.command.Wait()
-}
-
-func (executor *DefaultCommandExecutor) Kill() error {
-	if executor.command.Process == nil {
-		return nil
-	}
-	return executor.command.Process.Kill()
-}
-
-func (executor *DefaultCommandExecutor) String() string {
-	return executor.command.String()
 }

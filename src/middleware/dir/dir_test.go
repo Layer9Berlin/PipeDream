@@ -11,14 +11,14 @@ import (
 var currentDir = "/test"
 
 func TestDir_ChangeDir(t *testing.T) {
-	dirMiddleware := DirMiddleware{
+	dirMiddleware := Middleware{
 		DirChanger: func(newDir string) error {
 			currentDir = newDir
 			return nil
 		},
 	}
 	currentDir = "pre-test"
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"dir": "changed",
 	}, nil, nil)
 
@@ -36,14 +36,14 @@ func TestDir_ChangeDir(t *testing.T) {
 }
 
 func TestDir_DontChangeDir(t *testing.T) {
-	dirMiddleware := DirMiddleware{
+	dirMiddleware := Middleware{
 		DirChanger: func(newDir string) error {
 			currentDir = newDir
 			return nil
 		},
 	}
 	currentDir = "pre-test"
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	dirMiddleware.Apply(
@@ -59,14 +59,14 @@ func TestDir_DontChangeDir(t *testing.T) {
 }
 
 func TestDir_ErrorChangingDir(t *testing.T) {
-	dirMiddleware := DirMiddleware{
+	dirMiddleware := Middleware{
 		DirChanger: func(newDir string) error {
 			return fmt.Errorf("error changing directory")
 		},
 	}
 
 	currentDir = "pre-test"
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"dir": "changed",
 	}, nil, nil)
 
@@ -86,7 +86,7 @@ func TestDir_ErrorChangingDir(t *testing.T) {
 }
 
 func TestDir_CreateNewDirMiddleware(t *testing.T) {
-	dirMiddleware := NewDirMiddleware()
+	dirMiddleware := NewMiddleware()
 	require.NotNil(t, dirMiddleware)
 	require.NotNil(t, dirMiddleware.DirChanger)
 }

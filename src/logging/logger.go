@@ -2,6 +2,7 @@ package logging
 
 import (
 	"fmt"
+	customstrings "github.com/Layer9Berlin/pipedream/src/custom/strings"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"io"
@@ -11,12 +12,17 @@ import (
 	"strings"
 )
 
+// UserPipeLogLevel is the level at which user-defined pipes will be logged
 var UserPipeLogLevel = logrus.InfoLevel
-var BuiltInPipeLogLevel = logrus.InfoLevel
 
+// BuiltInPipeLogLevel is the level at which built-in pipes will be logged
+var BuiltInPipeLogLevel = logrus.ErrorLevel
+
+// CustomFormatter prints log entries in a format suitable for output to the console
 type CustomFormatter struct {
 }
 
+// Format turns a log entry into a string
 func (formatter CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	if readerField, ok := entry.Data["reader"]; ok {
 		if reader, ok := readerField.(io.Reader); ok {
@@ -108,7 +114,7 @@ func extractFields(entry *logrus.Entry, keys ...string) string {
 func prettyPrint(info interface{}, maxLength int) string {
 	infoMap, ok := info.(map[string]interface{})
 	if ok {
-		return PrettyPrintMap(infoMap, maxLength)
+		return prettyPrintMap(infoMap, maxLength)
 	}
 	infoArray, ok := info.([]string)
 	if ok {
@@ -118,17 +124,17 @@ func prettyPrint(info interface{}, maxLength int) string {
 	if info != nil {
 		infoString = fmt.Sprint(info)
 	}
-	return ShortenString(infoString, maxLength)
+	return customstrings.Shorten(infoString, maxLength)
 }
 
 func prettyPrintArray(arrayToPrint []string, maxLength int) string {
 	for index, item := range arrayToPrint {
-		arrayToPrint[index] = ShortenString(item, maxLength)
+		arrayToPrint[index] = customstrings.Shorten(item, maxLength)
 	}
-	return ShortenString(strings.Join(arrayToPrint, ", "), maxLength)
+	return customstrings.Shorten(strings.Join(arrayToPrint, ", "), maxLength)
 }
 
-func PrettyPrintMap(mapToPrint map[string]interface{}, maxLength int) string {
+func prettyPrintMap(mapToPrint map[string]interface{}, maxLength int) string {
 	if len(mapToPrint) > 0 {
 		keys := make([]string, 0, len(mapToPrint))
 		for k := range mapToPrint {
@@ -143,20 +149,11 @@ func PrettyPrintMap(mapToPrint map[string]interface{}, maxLength int) string {
 					result = result + ", "
 				}
 				maxComponentLength := int(math.Floor(float64(maxLength-4) / 2))
-				result = result + fmt.Sprintf("%v: `%v`", ShortenString(key, maxComponentLength), ShortenString(stringValue, maxComponentLength))
+				result = result + fmt.Sprintf("%v: `%v`", customstrings.Shorten(key, maxComponentLength), customstrings.Shorten(stringValue, maxComponentLength))
 			}
 		}
 		result = result + " }"
 		return result
 	}
 	return ""
-}
-
-func ShortenString(commandString string, maxLength int) string {
-	commandString = strings.Replace(commandString, "\n", "↩", -1)
-	commandString = strings.Replace(commandString, "\r", "⇤︎", -1)
-	if len(commandString) > maxLength {
-		return fmt.Sprintf("%v…", commandString[:maxLength])
-	}
-	return commandString
 }

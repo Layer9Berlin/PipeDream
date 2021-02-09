@@ -10,36 +10,44 @@ import (
 	"os"
 )
 
-// Env Var
 type envMiddlewareArguments struct {
 	Interpolate string
 	Save        *string
 }
 
-type EnvMiddleware struct {
+// Middleware is an environment variable handler
+type Middleware struct {
 	Setenv    func(string, string) error
 	ExpandEnv func(string) string
 }
 
-func (envMiddleware EnvMiddleware) String() string {
+// String is a human-readable description
+func (envMiddleware Middleware) String() string {
 	return "env"
 }
 
-func NewEnvMiddleware() EnvMiddleware {
-	return NewEnvMiddlewareWithProvider(os.Setenv, os.ExpandEnv)
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return NewMiddlewareWithProvider(os.Setenv, os.ExpandEnv)
 }
 
-func NewEnvMiddlewareWithProvider(
+// NewMiddlewareWithProvider creates a new middleware instance with the specified env functions
+func NewMiddlewareWithProvider(
 	setenv func(string, string) error,
 	expandEnv func(string) string,
-) EnvMiddleware {
-	return EnvMiddleware{
+) Middleware {
+	return Middleware{
 		Setenv:    setenv,
 		ExpandEnv: expandEnv,
 	}
 }
 
-func (envMiddleware EnvMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (envMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -50,36 +58,36 @@ func (envMiddleware EnvMiddleware) Apply(
 	}
 	pipeline.ParseArguments(&arguments, "env", run)
 
-	interpolator := NewInterpolator(envMiddleware)
+	envInterpolator := newInterpolator(envMiddleware)
 	interpolatedArguments := run.ArgumentsCopy()
 	switch arguments.Interpolate {
 	case "deep":
-		structparse.Strings(interpolator, interpolatedArguments)
+		structparse.Strings(envInterpolator, interpolatedArguments)
 		run.SetArguments(interpolatedArguments)
 	case "none":
 	default:
 		newArguments := run.ArgumentsCopy()
 		for argumentKey, argumentValue := range interpolatedArguments {
 			if argumentValueAsString, argumentValueIsString := argumentValue.(string); argumentValueIsString {
-				newArguments[argumentKey] = interpolator.ParseString(argumentValueAsString)
+				newArguments[argumentKey] = envInterpolator.ParseString(argumentValueAsString)
 			}
 		}
 		run.SetArguments(newArguments)
 	}
-	switch len(interpolator.Substitutions) {
+	switch len(envInterpolator.Substitutions) {
 	case 0:
 	case 1:
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("💲"),
 			fields.Message("made 1 env var substitution"),
-			fields.Info(interpolator.Substitutions),
+			fields.Info(envInterpolator.Substitutions),
 			fields.Middleware(envMiddleware),
 		)
 	default:
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("💲"),
-			fields.Message(fmt.Sprintf("made %v env var substitutions", len(interpolator.Substitutions))),
-			fields.Info(interpolator.Substitutions),
+			fields.Message(fmt.Sprintf("made %v env var substitutions", len(envInterpolator.Substitutions))),
+			fields.Info(envInterpolator.Substitutions),
 			fields.Middleware(envMiddleware),
 		)
 	}
@@ -87,10 +95,6 @@ func (envMiddleware EnvMiddleware) Apply(
 	next(run)
 
 	if arguments.Save != nil {
-		// to avoid flakiness, we need to defer subsequent executions,
-		// as they will usually want to use the env var we are setting here
-		run.Synchronous = true
-
 		run.LogClosingWaitGroup.Add(1)
 		go func() {
 			run.Stdout.Wait()
@@ -98,7 +102,7 @@ func (envMiddleware EnvMiddleware) Apply(
 			run.Log.PossibleError(err)
 			run.LogClosingWaitGroup.Done()
 		}()
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("💲"),
 			fields.Message(fmt.Sprintf("saving output")),
 			fields.Info("$"+*arguments.Save),
@@ -107,19 +111,19 @@ func (envMiddleware EnvMiddleware) Apply(
 	}
 }
 
-type Interpolator struct {
+type interpolator struct {
 	Substitutions map[string]interface{}
 	ExpandEnv     func(string) string
 }
 
-func NewInterpolator(envMiddleware EnvMiddleware) *Interpolator {
-	return &Interpolator{
+func newInterpolator(envMiddleware Middleware) *interpolator {
+	return &interpolator{
 		Substitutions: make(map[string]interface{}, 10),
 		ExpandEnv:     envMiddleware.ExpandEnv,
 	}
 }
 
-func (interpolator *Interpolator) ParseString(value string) interface{} {
+func (interpolator *interpolator) ParseString(value string) interface{} {
 	result := interpolator.ExpandEnv(value)
 	if result != value {
 		interpolator.Substitutions[value] = result

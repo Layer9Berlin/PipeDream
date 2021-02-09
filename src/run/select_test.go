@@ -161,7 +161,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singleFile(t *testing.T) {
 		},
 	}
 	executionContext := middleware.NewExecutionContext()
-	executionContext.Definitions = map[string][]pipeline2.PipelineDefinition{
+	executionContext.Definitions = map[string][]pipeline2.Definition{
 		"test": {
 			{
 				DefinitionArguments: map[string]interface{}{

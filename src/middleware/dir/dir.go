@@ -8,25 +8,32 @@ import (
 	"os"
 )
 
-// Directory Navigator
-type DirMiddleware struct {
+// Middleware is a directory navigator
+type Middleware struct {
 	WorkingDir string
 	DirChanger func(string) error
 }
 
-func (_ DirMiddleware) String() string {
+// String is a human-readable description
+func (Middleware) String() string {
 	return "dir"
 }
 
-func NewDirMiddleware() DirMiddleware {
+// NewMiddleware creates a new Middleware instance
+func NewMiddleware() Middleware {
 	workingDir, _ := os.Getwd()
-	return DirMiddleware{
+	return Middleware{
 		DirChanger: os.Chdir,
 		WorkingDir: workingDir,
 	}
 }
 
-func (dirMiddleware DirMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (dirMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -35,7 +42,7 @@ func (dirMiddleware DirMiddleware) Apply(
 	pipeline.ParseArgumentsIncludingParents(&dirArgument, "dir", run)
 
 	if dirArgument != "" {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("📂"),
 			fields.Message(dirArgument),
 			fields.Middleware(dirMiddleware),
@@ -49,7 +56,7 @@ func (dirMiddleware DirMiddleware) Apply(
 	dirMiddleware.changeDirectory(dirMiddleware.WorkingDir, run)
 }
 
-func (dirMiddleware DirMiddleware) changeDirectory(directory interface{}, run *pipeline.Run) {
+func (dirMiddleware Middleware) changeDirectory(directory interface{}, run *pipeline.Run) {
 	dir, ok := directory.(string)
 	if ok && dir != "" {
 		err := dirMiddleware.DirChanger(dir)

@@ -4,13 +4,14 @@ import (
 	"io"
 )
 
+// ComposableDataStreamIntercept is a structure for intercepting and manipulating data passed through a data stream
 type ComposableDataStreamIntercept struct {
 	reader       io.Reader
 	writer       io.WriteCloser
 	errorHandler func(error)
 }
 
-func NewComposableDataStreamIntercept(reader io.Reader, writer io.WriteCloser, errorHandler func(error)) *ComposableDataStreamIntercept {
+func newComposableDataStreamIntercept(reader io.Reader, writer io.WriteCloser, errorHandler func(error)) *ComposableDataStreamIntercept {
 	return &ComposableDataStreamIntercept{
 		reader:       reader,
 		writer:       writer,
@@ -26,6 +27,7 @@ func (intercept *ComposableDataStreamIntercept) Write(p []byte) (int, error) {
 	return intercept.writer.Write(p)
 }
 
+// Close closes the data stream intercept to indicate that all data has been written
 func (intercept *ComposableDataStreamIntercept) Close() error {
 	return intercept.writer.Close()
 }

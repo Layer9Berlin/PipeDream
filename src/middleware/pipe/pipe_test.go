@@ -1,6 +1,7 @@
 package pipe
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"github.com/sirupsen/logrus"
@@ -13,7 +14,7 @@ import (
 
 func TestPipe_Apply(t *testing.T) {
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"pipe": []interface{}{
 			map[string]interface{}{
 				"test1": map[string]interface{}{
@@ -27,7 +28,7 @@ func TestPipe_Apply(t *testing.T) {
 	run.Log.SetLevel(logrus.InfoLevel)
 	waitGroup := &sync.WaitGroup{}
 	run.Stdin.Replace(strings.NewReader("test input"))
-	NewPipeMiddleware().Apply(run,
+	NewMiddleware().Apply(run,
 		func(run *pipeline.Run) {
 		},
 		middleware.NewExecutionContext(
@@ -43,7 +44,7 @@ func TestPipe_Apply(t *testing.T) {
 						require.Equal(t, "test input", string(completeInput))
 					}()
 					childRun.Stdout.Replace(strings.NewReader("test1 output"))
-					childRun.Log.Info(logrus.WithField("message", "test1 log entry"))
+					childRun.Log.Info(fields.Message("test1 log entry"))
 				case "test2":
 					stdinCopy := childRun.Stdin.Copy()
 					waitGroup.Add(1)
@@ -54,7 +55,7 @@ func TestPipe_Apply(t *testing.T) {
 						waitGroup.Done()
 					}()
 					childRun.Stdout.Replace(strings.NewReader("test2 output"))
-					childRun.Log.Info(logrus.WithField("message", "test2 log entry"))
+					childRun.Log.Info(fields.Message("test2 log entry"))
 				}
 			}),
 		))
@@ -71,11 +72,11 @@ func TestPipe_Apply(t *testing.T) {
 
 func TestPipe_InvalidArguments(t *testing.T) {
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"pipe": "invalid",
 	}, nil, nil)
 
-	NewPipeMiddleware().Apply(run,
+	NewMiddleware().Apply(run,
 		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
@@ -91,9 +92,9 @@ func TestPipe_InvalidArguments(t *testing.T) {
 
 func TestPipe_NotInvoked(t *testing.T) {
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, nil, nil, nil)
+	run, _ := pipeline.NewRun(&identifier, nil, nil, nil)
 
-	NewPipeMiddleware().Apply(run,
+	NewMiddleware().Apply(run,
 		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
@@ -108,7 +109,7 @@ func TestPipe_NotInvoked(t *testing.T) {
 
 func TestPipe_InvalidReference(t *testing.T) {
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"pipe": []interface{}{
 			map[string]interface{}{
 				"test1": map[string]interface{}{
@@ -121,7 +122,7 @@ func TestPipe_InvalidReference(t *testing.T) {
 		},
 	}, nil, nil)
 
-	NewPipeMiddleware().Apply(run,
+	NewMiddleware().Apply(run,
 		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},
@@ -137,7 +138,7 @@ func TestPipe_InvalidReference(t *testing.T) {
 
 func TestPipe_AnonymousReference(t *testing.T) {
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"pipe": []interface{}{
 			map[*string]interface{}{
 				nil: map[string]interface{}{
@@ -149,7 +150,7 @@ func TestPipe_AnonymousReference(t *testing.T) {
 
 	run.Log.SetLevel(logrus.DebugLevel)
 	var fullRunCalled = false
-	NewPipeMiddleware().Apply(run,
+	NewMiddleware().Apply(run,
 		func(run *pipeline.Run) {
 			run.Stdout.Replace(strings.NewReader("test output"))
 		},

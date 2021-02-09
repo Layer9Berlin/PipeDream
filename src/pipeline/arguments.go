@@ -6,10 +6,13 @@ import (
 	"reflect"
 )
 
+// Arguments maps the string key corresponding to each middleware's identifier to its specific arguments
 type Arguments = map[string]interface{}
-type PipelineReference = map[*string]Arguments
 
-var pipelineReferenceType = reflect.TypeOf(PipelineReference{})
+// Reference is a map containing a single value indexed by the pipeline's identifier (possibly nil)
+type Reference = map[*string]Arguments
+
+var pipelineReferenceType = reflect.TypeOf(Reference{})
 
 func pipelineReferenceDecodeHook(
 	_ reflect.Type,
@@ -18,7 +21,7 @@ func pipelineReferenceDecodeHook(
 ) (interface{}, error) {
 	if outputType == pipelineReferenceType {
 		if valueAsString, valueIsString := value.(string); valueIsString {
-			return PipelineReference{
+			return Reference{
 				&valueAsString: make(map[string]interface{}, 0),
 			}, nil
 		}
@@ -43,6 +46,7 @@ func pipelineReferenceDecodeHook(
 	return value, nil
 }
 
+// ParseArguments transfers an unstructured map of arguments into a struct
 func ParseArguments(
 	middlewareArguments interface{},
 	middlewareIdentifier string,
@@ -70,6 +74,7 @@ func ParseArguments(
 	return true
 }
 
+// ParseArgumentsIncludingParents is like ParseArguments, but will traverse through parents if no suitable has been found
 func ParseArgumentsIncludingParents(
 	middlewareArguments interface{},
 	middlewareIdentifier string,

@@ -12,40 +12,49 @@ import (
 	"os"
 )
 
-type SelectMiddleware struct {
+// Middleware is a user selection handler
+type Middleware struct {
 	osStdin  io.ReadCloser
 	osStdout io.WriteCloser
 }
 
-func (selectMiddleware SelectMiddleware) String() string {
+// String is a human-readable description
+func (selectMiddleware Middleware) String() string {
 	return "select"
 }
 
-func NewSelectMiddleware() SelectMiddleware {
-	return NewSelectMiddlewareWithStdinAndStdout(os.Stdin, os.Stdout)
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return NewMiddlewareWithStdinAndStdout(os.Stdin, os.Stdout)
 }
 
-func NewSelectMiddlewareWithStdinAndStdout(stdin io.ReadCloser, stdout io.WriteCloser) SelectMiddleware {
-	return SelectMiddleware{
+// NewMiddlewareWithStdinAndStdout creates a new middleware instance with the specified stdin and stdout
+func NewMiddlewareWithStdinAndStdout(stdin io.ReadCloser, stdout io.WriteCloser) Middleware {
+	return Middleware{
 		osStdin:  stdin,
 		osStdout: customio.NewBellSkipper(stdout),
 	}
 }
 
-type selectMiddlewareArguments struct {
+type middlewareArguments struct {
 	Initial int
-	Options []pipeline.PipelineReference
+	Options []pipeline.Reference
 	Prompt  *string
 }
 
-func (selectMiddleware SelectMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (selectMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	middlewareArguments := selectMiddlewareArguments{
+	middlewareArguments := middlewareArguments{
 		Initial: 0,
-		Options: make([]pipeline.PipelineReference, 0, 16),
+		Options: make([]pipeline.Reference, 0, 16),
 	}
 	pipeline.ParseArguments(&middlewareArguments, "select", run)
 
@@ -102,7 +111,7 @@ func (selectMiddleware SelectMiddleware) Apply(
 					selectedPipelineArguments = pipelineArguments
 				}
 			}
-			run.Log.TraceWithFields(
+			run.Log.Trace(
 				fields.Symbol("👈"),
 				fields.Message("user selected pipeline"),
 				fields.Info(selectedPipelineIdentifier),
@@ -113,17 +122,17 @@ func (selectMiddleware SelectMiddleware) Apply(
 				middleware.WithIdentifier(&selectedPipelineIdentifier),
 				middleware.WithArguments(selectedPipelineArguments),
 				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
-					run.Log.TraceWithFields(
+					run.Log.Trace(
 						fields.DataStream(selectMiddleware, "copy parent stdin into child stdin")...,
 					)
 					childRun.Stdin.MergeWith(bytes.NewReader(completeStdin))
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
-					run.Log.TraceWithFields(
+					run.Log.Trace(
 						fields.DataStream(selectMiddleware, "copy child stdout into parent stdout")...,
 					)
 					childRun.Stdout.StartCopyingInto(stdoutWriter)
-					run.Log.TraceWithFields(
+					run.Log.Trace(
 						fields.DataStream(selectMiddleware, "copy child stderr into parent stderr")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrWriter)
@@ -137,9 +146,4 @@ func (selectMiddleware SelectMiddleware) Apply(
 		next(run)
 		return
 	}
-}
-
-type SaveMiddlewareEntry struct {
-	path []string
-	root *pipeline.Run
 }

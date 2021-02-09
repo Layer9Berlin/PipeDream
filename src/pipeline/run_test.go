@@ -10,7 +10,7 @@ import (
 )
 
 func TestPipelineRun_AppendToStdout(t *testing.T) {
-	run, setupErr := NewPipelineRun(nil, nil, nil, nil)
+	run, setupErr := NewRun(nil, nil, nil, nil)
 	require.Nil(t, setupErr)
 
 	run.Stdout.MergeWith(strings.NewReader("this is a test"))
@@ -21,7 +21,7 @@ func TestPipelineRun_AppendToStdout(t *testing.T) {
 }
 
 func TestPipelineRun_ArgumentAtPath(t *testing.T) {
-	run, _ := NewPipelineRun(nil, map[string]interface{}{
+	run, _ := NewRun(nil, map[string]interface{}{
 		"test": map[string]interface{}{
 			"key": "value",
 		},
@@ -34,12 +34,12 @@ func TestPipelineRun_ArgumentAtPath(t *testing.T) {
 }
 
 func TestPipelineRun_ArgumentAtPathIncludingParents(t *testing.T) {
-	parentRun, _ := NewPipelineRun(nil, map[string]interface{}{
+	parentRun, _ := NewRun(nil, map[string]interface{}{
 		"test": map[string]interface{}{
 			"key": "value",
 		},
 	}, nil, nil)
-	run, _ := NewPipelineRun(nil, nil, nil, parentRun)
+	run, _ := NewRun(nil, nil, nil, parentRun)
 	argument, err := run.ArgumentAtPathIncludingParents("test", "key")
 	require.Nil(t, err)
 	argumentAsString, argumentIsString := argument.(string)
@@ -48,12 +48,12 @@ func TestPipelineRun_ArgumentAtPathIncludingParents(t *testing.T) {
 }
 
 func TestPipelineRun_ArgumentAtPathIncludingParents_NotFound(t *testing.T) {
-	parentRun, _ := NewPipelineRun(nil, map[string]interface{}{
+	parentRun, _ := NewRun(nil, map[string]interface{}{
 		"test": map[string]interface{}{
 			"key": "value",
 		},
 	}, nil, nil)
-	run, _ := NewPipelineRun(nil, nil, nil, parentRun)
+	run, _ := NewRun(nil, nil, nil, parentRun)
 	argument, err := run.ArgumentAtPathIncludingParents("test", "key", "not_present")
 	require.NotNil(t, err)
 	require.Equal(t, "value does not exist at path", err.Error())
@@ -61,7 +61,7 @@ func TestPipelineRun_ArgumentAtPathIncludingParents_NotFound(t *testing.T) {
 }
 
 func TestPipelineRun_SetArgumentAtPath(t *testing.T) {
-	run, _ := NewPipelineRun(nil, map[string]interface{}{
+	run, _ := NewRun(nil, map[string]interface{}{
 		"test": map[string]interface{}{
 			"key": "value",
 		},
@@ -77,7 +77,7 @@ func TestPipelineRun_SetArgumentAtPath(t *testing.T) {
 }
 
 func TestPipelineRun_Lengths(t *testing.T) {
-	run, _ := NewPipelineRun(nil, nil, nil, nil)
+	run, _ := NewRun(nil, nil, nil, nil)
 	run.Stdin.MergeWith(strings.NewReader("test"))
 	run.Stdout.MergeWith(strings.NewReader("another test"))
 	run.Close()
@@ -88,17 +88,17 @@ func TestPipelineRun_Lengths(t *testing.T) {
 }
 
 func TestPipelineRun_NewPipelineRun(t *testing.T) {
-	definition := NewPipelineDefinition(map[string]interface{}{
+	definition := NewDefinition(map[string]interface{}{
 		"test": "value",
 	}, "test", true, false)
-	run, _ := NewPipelineRun(nil, nil, definition, nil)
+	run, _ := NewRun(nil, nil, definition, nil)
 	require.Equal(t, map[string]interface{}{
 		"test": "value",
 	}, run.ArgumentsCopy())
 }
 
 func TestPipelineRun_WaitForCompletion(t *testing.T) {
-	run, _ := NewPipelineRun(nil, nil, nil, nil)
+	run, _ := NewRun(nil, nil, nil, nil)
 	appender := run.Stderr.WriteCloser()
 	// Wait should be callable an arbitrary number of times simultaneously
 	go func() {
@@ -121,12 +121,12 @@ func TestPipelineRun_WaitForCompletion(t *testing.T) {
 
 func TestPipelineRun_String(t *testing.T) {
 	identifier := "test"
-	run, _ := NewPipelineRun(&identifier, nil, nil, nil)
+	run, _ := NewRun(&identifier, nil, nil, nil)
 	run.Stdin.MergeWith(strings.NewReader("test"))
 	run.Stdout.MergeWith(strings.NewReader("test output"))
 	run.Stderr.MergeWith(strings.NewReader("test err"))
 	run.Log.Error(fmt.Errorf("test error"))
-	run.Log.WarnWithFields(fields.Message("test warning"))
+	run.Log.Warn(fields.Message("test warning"))
 	run.Close()
 	run.Wait()
 
@@ -142,14 +142,14 @@ func TestPipelineRun_String(t *testing.T) {
 
 func TestPipelineRun_String_WithDescription(t *testing.T) {
 	identifier := "test"
-	run, _ := NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := NewRun(&identifier, map[string]interface{}{
 		"description": "Test description",
 	}, nil, nil)
 	run.Stdin.MergeWith(strings.NewReader("test"))
 	run.Stdout.MergeWith(strings.NewReader("test output"))
 	run.Stderr.MergeWith(strings.NewReader("test err"))
 	run.Log.Error(fmt.Errorf("test error"))
-	run.Log.WarnWithFields(fields.Message("test warning"))
+	run.Log.Warn(fields.Message("test warning"))
 	run.Close()
 	run.Wait()
 
@@ -164,10 +164,10 @@ func TestPipelineRun_String_WithDescription(t *testing.T) {
 }
 
 func TestPipelineRun_UnmergeableDefinition(t *testing.T) {
-	definition := NewPipelineDefinition(map[string]interface{}{
+	definition := NewDefinition(map[string]interface{}{
 		"test": "value",
 	}, "test", true, false)
-	run, err := NewPipelineRun(nil, map[string]interface{}{
+	run, err := NewRun(nil, map[string]interface{}{
 		"test": map[string]interface{}{
 			"key1": "value1",
 		},
@@ -177,7 +177,7 @@ func TestPipelineRun_UnmergeableDefinition(t *testing.T) {
 }
 
 func TestPipelineRun_SetArguments(t *testing.T) {
-	run, err := NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, err := NewRun(nil, map[string]interface{}{}, nil, nil)
 	require.NotNil(t, run)
 	require.Nil(t, err)
 	run.SetArguments(map[string]interface{}{
@@ -191,7 +191,7 @@ func TestPipelineRun_SetArguments(t *testing.T) {
 }
 
 func TestPipelineRun_Close(t *testing.T) {
-	run, _ := NewPipelineRun(nil, nil, nil, nil)
+	run, _ := NewRun(nil, nil, nil, nil)
 
 	require.False(t, run.Completed())
 

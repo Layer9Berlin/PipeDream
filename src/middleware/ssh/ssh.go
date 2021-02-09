@@ -8,19 +8,26 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
-// SSH Executor
-type SshMiddleware struct {
+// Middleware is an SSH executor
+type Middleware struct {
 }
 
-func (sshMiddleware SshMiddleware) String() string {
+// String is a human-readable description
+func (sshMiddleware Middleware) String() string {
 	return "ssh"
 }
 
-func NewSshMiddleware() SshMiddleware {
-	return SshMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (sshMiddleware SshMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (sshMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -31,18 +38,18 @@ func (sshMiddleware SshMiddleware) Apply(
 	pipeline.ParseArgumentsIncludingParents(&arguments, "ssh", run)
 
 	if arguments.Host != nil {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("👨‍💻"),
 			fields.Message(arguments.Host),
 			fields.Middleware(sshMiddleware),
 		)
-		prefixWithSshHost(run, *arguments.Host)
+		prefixWithSSHHost(run, *arguments.Host)
 	}
 
 	next(run)
 }
 
-func prefixWithSshHost(run *pipeline.Run, sshHost string) {
+func prefixWithSSHHost(run *pipeline.Run, sshHost string) {
 	path := []string{"shell", "run"}
 	// get the existing value - the shell -> run argument is not inheritable
 	existingValue, err := run.ArgumentAtPath(path...)

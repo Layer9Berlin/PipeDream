@@ -7,19 +7,26 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
-// Arguments Propagator
-type InheritMiddleware struct {
+// Middleware is an arguments propagator
+type Middleware struct {
 }
 
-func (_ InheritMiddleware) String() string {
+// String is a human-readable description
+func (Middleware) String() string {
 	return "inherit"
 }
 
-func NewInheritMiddleware() InheritMiddleware {
-	return InheritMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (inheritMiddleware InheritMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (inheritMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -41,7 +48,7 @@ func (inheritMiddleware InheritMiddleware) Apply(
 			}
 		}
 		if len(substitutions) > 0 {
-			run.Log.DebugWithFields(
+			run.Log.Debug(
 				fields.Symbol("👪"),
 				fields.Message("inherited arguments"),
 				fields.Info(substitutions),

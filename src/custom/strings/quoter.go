@@ -5,6 +5,9 @@ import (
 	systemstrings "strings"
 )
 
+// QuoteValue adds surrounding quotes around a string
+//
+// Available quoteTypes are 'single', 'none', and 'double' (default)
 func QuoteValue(value string, quoteType string) string {
 	switch quoteType {
 	case "single":

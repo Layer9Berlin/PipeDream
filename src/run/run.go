@@ -12,9 +12,19 @@ import (
 	"path/filepath"
 )
 
+// Log is the main logger that all other loggers are based on
 var Log = logrus.New()
+
+// Verbosity determines the global log levels
+//
+// It corresponds to the log level of user-defined pipelines.
+// Note that built-in pipelines may have a different log level.
 var Verbosity string
+
+// PipelineFlag sets the pipeline to be executed, skipping the user selection prompt
 var PipelineFlag string
+
+// FileFlag sets the file to be executed, skipping the user selection prompt
 var FileFlag string
 
 var executionContextFactory = middleware.NewExecutionContext
@@ -22,6 +32,7 @@ var osStdin io.ReadCloser = os.Stdin
 var osStdout io.WriteCloser = os.Stdout
 var osStderr io.WriteCloser = os.Stderr
 
+// Cmd executes the main command, selecting and running a pipeline within an execution context
 func Cmd(_ *cobra.Command, args []string) {
 	executableLocation, _ := os.Executable()
 	executableDir := path.Dir(executableLocation)

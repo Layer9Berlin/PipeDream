@@ -10,7 +10,7 @@ import (
 )
 
 func TestInherit_ArgumentsFromParent(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"arg":       "value",
 		"arg2":      "another-value",
 		"arg-array": []interface{}{"line0", "line1", "line2"},
@@ -30,7 +30,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 		},
 	}, nil, nil)
 
-	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	childRun, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"inherit": []interface{}{
 			"arg",
 			"arg-array",
@@ -44,7 +44,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 	}, nil, run)
 
 	childRun.Log.SetLevel(logrus.TraceLevel)
-	NewInheritMiddleware().Apply(
+	NewMiddleware().Apply(
 		childRun,
 		func(invocation *pipeline.Run) {},
 		nil,
@@ -84,7 +84,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 
 func TestInherit_WithoutParent(t *testing.T) {
 	identifier := "orphan"
-	orphanRun, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	orphanRun, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"inherit": []interface{}{
 			"arg",
 			"arg-array",
@@ -98,7 +98,7 @@ func TestInherit_WithoutParent(t *testing.T) {
 	}, nil, nil)
 
 	orphanRun.Log.SetLevel(logrus.TraceLevel)
-	NewInheritMiddleware().Apply(
+	NewMiddleware().Apply(
 		orphanRun,
 		func(invocation *pipeline.Run) {},
 		nil,

@@ -30,7 +30,7 @@ func TestExecutionContext_FullRun_WithDefinitionsLookupOption(t *testing.T) {
 	arguments := map[string]interface{}{
 		"key": "value",
 	}
-	executionContext := NewExecutionContext(WithDefinitionsLookup(map[string][]pipeline.PipelineDefinition{
+	executionContext := NewExecutionContext(WithDefinitionsLookup(map[string][]pipeline.Definition{
 		"test": {
 			{
 				DefinitionArguments: arguments,
@@ -56,7 +56,7 @@ func TestExecutionContext_FullRun_WithUnmergeableArguments(t *testing.T) {
 		"key": map[string]interface{}{},
 	}
 	executionContext := ExecutionContext{
-		Definitions: map[string][]pipeline.PipelineDefinition{
+		Definitions: map[string][]pipeline.Definition{
 			"test": {
 				{
 					DefinitionArguments: arguments1,
@@ -139,7 +139,7 @@ func TestExecutionContext_PipelineFileAtPath_NotFound(t *testing.T) {
 }
 
 func TestExecutionContext_LookUpPipelineDefinition(t *testing.T) {
-	definitionsLookup := map[string][]pipeline.PipelineDefinition{
+	definitionsLookup := map[string][]pipeline.Definition{
 		"test1": {
 			{
 				FileName: "test1.file",
@@ -323,7 +323,7 @@ func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 //				parsers.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
 //					return []string{"test.file"}, nil
 //				}))),
-//		WithDefinitionsLookup(models.PipelineDefinitionsLookup{}),
+//		WithDefinitionsLookup(models.DefinitionsLookup{}),
 //	)
 //	err := executionContext.SetUpPipelines([]string{"test1"})
 //	require.NotNil(t, err)
@@ -333,7 +333,7 @@ func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 
 //func TestRun_PipelineSetupHelper_setUpPipelines(t *testing.T) {
 //	executionContext := middleware.NewExecutionContext(
-//		middleware.WithDefinitionsLookup(models.PipelineDefinitionsLookup{}),
+//		middleware.WithDefinitionsLookup(models.DefinitionsLookup{}),
 //		WithFindByGlobImplementation(func(pattern string) ([]string, error) {
 //			return []string{"test1.pipe"}, nil
 //		}),
@@ -368,6 +368,6 @@ func (fakeMiddleware *FakeMiddleware) Apply(
 	next func(*pipeline.Run),
 	_ *ExecutionContext,
 ) {
-	fakeMiddleware.CallCount += 1
+	fakeMiddleware.CallCount++
 	next(run)
 }

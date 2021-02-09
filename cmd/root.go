@@ -1,4 +1,4 @@
-// Implements the `pipedream` command line tool
+// Package cmd implements the `pipedream` command line tool
 package cmd
 
 import (
@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-// The main command that is both the root for subcommands like `version`
+// RootCmd is the main command that is both the root for subcommands like `version`
 // and the default command if no subcommand is specified
 // most of the time, you will want the default, which runs applicable pipes
 var RootCmd = &cobra.Command{

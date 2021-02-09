@@ -10,7 +10,7 @@ import (
 )
 
 func TestEnv_InterpolateShallow(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"test": []interface{}{
 			map[string]interface{}{"test1": map[string]interface{}{
 				"value": "$TEST",
@@ -41,7 +41,7 @@ func TestEnv_InterpolateShallow(t *testing.T) {
 		return result
 	}
 	var calledRun *pipeline.Run = nil
-	NewEnvMiddlewareWithProvider(setenv, expandEnv).Apply(
+	NewMiddlewareWithProvider(setenv, expandEnv).Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			calledRun = pipelineRun
@@ -71,7 +71,7 @@ func TestEnv_InterpolateShallow(t *testing.T) {
 }
 
 func TestEnv_InterpolateDeep(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"env": map[string]interface{}{
 			"interpolate": "deep",
 		},
@@ -105,7 +105,7 @@ func TestEnv_InterpolateDeep(t *testing.T) {
 		return result
 	}
 	var calledRun *pipeline.Run = nil
-	NewEnvMiddlewareWithProvider(setenv, expandEnv).Apply(
+	NewMiddlewareWithProvider(setenv, expandEnv).Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			calledRun = pipelineRun
@@ -138,7 +138,7 @@ func TestEnv_InterpolateDeep(t *testing.T) {
 }
 
 func TestEnv_NoSubstitutions(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"env": map[string]interface{}{
 			"interpolate": "deep",
 		},
@@ -172,7 +172,7 @@ func TestEnv_NoSubstitutions(t *testing.T) {
 		return result
 	}
 	var calledRun *pipeline.Run = nil
-	NewEnvMiddlewareWithProvider(setenv, expandEnv).Apply(
+	NewMiddlewareWithProvider(setenv, expandEnv).Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			calledRun = pipelineRun
@@ -205,7 +205,7 @@ func TestEnv_NoSubstitutions(t *testing.T) {
 }
 
 func TestEnv_InterpolateNone(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"env": map[string]interface{}{
 			"interpolate": "none",
 		},
@@ -239,7 +239,7 @@ func TestEnv_InterpolateNone(t *testing.T) {
 		return result
 	}
 	var calledRun *pipeline.Run = nil
-	NewEnvMiddlewareWithProvider(setenv, expandEnv).Apply(
+	NewMiddlewareWithProvider(setenv, expandEnv).Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			calledRun = pipelineRun
@@ -272,7 +272,7 @@ func TestEnv_InterpolateNone(t *testing.T) {
 }
 
 func TestEnv_Save(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"env": map[string]interface{}{
 			"save": "KEY",
 		},
@@ -294,7 +294,7 @@ func TestEnv_Save(t *testing.T) {
 		return result
 	}
 	var calledRun *pipeline.Run = nil
-	NewEnvMiddlewareWithProvider(setenv, expandEnv).Apply(
+	NewMiddlewareWithProvider(setenv, expandEnv).Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			calledRun = pipelineRun
@@ -313,7 +313,7 @@ func TestEnv_Save(t *testing.T) {
 }
 
 func TestEnv_NewEnvMiddleware(t *testing.T) {
-	envMiddleware := NewEnvMiddleware()
+	envMiddleware := NewMiddleware()
 	key := "PIPEDREAM_TEST_TEMP"
 	err := envMiddleware.Setenv(key, "value")
 	require.Nil(t, err)

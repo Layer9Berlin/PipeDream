@@ -16,7 +16,6 @@ import (
 	"sync"
 )
 
-// Value Replacer
 type interpolateMiddlewareArguments struct {
 	Enable         bool
 	EscapeQuotes   string
@@ -24,17 +23,25 @@ type interpolateMiddlewareArguments struct {
 	Quote          string
 }
 
-type InterpolateMiddleware struct{}
+// Middleware is a value replacer
+type Middleware struct{}
 
-func (interpolateMiddleware InterpolateMiddleware) String() string {
+// String is a human-readable description
+func (interpolateMiddleware Middleware) String() string {
 	return "interpolate"
 }
 
-func NewInterpolateMiddleware() InterpolateMiddleware {
-	return InterpolateMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (interpolateMiddleware InterpolateMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (interpolateMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
@@ -48,40 +55,40 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 	pipeline.ParseArguments(&arguments, "interpolate", run)
 
 	if arguments.Enable {
-		interpolator := NewInterpolator(run.ArgumentsCopy(), arguments)
+		preliminaryInterpolator := newInterpolator(run.ArgumentsCopy(), arguments)
 
 		interpolatedArguments := run.ArgumentsCopy()
-		structparse.Strings(interpolator, interpolatedArguments)
+		structparse.Strings(preliminaryInterpolator, interpolatedArguments)
 
-		if interpolator.NeedCompleteInput {
+		if preliminaryInterpolator.NeedCompleteInput {
 			// we log any errors only as warnings
 			// this is because we might have other middleware (like `when`)
 			// that renders certain errors moot
-			if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
+			if preliminaryInterpolator.Errors != nil && preliminaryInterpolator.Errors.Len() > 0 {
 				if !arguments.IgnoreWarnings {
-					run.Log.WarnWithFields(
+					run.Log.Warn(
 						fields.Symbol("⚠️"),
 						fields.Message("warning"),
-						fields.Info(interpolator.Errors.Errors),
+						fields.Info(preliminaryInterpolator.Errors.Errors),
 						fields.Middleware(interpolateMiddleware),
 					)
 				}
 			} else {
-				run.Log.DebugWithFields(
+				run.Log.Debug(
 					fields.Symbol("💤"),
 					fields.Message("input interpolation used, need to wait for input to complete..."),
 					fields.Middleware(interpolateMiddleware),
 				)
 			}
-			run.Log.TraceWithFields(
+			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "copying stdin")...,
 			)
-			stdinCopy := run.Stdin.CopyOrResult()
-			run.Log.TraceWithFields(
+			stdinCopy := run.Stdin.Copy()
+			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "creating stdout writer")...,
 			)
 			stdoutAppender := run.Stdout.WriteCloser()
-			run.Log.TraceWithFields(
+			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "creating stderr writer")...,
 			)
 			stderrAppender := run.Stdout.WriteCloser()
@@ -90,27 +97,27 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			parentLogWriter := run.Log.AddWriteCloserEntry()
 			go func() {
 				input, inputErr := ioutil.ReadAll(stdinCopy)
-				interpolator := NewInterpolatorWithInput(interpolatedArguments, arguments, input)
-				structparse.Strings(interpolator, interpolatedArguments)
+				fullInterpolator := newInterpolatorWithInput(interpolatedArguments, arguments, input)
+				structparse.Strings(fullInterpolator, interpolatedArguments)
 				executionContext.FullRun(
 					middleware.WithIdentifier(run.Identifier),
 					middleware.WithParentRun(run),
 					middleware.WithLogWriter(parentLogWriter),
 					middleware.WithArguments(interpolatedArguments),
 					middleware.WithSetupFunc(func(childRun *pipeline.Run) {
-						interpolator.log(childRun.Log, interpolateMiddleware)
+						fullInterpolator.log(childRun.Log, interpolateMiddleware)
 						childRun.Log.PossibleErrorWithExplanation(inputErr, "unable to find value for previous output")
-						childRun.Log.TraceWithFields(
+						childRun.Log.Trace(
 							fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 						)
 						childRun.Stdin.MergeWith(bytes.NewReader(input))
 					}),
 					middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
-						childRun.Log.TraceWithFields(
+						childRun.Log.Trace(
 							fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout")...,
 						)
 						childRun.Stdout.StartCopyingInto(stdoutAppender)
-						childRun.Log.TraceWithFields(
+						childRun.Log.Trace(
 							fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr")...,
 						)
 						childRun.Stderr.StartCopyingInto(stderrAppender)
@@ -125,13 +132,13 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 			return
 		}
 
-		interpolator.log(run.Log, interpolateMiddleware)
-		if len(interpolator.Substitutions) > 0 {
-			run.Log.TraceWithFields(
+		preliminaryInterpolator.log(run.Log, interpolateMiddleware)
+		if len(preliminaryInterpolator.Substitutions) > 0 {
+			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "creating parent stdout writer")...,
 			)
 			stdoutAppender := run.Stdout.WriteCloser()
-			run.Log.TraceWithFields(
+			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "creating parent stderr writer")...,
 			)
 			stderrAppender := run.Stderr.WriteCloser()
@@ -140,17 +147,17 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 				middleware.WithParentRun(run),
 				middleware.WithArguments(interpolatedArguments),
 				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
-					childRun.Log.TraceWithFields(
+					childRun.Log.Trace(
 						fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 					)
-					childRun.Stdin.MergeWith(run.Stdin.CopyOrResult())
+					childRun.Stdin.MergeWith(run.Stdin.Copy())
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
-					childRun.Log.TraceWithFields(
+					childRun.Log.Trace(
 						fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout writer")...,
 					)
 					childRun.Stdout.StartCopyingInto(stdoutAppender)
-					childRun.Log.TraceWithFields(
+					childRun.Log.Trace(
 						fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr writer")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrAppender)
@@ -168,7 +175,7 @@ func (interpolateMiddleware InterpolateMiddleware) Apply(
 	next(run)
 }
 
-type Interpolator struct {
+type interpolator struct {
 	ArgumentReplacements map[string]interface{}
 	completeInput        []byte
 	Errors               *multierror.Error
@@ -178,12 +185,12 @@ type Interpolator struct {
 	WaitGroup            *sync.WaitGroup
 }
 
-func NewInterpolatorWithInput(
+func newInterpolatorWithInput(
 	availableReplacements map[string]interface{},
 	middlewareArguments interpolateMiddlewareArguments,
 	completeInput []byte,
-) *Interpolator {
-	interpolator := Interpolator{
+) *interpolator {
+	interpolator := interpolator{
 		ArgumentReplacements: availableReplacements,
 		completeInput:        completeInput,
 		Errors:               nil,
@@ -195,14 +202,14 @@ func NewInterpolatorWithInput(
 	return &interpolator
 }
 
-func NewInterpolator(
+func newInterpolator(
 	availableReplacements map[string]interface{},
 	middlewareArguments interpolateMiddlewareArguments,
-) *Interpolator {
-	return NewInterpolatorWithInput(availableReplacements, middlewareArguments, nil)
+) *interpolator {
+	return newInterpolatorWithInput(availableReplacements, middlewareArguments, nil)
 }
 
-func (interpolator *Interpolator) ParseString(value string) interface{} {
+func (interpolator *interpolator) ParseString(value string) interface{} {
 	// we allow defining keys in terms of arguments and vice versa, within reason
 	result := interpolator.interpolateInput(value)
 
@@ -227,7 +234,7 @@ func (interpolator *Interpolator) ParseString(value string) interface{} {
 	return result
 }
 
-func (interpolator *Interpolator) interpolateInput(value string) string {
+func (interpolator *interpolator) interpolateInput(value string) string {
 	if strings.Contains(value, "$!!") {
 		interpolator.NeedCompleteInput = true
 		if interpolator.completeInput != nil {
@@ -239,7 +246,7 @@ func (interpolator *Interpolator) interpolateInput(value string) string {
 	return value
 }
 
-func (interpolator *Interpolator) interpolateArguments(value string) (string, error) {
+func (interpolator *interpolator) interpolateArguments(value string) (string, error) {
 	// we proceed even if we have no valid replacements
 	// as @? directives should still be processed
 	// and default values substituted
@@ -267,12 +274,12 @@ func (interpolator *Interpolator) interpolateArguments(value string) (string, er
 				// not finding a value does not necessarily indicate an error
 				// we might not end up executing the respective part of the pipe
 				return value, fmt.Errorf("unable to find value for argument: `%v` (this might be fine)", key)
-			} else {
-				// note that match[3] might be "", but we do want to allow expressions
-				// of the form `@{key|}` that do not throw an error if the value can't be found
-				interpolator.Substitutions[key] = match[3]
-				value = strings.Replace(value, match[0], match[3], 1)
 			}
+
+			// note that match[3] might be "", but we do want to allow expressions
+			// of the form `@{key|}` that do not throw an error if the value can't be found
+			interpolator.Substitutions[key] = match[3]
+			value = strings.Replace(value, match[0], match[3], 1)
 		} else {
 			switch typedReplacement := replacement.(type) {
 			case string:
@@ -301,10 +308,10 @@ func (interpolator *Interpolator) interpolateArguments(value string) (string, er
 	return value, nil
 }
 
-func (interpolator *Interpolator) log(logger *pipeline.Logger, interpolateMiddleware InterpolateMiddleware) {
+func (interpolator *interpolator) log(logger *pipeline.Logger, interpolateMiddleware Middleware) {
 	if interpolator.Errors != nil && interpolator.Errors.Len() > 0 {
 		if !interpolator.MiddlewareArguments.IgnoreWarnings {
-			logger.WarnWithFields(
+			logger.Warn(
 				fields.Symbol("⚠️"),
 				fields.Message("warning"),
 				fields.Info(interpolator.Errors.Errors),
@@ -315,14 +322,14 @@ func (interpolator *Interpolator) log(logger *pipeline.Logger, interpolateMiddle
 		switch len(interpolator.Substitutions) {
 		case 0:
 		case 1:
-			logger.DebugWithFields(
+			logger.Debug(
 				fields.Symbol("⎆"),
 				fields.Message("made 1 substitution"),
 				fields.Info(interpolator.Substitutions),
 				fields.Middleware(interpolateMiddleware),
 			)
 		default:
-			logger.DebugWithFields(
+			logger.Debug(
 				fields.Symbol("⎆"),
 				fields.Message(fmt.Sprintf("made %v substitutions", len(interpolator.Substitutions))),
 				fields.Info(interpolator.Substitutions),

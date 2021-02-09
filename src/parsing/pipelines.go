@@ -8,6 +8,7 @@ import (
 	"syscall"
 )
 
+// BuiltInPipelineFilePaths lists the file paths of all built-in pipelines
 func (parser *Parser) BuiltInPipelineFilePaths(projectPath string) ([]string, error) {
 	resolvedPipesPath, err := filepath.EvalSymlinks(path.Join(projectPath, "pipedream_pipes"))
 	if err != nil {
@@ -32,6 +33,7 @@ func (parser *Parser) BuiltInPipelineFilePaths(projectPath string) ([]string, er
 	return matches, nil
 }
 
+// UserPipelineFilePaths lists the file paths of all user-defined pipelines
 func (parser *Parser) UserPipelineFilePaths(args []string) ([]string, error) {
 	pipelineFilePaths := make([]string, 0, 10)
 	if len(args) == 1 {

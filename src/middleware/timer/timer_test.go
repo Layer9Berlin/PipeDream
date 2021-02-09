@@ -33,14 +33,14 @@ func TestTimer_WithValidArguments_RecordsExecutionTime(t *testing.T) {
 	}
 
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"timer": map[string]interface{}{
 			"record": true,
 		},
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewTimerMiddlewareWithProvider(timeProvider).Apply(run,
+	NewMiddlewareWithProvider(timeProvider).Apply(run,
 		func(run *pipeline.Run) {},
 		nil,
 	)
@@ -60,14 +60,14 @@ func TestTimer_WithInvalidArguments_ThrowsError(t *testing.T) {
 	}
 
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"timer": []string{
 			"invalid",
 		},
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewTimerMiddlewareWithProvider(&timeProvider).Apply(run,
+	NewMiddlewareWithProvider(&timeProvider).Apply(run,
 		func(run *pipeline.Run) {},
 		nil,
 	)
@@ -88,10 +88,10 @@ func TestTimer_NoArguments_DeactivateTimer(t *testing.T) {
 	}
 
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, nil, nil, nil)
+	run, _ := pipeline.NewRun(&identifier, nil, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewTimerMiddlewareWithProvider(&timeProvider).Apply(run,
+	NewMiddlewareWithProvider(&timeProvider).Apply(run,
 		func(run *pipeline.Run) {},
 		nil,
 	)
@@ -104,14 +104,14 @@ func TestTimer_NoArguments_DeactivateTimer(t *testing.T) {
 
 func TestDefaultTimeProvider(t *testing.T) {
 	identifier := "test"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"timer": map[string]interface{}{
 			"record": true,
 		},
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewTimerMiddleware().Apply(run,
+	NewMiddleware().Apply(run,
 		func(run *pipeline.Run) {},
 		nil,
 	)

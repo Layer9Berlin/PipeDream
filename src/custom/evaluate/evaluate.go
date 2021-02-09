@@ -6,8 +6,8 @@ import (
 	"gopkg.in/Knetic/govaluate.v2"
 )
 
-// Evaluate an expression that is assumed to be boolean
-func EvaluateBool(condition string) (bool, error) {
+// Bool evaluates an expression that is assumed to be boolean
+func Bool(condition string) (bool, error) {
 	expression, err := govaluate.NewEvaluableExpression(condition)
 	if err != nil {
 		return false, fmt.Errorf("error parsing condition %q: %w", condition, err)

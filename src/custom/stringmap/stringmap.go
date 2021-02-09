@@ -1,4 +1,4 @@
-// Convenience functions for maps with string keys
+// Package stringmap contains convenience functions for maps with string keys
 package stringmap
 
 import (
@@ -6,8 +6,12 @@ import (
 	"github.com/hashicorp/go-multierror"
 )
 
+// StringMap is a map with string keys and arbitrary values
 type StringMap = map[string]interface{}
 
+// CopyMap creates a deep copy of a StringMap
+//
+// The copy can be safely mutated without changing nested keys of the original StringMap.
 func CopyMap(otherMap StringMap) StringMap {
 	if otherMap == nil {
 		return make(StringMap, 0)
@@ -47,11 +51,12 @@ func copyValue(value interface{}) interface{} {
 	}
 }
 
-// merge values from another map into the subject:
-// for each key path at which the subject does not have a value,
-// this will set the value from the other map
-// even if the subject has a value at a prefix of the key path
-// existing values - including nil - will not be overwritten
+// MergeIntoMap deep merges values from one StringMap into another
+//
+// For each key path at which subject does not have a value,
+// this will set the value from otherMap
+// even if subject has a value at a prefix of the key path.
+// Existing values - including nil - at matching complete paths will not be overwritten.
 func MergeIntoMap(subject StringMap, otherMap StringMap) error {
 	if subject == nil || otherMap == nil {
 		return nil
@@ -87,25 +92,27 @@ func MergeIntoMap(subject StringMap, otherMap StringMap) error {
 	return allErrors.ErrorOrNil()
 }
 
+// GetValueInMap returns the value of a nested StringMap at the specified path
 func GetValueInMap(searchedMap map[string]interface{}, path ...string) (interface{}, error) {
 	firstComponent, restOfPath := path[0], path[1:]
 	existingValue, haveExistingValue := searchedMap[firstComponent]
 	if haveExistingValue {
 		if len(restOfPath) == 0 {
 			return existingValue, nil
-		} else {
-			nestedMap, haveNestedMap := existingValue.(map[string]interface{})
-			if haveNestedMap {
-				return GetValueInMap(nestedMap, restOfPath...)
-			} else {
-				return nil, fmt.Errorf("value does not exist at path")
-			}
 		}
-	} else {
+
+		nestedMap, haveNestedMap := existingValue.(map[string]interface{})
+		if haveNestedMap {
+			return GetValueInMap(nestedMap, restOfPath...)
+		}
 		return nil, fmt.Errorf("value does not exist at path")
 	}
+	return nil, fmt.Errorf("value does not exist at path")
 }
 
+// SetValueInMap fixes the value of a nested StringMap at the specified path
+//
+// Additional levels of nesting will be created if necessary.
 func SetValueInMap(mapToChange map[string]interface{}, value interface{}, path ...string) error {
 	firstComponent, restOfPath := path[0], path[1:]
 	nextValue, haveNextValue := mapToChange[firstComponent]
@@ -116,12 +123,11 @@ func SetValueInMap(mapToChange map[string]interface{}, value interface{}, path .
 	if len(restOfPath) == 0 {
 		mapToChange[firstComponent] = value
 		return nil
-	} else {
-		nestedMap, haveNestedMap := nextValue.(map[string]interface{})
-		if haveNestedMap {
-			return SetValueInMap(nestedMap, value, restOfPath...)
-		} else {
-			return fmt.Errorf("failed to set new value, encountered something other than a string map")
-		}
 	}
+
+	nestedMap, haveNestedMap := nextValue.(map[string]interface{})
+	if haveNestedMap {
+		return SetValueInMap(nestedMap, value, restOfPath...)
+	}
+	return fmt.Errorf("failed to set new value, encountered something other than a string map")
 }

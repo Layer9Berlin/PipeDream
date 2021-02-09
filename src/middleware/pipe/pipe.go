@@ -10,23 +10,29 @@ import (
 	"strings"
 )
 
-// Invocation Chain
-type PipeMiddleware struct{}
+// Middleware is an invocation chainer
+type Middleware struct{}
 
-func (pipeMiddleware PipeMiddleware) String() string {
+func (pipeMiddleware Middleware) String() string {
 	return "pipe"
 }
 
-func NewPipeMiddleware() PipeMiddleware {
-	return PipeMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (pipeMiddleware PipeMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (pipeMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	arguments := make([]pipeline.PipelineReference, 0, 10)
+	arguments := make([]pipeline.Reference, 0, 10)
 	pipeline.ParseArguments(&arguments, "pipe", run)
 
 	haveChildren := len(arguments) > 0
@@ -51,7 +57,7 @@ func (pipeMiddleware PipeMiddleware) Apply(
 
 		switch len(info) {
 		case 0:
-			run.Log.DebugWithFields(
+			run.Log.Debug(
 				fields.Symbol("⇣"),
 				fields.Message("no invocation"),
 				fields.Middleware(pipeMiddleware),
@@ -59,13 +65,13 @@ func (pipeMiddleware PipeMiddleware) Apply(
 			next(run)
 			return
 		case 1:
-			run.Log.DebugWithFields(
+			run.Log.Debug(
 				fields.Symbol("⇣"),
 				fields.Message("single invocation: "+strings.Join(info, ", ")),
 				fields.Middleware(pipeMiddleware),
 			)
 		default:
-			run.Log.DebugWithFields(
+			run.Log.Debug(
 				fields.Symbol("⇣"),
 				fields.Message("invocation chain: "+strings.Join(info, ", ")),
 				fields.Middleware(pipeMiddleware),
@@ -81,19 +87,19 @@ func (pipeMiddleware PipeMiddleware) Apply(
 				middleware.WithArguments(childRunArguments),
 				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
 					if index == 0 {
-						childRun.Log.TraceWithFields(
+						childRun.Log.Trace(
 							fields.DataStream(pipeMiddleware, "merging parent stdin into stdin")...,
 						)
 						childRun.Stdin.MergeWith(run.Stdin.Copy())
 					} else {
-						childRun.Log.TraceWithFields(
+						childRun.Log.Trace(
 							fields.DataStream(pipeMiddleware, "merging previous stdout into stdin")...,
 						)
 						childRun.Stdin.MergeWith(previousOutput)
 					}
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
-					childRun.Log.TraceWithFields(
+					childRun.Log.Trace(
 						fields.DataStream(pipeMiddleware, "copying stdout")...,
 					)
 					// write to the next run's input
@@ -101,7 +107,7 @@ func (pipeMiddleware PipeMiddleware) Apply(
 					previousOutput = childRun.Stdout.Copy()
 				}))
 		}
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.DataStream(pipeMiddleware, "merging last child's stdout into stdout")...,
 		)
 		run.Stdout.MergeWith(previousOutput)

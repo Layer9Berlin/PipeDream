@@ -10,32 +10,39 @@ import (
 	"time"
 )
 
-// Execution Synchronizer
-type SyncMiddleware struct {
+// Middleware is an execution synchronizer
+type Middleware struct {
 	LookupEnv func(string) (string, bool)
 }
 
-func (syncMiddleware SyncMiddleware) String() string {
+// String is a human-readable description
+func (syncMiddleware Middleware) String() string {
 	return "sync"
 }
 
-func NewSyncMiddleware() SyncMiddleware {
-	return SyncMiddleware{
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{
 		LookupEnv: os.LookupEnv,
 	}
 }
 
-type SyncMiddlewareArguments struct {
+type middlewareArguments struct {
 	Pipes   []string
 	EnvVars []string
 }
 
-func (syncMiddleware SyncMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (syncMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
-	arguments := SyncMiddlewareArguments{}
+	arguments := middlewareArguments{}
 	pipeline.ParseArguments(&arguments, "sync", run)
 
 	if arguments.Pipes != nil {
@@ -43,7 +50,7 @@ func (syncMiddleware SyncMiddleware) Apply(
 			for _, dependentRun := range executionContext.Runs {
 				if dependentRun.Identifier != nil && *dependentRun.Identifier == pipelineIdentifier {
 					run.StartWaitGroup.Add(1)
-					run.Log.DebugWithFields(
+					run.Log.Debug(
 						fields.Symbol("🕙"),
 						fields.Message(fmt.Sprintf("waiting for run %q", pipelineIdentifier)),
 						fields.Middleware(syncMiddleware),
@@ -61,7 +68,7 @@ func (syncMiddleware SyncMiddleware) Apply(
 		for _, envVar := range arguments.EnvVars {
 			run.StartWaitGroup.Add(1)
 			envVar := envVar
-			run.Log.DebugWithFields(
+			run.Log.Debug(
 				fields.Symbol("🕙"),
 				fields.Message(fmt.Sprintf("waiting for env var %q to be set", envVar)),
 				fields.Middleware(syncMiddleware),

@@ -1,6 +1,7 @@
-// Provides a representation of a yaml pipeline file as a Go struct
 package pipeline
 
+// File is a representation of a yaml pipeline file as a Go struct
+//
 // Note that this struct does not have exactly the same structure as the yaml file
 type File struct {
 	Default  DefaultSettings
@@ -15,10 +16,12 @@ type File struct {
 	Private map[string]map[string]interface{}
 }
 
-type PipelineFileImportSkeleton struct {
+// FileImportSkeleton is a very basic representation of a yaml pipeline file concerned only with import declarations
+type FileImportSkeleton struct {
 	Import []string
 }
 
+// DefaultSettings are file-level options (to be refined in future)
 type DefaultSettings struct {
 	Command string
 	Dir     string

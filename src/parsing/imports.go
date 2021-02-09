@@ -16,7 +16,7 @@ func (parser *Parser) recursiveImportStep(unprocessedFilePaths []string, process
 		if err != nil {
 			return nil, err
 		}
-		importSkeleton := pipeline.PipelineFileImportSkeleton{}
+		importSkeleton := pipeline.FileImportSkeleton{}
 		err = yaml.Unmarshal(fileData, &importSkeleton)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing %q: %w", filePath, err)

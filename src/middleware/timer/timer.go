@@ -9,44 +9,53 @@ import (
 )
 
 // Execution Time Recorder
-type TimeProvider interface {
+type timeProvider interface {
 	Now() time.Time
 	Since(time time.Time) time.Duration
 }
 
 type defaultTimeProvider struct{}
 
-func (_ defaultTimeProvider) Now() time.Time {
+func (defaultTimeProvider) Now() time.Time {
 	return time.Now()
 }
 
-func (_ defaultTimeProvider) Since(startTime time.Time) time.Duration {
+func (defaultTimeProvider) Since(startTime time.Time) time.Duration {
 	return time.Since(startTime)
 }
 
-type TimerMiddleware struct {
-	timeProvider TimeProvider
+// Middleware is an execution time recorder
+type Middleware struct {
+	timeProvider timeProvider
 }
 
 type timerMiddlewareArguments struct {
 	Record bool
 }
 
-func (timerMiddleware TimerMiddleware) String() string {
+// String is a human-readable description
+func (timerMiddleware Middleware) String() string {
 	return "timer"
 }
 
-func NewTimerMiddleware() TimerMiddleware {
-	return NewTimerMiddlewareWithProvider(defaultTimeProvider{})
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return NewMiddlewareWithProvider(defaultTimeProvider{})
 }
 
-func NewTimerMiddlewareWithProvider(timeProvider TimeProvider) TimerMiddleware {
-	return TimerMiddleware{
+// NewMiddlewareWithProvider creates a new middleware instance with the specified time provider
+func NewMiddlewareWithProvider(timeProvider timeProvider) Middleware {
+	return Middleware{
 		timeProvider: timeProvider,
 	}
 }
 
-func (timerMiddleware TimerMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (timerMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -57,7 +66,7 @@ func (timerMiddleware TimerMiddleware) Apply(
 	pipeline.ParseArguments(&arguments, "timer", run)
 
 	if arguments.Record {
-		run.Log.TraceWithFields(
+		run.Log.Trace(
 			fields.Symbol("🕑"),
 			fields.Message("starting execution timer..."),
 			fields.Middleware(timerMiddleware),
@@ -65,7 +74,7 @@ func (timerMiddleware TimerMiddleware) Apply(
 		start := timerMiddleware.timeProvider.Now()
 		next(run)
 		recordDuration := timerMiddleware.timeProvider.Since(start)
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("🕑"),
 			fields.Message("execution time"),
 			fields.Info(recordDuration),

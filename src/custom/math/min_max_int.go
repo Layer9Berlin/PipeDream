@@ -1,6 +1,7 @@
-// Custom functions extending the native `math` package
+// Package math contains custom functions extending the native `math` package
 package math
 
+// MaxInt returns the larger of two integers
 func MaxInt(a int, b int) int {
 	if a > b {
 		return a
@@ -8,6 +9,7 @@ func MaxInt(a int, b int) int {
 	return b
 }
 
+// MinInt returns the smaller of two integers
 func MinInt(a int, b int) int {
 	if a < b {
 		return a

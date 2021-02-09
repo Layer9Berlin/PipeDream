@@ -1,2 +1,2 @@
-// Custom functions extending the native `io` package
+// Package io contains custom functions extending the native `io` package
 package io

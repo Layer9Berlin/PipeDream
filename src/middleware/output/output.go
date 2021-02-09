@@ -8,40 +8,47 @@ import (
 	"io/ioutil"
 )
 
-// Output Interceptor
-type OutputMiddleware struct {
+// Middleware is an output interceptor
+type Middleware struct {
 }
 
-func (outputMiddleware OutputMiddleware) String() string {
+// String is a human-readable description
+func (outputMiddleware Middleware) String() string {
 	return "output"
 }
 
-func NewOutputMiddleware() OutputMiddleware {
-	return OutputMiddleware{}
+// NewMiddleware creates a new middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-type OutputMiddlewareArguments struct {
+type middlewareArguments struct {
 	Text *string
 }
 
-func NewOutputMiddlewareArguments() OutputMiddlewareArguments {
-	return OutputMiddlewareArguments{
+func newMiddlewareArguments() middlewareArguments {
+	return middlewareArguments{
 		Text: nil,
 	}
 }
 
-func (outputMiddleware OutputMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (outputMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
-	arguments := NewOutputMiddlewareArguments()
+	arguments := newMiddlewareArguments()
 	pipeline.ParseArguments(&arguments, "output", run)
 
 	next(run)
 
 	if arguments.Text != nil {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("↗️️"),
 			fields.Message(*arguments.Text),
 			fields.Middleware(outputMiddleware),

@@ -19,34 +19,34 @@ import (
 	"syscall"
 )
 
-func WithUserPromptImplementation(implementation func(
-	label string,
-	items []string,
-	initialSelection int,
-	size int,
-	input io.ReadCloser,
-	output io.WriteCloser,
-) (int, string, error)) ExecutionContextOption {
-	return func(executionContext *ExecutionContext) {
-		executionContext.UserPromptImplementation = implementation
-	}
-}
-
+// ExecutionContext is the data model keeping track of everything required to execute a pipeline file
 type ExecutionContext struct {
-	PipelineFiles   []pipeline.File
-	Definitions     pipeline.PipelineDefinitionsLookup
+	// SelectableFiles is a list of filenames of all pipeline files in the current directory
+	//
+	// Only one file can be selected for execution, but all files will be parsed.
+	SelectableFiles []string
+	// PipelineFiles is a list of pipeline files in the current directory, including recursive imports
+	PipelineFiles []pipeline.File
+	// Definitions contains all pipeline definitions in the PipelineFiles, as well as built-in pipes
+	Definitions pipeline.DefinitionsLookup
+	// MiddlewareStack is a list of middleware items that will be executed in turn
 	MiddlewareStack []Middleware
-	Defaults        pipeline.DefaultSettings
-	Hooks           pipeline.HookDefinitions
+	// Defaults contains some execution options that can be set at file level
+	Defaults pipeline.DefaultSettings
+	// Hooks can execute certain functions before or after pipeline execution
+	//
+	// Currently not implemented or used.
+	Hooks pipeline.HookDefinitions
 
+	// Log is the execution context's logger
 	Log *logrus.Logger
 
-	ProjectPath  string
+	// ProjectPath is the directory in which the tool is currently executing
+	ProjectPath string
+	// RootFileName is the name of the file selected for execution
 	RootFileName string
 
 	rootRun *pipeline.Run
-
-	SelectableFiles []string
 
 	Runs []*pipeline.Run
 
@@ -58,6 +58,9 @@ type ExecutionContext struct {
 
 	parser *parsing.Parser
 
+	// UserPromptImplementation by default shows an interactive prompt to the user
+	//
+	// Can be overwritten if you need a different implementation e.g. for tests.
 	UserPromptImplementation func(
 		label string,
 		items []string,
@@ -68,6 +71,7 @@ type ExecutionContext struct {
 	) (int, string, error)
 }
 
+// NewExecutionContext creates a new ExecutionContext with the specified options
 func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 	executionContext := &ExecutionContext{
 		parser:                   parsing.NewParser(),
@@ -83,6 +87,7 @@ func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 	return executionContext
 }
 
+// CancelAll cancels all active runs
 func (executionContext *ExecutionContext) CancelAll() error {
 	err := &multierror.Error{}
 	for _, run := range executionContext.Runs {
@@ -91,18 +96,19 @@ func (executionContext *ExecutionContext) CancelAll() error {
 	return err.ErrorOrNil()
 }
 
+// FullRun starts the complete execution procedure for a nested pipeline, unwinding the entire middleware stack again
 func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pipeline.Run {
 	runOptions := FullRunOptions{}
 	for _, option := range options {
 		option(&runOptions)
 	}
-	var pipelineDefinition *pipeline.PipelineDefinition = nil
+	var pipelineDefinition *pipeline.Definition = nil
 	if runOptions.pipelineIdentifier != nil {
 		if definition, ok := LookUpPipelineDefinition(executionContext.Definitions, *runOptions.pipelineIdentifier, executionContext.RootFileName); ok {
 			pipelineDefinition = definition
 		}
 	}
-	pipelineRun, err := pipeline.NewPipelineRun(runOptions.pipelineIdentifier, runOptions.arguments, pipelineDefinition, runOptions.parentRun)
+	pipelineRun, err := pipeline.NewRun(runOptions.pipelineIdentifier, runOptions.arguments, pipelineDefinition, runOptions.parentRun)
 	if err != nil {
 		panic(fmt.Errorf("failed to create pipeline run: %w", err))
 	}
@@ -111,7 +117,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 	}
 	if runOptions.logWriter == nil {
 		if runOptions.parentRun != nil {
-			runOptions.parentRun.Log.DebugWithFields(
+			runOptions.parentRun.Log.Debug(
 				fields.Symbol("🏃"),
 				fields.Message("full run"),
 				fields.Info(pipelineRun.String()),
@@ -144,7 +150,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 			}()
 		}
 	}
-	pipelineRun.Log.DebugWithFields(
+	pipelineRun.Log.Debug(
 		fields.Message("starting"),
 		fields.Info(pipelineRun.String()),
 		fields.Symbol("▶️"),
@@ -180,7 +186,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 		pipelineRun.Stdin.Wait()
 		stdin := pipelineRun.Stdin.String()
 		if len(stdin) > 0 {
-			pipelineRun.Log.TraceWithFields(
+			pipelineRun.Log.Trace(
 				fields.Message("input"),
 				fields.Info(stdin),
 				fields.Symbol("↘️️"),
@@ -194,7 +200,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 		pipelineRun.Stdout.Wait()
 		stdout := pipelineRun.Stdout.String()
 		if len(stdout) > 0 {
-			pipelineRun.Log.TraceWithFields(
+			pipelineRun.Log.Trace(
 				fields.Message("output"),
 				fields.Info(stdout),
 				fields.Symbol("↗️"),
@@ -207,6 +213,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 	return pipelineRun
 }
 
+// PipelineFileAtPath returns a *pipeline.File corresponding to the parsed pipeline file at the given path, if any
 func (executionContext *ExecutionContext) PipelineFileAtPath(path string) (*pipeline.File, error) {
 	for _, file := range executionContext.PipelineFiles {
 		if file.FileName == path {
@@ -216,7 +223,8 @@ func (executionContext *ExecutionContext) PipelineFileAtPath(path string) (*pipe
 	return nil, fmt.Errorf("file not found")
 }
 
-func LookUpPipelineDefinition(definitionsLookup pipeline.PipelineDefinitionsLookup, identifier string, rootFileName string) (*pipeline.PipelineDefinition, bool) {
+// LookUpPipelineDefinition looks for a particular pipeline within the already parsed deinitions
+func LookUpPipelineDefinition(definitionsLookup pipeline.DefinitionsLookup, identifier string, rootFileName string) (*pipeline.Definition, bool) {
 	definitions, ok := definitionsLookup[identifier]
 	if !ok {
 		return nil, false
@@ -224,8 +232,8 @@ func LookUpPipelineDefinition(definitionsLookup pipeline.PipelineDefinitionsLook
 	// pipelines defined in the same file take precedence,
 	// then the first public pipeline
 	// private pipelines in other files will only be invoked if there is no public match
-	var firstPublicMatch *pipeline.PipelineDefinition = nil
-	var firstPrivateMatch *pipeline.PipelineDefinition = nil
+	var firstPublicMatch *pipeline.Definition = nil
+	var firstPrivateMatch *pipeline.Definition = nil
 	for _, definition := range definitions {
 		// need to copy here to prevent modification of saved result by for loop
 		definitionCopy := definition
@@ -257,12 +265,13 @@ func (executionContext *ExecutionContext) unwindStack(
 	}
 }
 
+// Execute runs a pipeline and outputs the result
 func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, stdoutWriter io.Writer, stderrWriter io.Writer) {
 
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
 	setUpCancelHandler(func() {
-		err := executionContext.Cancel()
+		err := executionContext.CancelAll()
 		if err != nil {
 			fmt.Printf("Failed to cancel: %v", err)
 		}
@@ -276,6 +285,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 	outputErrors(executionContext.errors, stderrWriter)
 }
 
+// SetUpPipelines collects and parses all relevant pipeline files
 func (executionContext *ExecutionContext) SetUpPipelines(args []string) error {
 	executionContext.Log.Tracef("Setting up pipelines...")
 
@@ -342,14 +352,4 @@ func setUpCancelHandler(handler func()) {
 		close(signalChannel)
 		signal.Reset(os.Interrupt, syscall.SIGTERM)
 	}()
-}
-
-func (executionContext *ExecutionContext) Cancel() error {
-	err := &multierror.Error{}
-	for _, run := range executionContext.Runs {
-		if !run.Completed() {
-			err = multierror.Append(err, run.Cancel())
-		}
-	}
-	return err.ErrorOrNil()
 }

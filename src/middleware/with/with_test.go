@@ -11,7 +11,7 @@ import (
 )
 
 func TestWith_Pattern(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"with": map[string]interface{}{
 			"pattern": "(?m)^test.*",
 		},
@@ -19,7 +19,7 @@ func TestWith_Pattern(t *testing.T) {
 
 	waitGroup := &sync.WaitGroup{}
 	allInputs := make([]string, 0, 3)
-	NewWithMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\ntest1\nbla\ntest2\ntest3\nend\n"))
@@ -48,9 +48,9 @@ func TestWith_Pattern(t *testing.T) {
 }
 
 func TestWith_NoPattern(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, nil, nil, nil)
+	run, _ := pipeline.NewRun(nil, nil, nil, nil)
 
-	NewWithMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\ntest1\nbla\ntest2\ntest3\nend\n"))
@@ -67,13 +67,13 @@ func TestWith_NoPattern(t *testing.T) {
 }
 
 func TestWith_NoMatch(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"with": map[string]interface{}{
 			"pattern": "(?m)^test.*",
 		},
 	}, nil, nil)
 
-	NewWithMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))
@@ -89,13 +89,13 @@ func TestWith_NoMatch(t *testing.T) {
 }
 
 func TestWith_PatternDoesNotCompile(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"with": map[string]interface{}{
 			"pattern": "(?m^test.*",
 		},
 	}, nil, nil)
 
-	NewWithMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
 			run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))

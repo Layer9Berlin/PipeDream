@@ -28,7 +28,7 @@ func TestRun_Output_outputResult_nil(t *testing.T) {
 func TestRun_outputLogs(t *testing.T) {
 	buffer := new(bytes.Buffer)
 	outputLogs(&pipeline.Run{
-		Log: pipeline.NewClosedPipelineRunLoggerWithResult(bytes.NewBuffer([]byte("test"))),
+		Log: pipeline.NewClosedLoggerWithResult(bytes.NewBuffer([]byte("test"))),
 	}, buffer)
 	require.Equal(t, fmt.Sprintln("====== LOGS ======\ntest"), buffer.String())
 }

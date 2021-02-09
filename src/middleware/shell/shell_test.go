@@ -14,13 +14,13 @@ import (
 )
 
 func TestShell_NonRunnable(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, nil)
 
 	testWaitGroup := &sync.WaitGroup{}
 	testWaitGroup.Add(1)
 	nextExecuted := false
 	run.Log.SetLevel(logrus.DebugLevel)
-	NewShellMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
@@ -39,7 +39,7 @@ func TestShell_NonRunnable(t *testing.T) {
 
 func TestShell_ChangeDir(t *testing.T) {
 	identifier := "command-identifier"
-	run, _ := pipeline.NewPipelineRun(&identifier, map[string]interface{}{
+	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"dir": "test",
 			"run": "something",
@@ -75,7 +75,7 @@ func TestShell_ChangeDir(t *testing.T) {
 }
 
 func TestShell_RunWithArguments(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"args": []interface{}{
 				map[string]interface{}{
@@ -132,7 +132,7 @@ func TestShell_RunWithArguments(t *testing.T) {
 }
 
 func TestShell_InvalidArguments(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"args": []interface{}{
 				[]interface{}{
@@ -162,7 +162,7 @@ func TestShell_InvalidArguments(t *testing.T) {
 }
 
 func TestShell_Login(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"login": true,
 			"run":   "something",
@@ -193,7 +193,7 @@ func TestShell_Login(t *testing.T) {
 }
 
 func TestShell_NonZeroExitCode(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"login": true,
 			"run":   "something",
@@ -227,7 +227,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 }
 
 //func TestShell_Interactive(t *testing.T) {
-//	run, _ := models.NewPipelineRun(nil, map[string]interface{}{
+//	run, _ := models.NewRun(nil, map[string]interface{}{
 //		"shell": map[string]interface{}{
 //			"interactive": true,
 //			"run":         "something",
@@ -244,7 +244,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 //		osStdin:         osStdin,
 //		osStdout:        osStdout,
 //		osStderr:        osStderr,
-//		ExecutorCreator: func() CommandExecutor { return executor },
+//		ExecutorCreator: func() commandExecutor { return executor },
 //	}
 //	shellCommandInput := ""
 //	go func() {
@@ -317,7 +317,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 //}
 
 func TestShell_WaitError(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "something",
 		},
@@ -325,11 +325,11 @@ func TestShell_WaitError(t *testing.T) {
 
 	executor := NewTestCommandExecutor()
 	executor.WaitError = fmt.Errorf("test error")
-	shellMiddleware := ShellMiddleware{
+	shellMiddleware := Middleware{
 		osStdin:         new(bytes.Buffer),
 		osStdout:        new(bytes.Buffer),
 		osStderr:        new(bytes.Buffer),
-		ExecutorCreator: func() CommandExecutor { return executor },
+		ExecutorCreator: func() commandExecutor { return executor },
 	}
 	shellMiddleware.Apply(
 		run,
@@ -344,7 +344,7 @@ func TestShell_WaitError(t *testing.T) {
 }
 
 func TestShell_UnmockedCommand(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "echo \"Test\"",
 		},
@@ -354,7 +354,7 @@ func TestShell_UnmockedCommand(t *testing.T) {
 	testWaitGroup.Add(1)
 	nextExecuted := false
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewShellMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {
 			defer testWaitGroup.Done()
@@ -373,14 +373,14 @@ func TestShell_UnmockedCommand(t *testing.T) {
 }
 
 func TestShell_CancelHook(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "read",
 		},
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewShellMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {
 		},
@@ -397,7 +397,7 @@ func TestShell_CancelHook(t *testing.T) {
 }
 
 func TestShell_PrintfRun(t *testing.T) {
-	run, err := pipeline.NewPipelineRun(
+	run, err := pipeline.NewRun(
 		nil,
 		map[string]interface{}{
 			"shell": map[string]interface{}{
@@ -410,7 +410,7 @@ func TestShell_PrintfRun(t *testing.T) {
 	require.Nil(t, err)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewShellMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(run *pipeline.Run) {
 		},
@@ -491,7 +491,7 @@ func NewTestCommandExecutor() *TestCommandExecutor {
 	}
 }
 
-func NewTestShellMiddleware() (*TestCommandExecutor, ShellMiddleware) {
+func NewTestShellMiddleware() (*TestCommandExecutor, Middleware) {
 	executor := NewTestCommandExecutor()
-	return executor, NewShellMiddlewareWithExecutorCreator(func() CommandExecutor { return executor })
+	return executor, NewMiddlewareWithExecutorCreator(func() commandExecutor { return executor })
 }

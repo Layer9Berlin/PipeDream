@@ -1,7 +1,6 @@
 package run
 
 import (
-	"errors"
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/custom/strings"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
@@ -41,7 +40,7 @@ func letUserSelectPipelineFile(executionContext *middleware.ExecutionContext, se
 	)
 
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("prompt failed: %v", err))
+		return nil, fmt.Errorf("prompt failed: %w", err)
 	}
 
 	return executionContext.PipelineFileAtPath(pipelineFiles[resultIndex])
@@ -97,7 +96,7 @@ func letUserSelectPipelineFileAndPipeline(
 	)
 
 	if err != nil {
-		return "", pipelineFile.FileName, errors.New(fmt.Sprintf("prompt failed: %v", err))
+		return "", pipelineFile.FileName, fmt.Errorf("prompt failed: %w", err)
 	}
 
 	return pipelineIdentifiers[resultIndex], pipelineFile.FileName, nil

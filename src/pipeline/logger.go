@@ -15,8 +15,8 @@ import (
 	"sync"
 )
 
-// To keep track of log entries while several pipeline runs might be executing asynchronously,
-// each run has its own logger. It needs to:
+// Logger keeps track of a pipeline run's log entries while several pipeline runs might be executing asynchronously.
+// It needs to:
 // - implement the io.Reader interface
 // - be non-blocking, even when its output is not yet being read
 // - keep a running total of the number of log entries at each log level, as well as all errors
@@ -29,7 +29,6 @@ type Logger struct {
 	run         *Run
 	Indentation int
 	errors      *multierror.Error
-	logBuffer   *bytes.Buffer
 
 	logCountTrace   int
 	logCountDebug   int
@@ -40,16 +39,13 @@ type Logger struct {
 	closureMutex *sync.Mutex
 	closed       bool
 
-	completed           bool
-	completionMutex     *sync.Mutex
-	completionWaitGroup *sync.WaitGroup
-
 	ErrorCallback func(error)
 
 	unreadBuffer []byte
 }
 
-func NewPipelineRunLogger(run *Run, indentation int) *Logger {
+// NewLogger creates a new Logger
+func NewLogger(run *Run, indentation int) *Logger {
 	logger := logrus.New()
 	logger.Formatter = logging.CustomFormatter{}
 	logger.SetLevel(logging.UserPipeLogLevel)
@@ -58,17 +54,12 @@ func NewPipelineRunLogger(run *Run, indentation int) *Logger {
 	numInfoLogs := 0
 	numWarningLogs := 0
 	numErrorLogs := 0
-	logBuffer := new(bytes.Buffer)
-	logger.SetOutput(logBuffer)
-	completionWaitGroup := &sync.WaitGroup{}
-	completionWaitGroup.Add(1)
 
 	return &Logger{
 		baseLogger:  logger,
 		run:         run,
 		Indentation: indentation,
 		errors:      nil,
-		logBuffer:   logBuffer,
 
 		logCountTrace:   numTraceLogs,
 		logCountDebug:   numDebugLogs,
@@ -76,26 +67,22 @@ func NewPipelineRunLogger(run *Run, indentation int) *Logger {
 		logCountWarning: numWarningLogs,
 		logCountError:   numErrorLogs,
 
-		completed:           false,
-		completionMutex:     &sync.Mutex{},
-		completionWaitGroup: completionWaitGroup,
-		closureMutex:        &sync.Mutex{},
-		closed:              false,
+		closureMutex: &sync.Mutex{},
+		closed:       false,
 
 		unreadBuffer: make([]byte, 0, 1024),
 	}
 }
 
-func NewClosedPipelineRunLoggerWithResult(buffer *bytes.Buffer) *Logger {
-	completionWaitGroup := &sync.WaitGroup{}
+// NewClosedLoggerWithResult creates a new Logger that is already closed with the specified result
+func NewClosedLoggerWithResult(buffer *bytes.Buffer) *Logger {
 	return &Logger{
-		completed:           true,
-		completionWaitGroup: completionWaitGroup,
-		closed:              true,
-		unreadBuffer:        buffer.Bytes(),
+		closed:       true,
+		unreadBuffer: buffer.Bytes(),
 	}
 }
 
+// Close finalizes the log, preventing further entries from being logged
 func (logger *Logger) Close() {
 	defer logger.closureMutex.Unlock()
 	logger.closureMutex.Lock()
@@ -103,17 +90,14 @@ func (logger *Logger) Close() {
 		return
 	}
 	logger.closed = true
-	logger.completionWaitGroup.Done()
 }
 
+// Closed indicates whether the run has been closed
 func (logger *Logger) Closed() bool {
 	return logger.closed
 }
 
-func (logger *Logger) Wait() {
-	logger.completionWaitGroup.Wait()
-}
-
+// Summary returns a human-readable short description of the logged warnings and errors
 func (logger *Logger) Summary() string {
 	components := make([]string, 0, 2)
 	if logger.logCountWarning > 0 {
@@ -125,14 +109,17 @@ func (logger *Logger) Summary() string {
 	return strings.Join(components, "  ")
 }
 
+// SetLevel sets the logger's log level
 func (logger *Logger) SetLevel(level logrus.Level) {
 	logger.baseLogger.SetLevel(level)
 }
 
+// Level indicates the log level
 func (logger *Logger) Level() logrus.Level {
 	return logger.baseLogger.Level
 }
 
+// AddReaderEntry adds an entry that will write the entire contents of the provided reader before proceeding to the next entry
 func (logger *Logger) AddReaderEntry(reader io.Reader) {
 	logEntry := fields.EntryWithFields(
 		fields.Indentation(logger.Indentation+2),
@@ -142,12 +129,16 @@ func (logger *Logger) AddReaderEntry(reader io.Reader) {
 	logger.logEntries.PushBack(logEntry)
 }
 
+// AddWriteCloserEntry adds an entry that will write everything written to the writer to the log before proceeding to the next entry
+//
+// You must close the io.WriteCloser to indicate that you are done writing, so that the log can move on.
 func (logger *Logger) AddWriteCloserEntry() io.WriteCloser {
 	pipeReader, pipeWriter := io.Pipe()
 	logger.AddReaderEntry(pipeReader)
 	return pipeWriter
 }
 
+// PossibleError does nothing if it is passed nil and otherwise logs the provided error
 func (logger *Logger) PossibleError(err error) {
 	if err == nil {
 		return
@@ -155,6 +146,7 @@ func (logger *Logger) PossibleError(err error) {
 	logger.Error(err)
 }
 
+// PossibleErrorWithExplanation does nothing if it is passed nil and otherwise logs the provided error with an additional explanation
 func (logger *Logger) PossibleErrorWithExplanation(err error, explanation string) {
 	if err == nil {
 		return
@@ -162,8 +154,9 @@ func (logger *Logger) PossibleErrorWithExplanation(err error, explanation string
 	logger.Error(fmt.Errorf(explanation+" %w", err))
 }
 
+// StderrOutput adds an appropriate entry for non-trivial stderr output to the logs
 func (logger *Logger) StderrOutput(message string, logFields ...fields.LogEntryField) {
-	logger.logCountError += 1
+	logger.logCountError++
 	logger.errors = multierror.Append(logger.errors, fmt.Errorf("stderr: %v", message))
 	logEntry := logrus.WithFields(logrus.Fields{
 		"prefix":  "⛔️ ",
@@ -177,8 +170,9 @@ func (logger *Logger) StderrOutput(message string, logFields ...fields.LogEntryF
 	logger.logEntries.PushBack(logEntry)
 }
 
+// Error adds an appropriate entry for an encountered error
 func (logger *Logger) Error(err error, logFields ...fields.LogEntryField) {
-	logger.logCountError += 1
+	logger.logCountError++
 	logger.errors = multierror.Append(logger.errors, err)
 	logEntry := logrus.WithFields(logrus.Fields{
 		"prefix":  "🛑 ",
@@ -192,96 +186,84 @@ func (logger *Logger) Error(err error, logFields ...fields.LogEntryField) {
 	logger.logEntries.PushBack(logEntry)
 	if logger.ErrorCallback != nil {
 		if logger.run.Identifier == nil {
-			logger.ErrorCallback(fmt.Errorf("%v:\n%w\n", "anonymous", err))
+			logger.ErrorCallback(fmt.Errorf("%v:\n%w", "anonymous", err))
 		} else {
-			logger.ErrorCallback(fmt.Errorf("%v:\n%w\n", *logger.run.Identifier, err))
+			logger.ErrorCallback(fmt.Errorf("%v:\n%w", *logger.run.Identifier, err))
 		}
 	}
 }
 
-func (logger *Logger) WarnWithFields(logFields ...fields.LogEntryField) {
-	logger.logCountWarning += 1
+// Warn adds an appropriate entry for an encountered warning
+func (logger *Logger) Warn(logFields ...fields.LogEntryField) {
+	logger.logCountWarning++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.WarnLevel
 	logger.logEntries.PushBack(entry)
 }
 
-func (logger *Logger) Warn(entry *logrus.Entry) {
-	logger.logCountWarning += 1
-	entry.Level = logrus.WarnLevel
-	logger.logEntries.PushBack(entry)
-}
-
-func (logger *Logger) Info(entry *logrus.Entry) {
-	logger.logCountInfo += 1
-	entry.Level = logrus.InfoLevel
-	logger.logEntries.PushBack(entry)
-}
-
-func (logger *Logger) InfoWithFields(logFields ...fields.LogEntryField) {
-	logger.logCountInfo += 1
+// Info adds an appropriate entry for non-critical information
+func (logger *Logger) Info(logFields ...fields.LogEntryField) {
+	logger.logCountInfo++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.InfoLevel
 	logger.logEntries.PushBack(entry)
 }
 
-func (logger *Logger) Debug(entry *logrus.Entry) {
-	logger.logCountDebug += 1
-	entry.Level = logrus.DebugLevel
-	logger.logEntries.PushBack(entry)
-}
-
-func (logger *Logger) DebugWithFields(logFields ...fields.LogEntryField) {
-	logger.logCountDebug += 1
+// Debug adds an appropriate entry for a debug message
+func (logger *Logger) Debug(logFields ...fields.LogEntryField) {
+	logger.logCountDebug++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.DebugLevel
 	logger.logEntries.PushBack(entry)
 }
 
-func (logger *Logger) Trace(entry *logrus.Entry) {
-	logger.logCountTrace += 1
-	entry.Level = logrus.TraceLevel
-	logger.logEntries.PushBack(entry)
-}
-
-func (logger *Logger) TraceWithFields(logFields ...fields.LogEntryField) {
-	logger.logCountTrace += 1
+// Trace adds an appropriate entry for a trace message
+func (logger *Logger) Trace(logFields ...fields.LogEntryField) {
+	logger.logCountTrace++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
 	entry.Level = logrus.TraceLevel
 	logger.logEntries.PushBack(entry)
 }
 
+// TraceCount is the total number of trace logs encountered
 func (logger *Logger) TraceCount() int {
 	return logger.logCountTrace
 }
 
+// DebugCount is the total number of debug logs encountered
 func (logger *Logger) DebugCount() int {
 	return logger.logCountDebug
 }
+
+// InfoCount is the total number of info logs encountered
 func (logger *Logger) InfoCount() int {
 	return logger.logCountInfo
 }
+
+// WarnCount is the total number of warning logs encountered
 func (logger *Logger) WarnCount() int {
 	return logger.logCountWarning
 }
 
+// ErrorCount is the total number of error logs encountered
 func (logger *Logger) ErrorCount() int {
 	return logger.logCountError
 }
 
-func (logger *Logger) Bytes() []byte {
-	result, _ := ioutil.ReadAll(logger)
-	return result
-}
-
+// String returns the logger's total output as a string
+//
+// Note that this will consume the output, competing with other reads,
+// so String should only be called once and not in conjunction with Read.
 func (logger *Logger) String() string {
-	return string(logger.Bytes())
+	result, _ := ioutil.ReadAll(logger)
+	return string(result)
 }
 
+// LastError returns the most recent error level log entry
 func (logger *Logger) LastError() error {
 	if logger.errors == nil || logger.errors.Len() == 0 {
 		return nil
@@ -289,6 +271,7 @@ func (logger *Logger) LastError() error {
 	return logger.errors.WrappedErrors()[logger.errors.Len()-1]
 }
 
+// AllErrorMessages returns all errors logged up to this point
 func (logger *Logger) AllErrorMessages() []string {
 	result := make([]string, 0, logger.errors.Len())
 	for _, err := range logger.errors.WrappedErrors() {
@@ -297,6 +280,9 @@ func (logger *Logger) AllErrorMessages() []string {
 	return result
 }
 
+// Read writes an entry, or part of an entry to the provided buffer
+//
+// io.EOF indicates that the log is closed and all log entries have been read.
 func (logger *Logger) Read(p []byte) (int, error) {
 	if logger.unreadBuffer != nil && len(logger.unreadBuffer) > 0 {
 		return logger.readFromUnreadBuffer(p)
@@ -307,12 +293,10 @@ func (logger *Logger) Read(p []byte) (int, error) {
 			readerDataEntry := logEntry.Data["reader"]
 			if readerDataEntry != nil {
 				return logger.readFromNestedReader(p, readerDataEntry)
-			} else {
-				return logger.readFromLogEntry(p, logEntry)
 			}
-		} else {
-			panic("unknown log entry type")
+			return logger.readFromLogEntry(p, logEntry)
 		}
+		panic("unknown log entry type")
 	}
 	if logger.Closed() {
 		return 0, io.EOF
@@ -339,9 +323,9 @@ func (logger *Logger) readFromNestedReader(p []byte, readerDataEntry interface{}
 			err = nil
 		}
 		return n, err
-	} else {
-		return 0, fmt.Errorf("invalid type for `reader` data field")
 	}
+
+	return 0, fmt.Errorf("invalid type for `reader` data field")
 }
 
 func (logger *Logger) readFromLogEntry(p []byte, logEntry *logrus.Entry) (int, error) {

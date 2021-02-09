@@ -21,23 +21,24 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/middleware/when"
 )
 
+// SetUpMiddleware returns the stack of middleware items that will be unwound during the run's execution
 func SetUpMiddleware() []middleware.Middleware {
 	return []middleware.Middleware{
-		selectmiddleware.NewSelectMiddleware(),
-		timer.NewTimerMiddleware(),
-		inherit.NewInheritMiddleware(),
-		interpolate.NewInterpolateMiddleware(),
-		env.NewEnvMiddleware(),
-		catch.NewCatchMiddleware(),
-		when.NewWhenMiddleware(),
-		syncmiddleware.NewSyncMiddleware(),
-		pipe.NewPipeMiddleware(),
-		each.NewEachMiddleware(),
-		shell.NewShellMiddleware(),
-		ssh.NewSshMiddleware(),
-		docker.NewDockerMiddleware(),
-		dir.NewDirMiddleware(),
-		inputmiddleware.NewInputMiddleware(),
-		outputmiddleware.NewOutputMiddleware(),
+		selectmiddleware.NewMiddleware(),
+		timer.NewMiddleware(),
+		inherit.NewMiddleware(),
+		interpolate.NewMiddleware(),
+		env.NewMiddleware(),
+		catch.NewMiddleware(),
+		when.NewMiddleware(),
+		syncmiddleware.NewMiddleware(),
+		pipe.NewMiddleware(),
+		each.NewMiddleware(),
+		shell.NewMiddleware(),
+		ssh.NewMiddleware(),
+		docker.NewMiddleware(),
+		dir.NewMiddleware(),
+		inputmiddleware.NewMiddleware(),
+		outputmiddleware.NewMiddleware(),
 	}
 }

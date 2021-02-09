@@ -57,7 +57,7 @@ private:
 	defaults, definitions, files, err := parser.ParsePipelineFiles([]string{"file1", "file2"}, false)
 	require.Nil(t, err)
 	require.Equal(t, pipeline.DefaultSettings{Command: "test-command", Dir: "test-dir"}, defaults)
-	require.Equal(t, map[string][]pipeline.PipelineDefinition{
+	require.Equal(t, map[string][]pipeline.Definition{
 		"test": {
 			{
 				BuiltIn: false,
@@ -240,8 +240,8 @@ func TestParser_ProcessPipelineFile(t *testing.T) {
 	}
 
 	definitions := parser.ProcessPipelineFile(pipelineFile, false)
-	require.Equal(t, pipeline.PipelineDefinitionsLookup{
-		"test1": []pipeline.PipelineDefinition{
+	require.Equal(t, pipeline.DefinitionsLookup{
+		"test1": []pipeline.Definition{
 			{
 				DefinitionArguments: map[string]interface{}{
 					"name": "Test 1",
@@ -311,8 +311,8 @@ func TestParser_ProcessPipelineFile_WithMultipleDefinitionsInSameFile(t *testing
 		},
 	}
 	definitions := parser.ProcessPipelineFile(pipelineFile, false)
-	require.Equal(t, pipeline.PipelineDefinitionsLookup{
-		"test": []pipeline.PipelineDefinition{
+	require.Equal(t, pipeline.DefinitionsLookup{
+		"test": []pipeline.Definition{
 			{
 				DefinitionArguments: map[string]interface{}{
 					"name": "Test 1",

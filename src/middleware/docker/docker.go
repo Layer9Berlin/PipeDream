@@ -8,19 +8,26 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 )
 
-// Docker Executor
-type DockerMiddleware struct {
+// Middleware is a Docker (Compose) executor
+type Middleware struct {
 }
 
-func (_ DockerMiddleware) String() string {
+// String is a human-readable description
+func (Middleware) String() string {
 	return "docker"
 }
 
-func NewDockerMiddleware() DockerMiddleware {
-	return DockerMiddleware{}
+// NewMiddleware create a new Middleware instance
+func NewMiddleware() Middleware {
+	return Middleware{}
 }
 
-func (dockerMiddleware DockerMiddleware) Apply(
+// Apply is where the middleware's logic resides
+//
+// It adapts the run based on its slice of the run's arguments.
+// It may also trigger side effects such as executing shell commands or full runs of other pipelines.
+// When done, this function should call next in order to continue unwinding the stack.
+func (dockerMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
@@ -31,7 +38,7 @@ func (dockerMiddleware DockerMiddleware) Apply(
 	pipeline.ParseArgumentsIncludingParents(&arguments, "docker", run)
 
 	if arguments.Service != nil {
-		run.Log.DebugWithFields(
+		run.Log.Debug(
 			fields.Symbol("🐳"),
 			fields.Message("docker-compose exec"),
 			fields.Info(arguments.Service),

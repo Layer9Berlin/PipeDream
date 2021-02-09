@@ -8,7 +8,7 @@ import (
 )
 
 func TestDocker_RunInDockerContainer(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"service": "test-service",
 		},
@@ -18,7 +18,7 @@ func TestDocker_RunInDockerContainer(t *testing.T) {
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewDockerMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(invocation *pipeline.Run) {},
 		nil,
@@ -32,7 +32,7 @@ func TestDocker_RunInDockerContainer(t *testing.T) {
 }
 
 func TestDocker_MalformedArgument(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"test": "test-service",
 		},
@@ -42,7 +42,7 @@ func TestDocker_MalformedArgument(t *testing.T) {
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewDockerMiddleware().Apply(
+	NewMiddleware().Apply(
 		run,
 		func(invocation *pipeline.Run) {},
 		nil,
@@ -57,20 +57,20 @@ func TestDocker_MalformedArgument(t *testing.T) {
 }
 
 func TestDocker_InheritArgument(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"service": "test-service",
 		},
 	}, nil, nil)
 
-	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	childRun, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "test",
 		},
 	}, nil, run)
 
 	childRun.Log.SetLevel(logrus.TraceLevel)
-	NewDockerMiddleware().Apply(
+	NewMiddleware().Apply(
 		childRun,
 		func(invocation *pipeline.Run) {},
 		nil,
@@ -84,16 +84,16 @@ func TestDocker_InheritArgument(t *testing.T) {
 }
 
 func TestDocker_NonRunnable(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"docker": map[string]interface{}{
 			"service": "test-service",
 		},
 	}, nil, nil)
 
-	childRun, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, run)
+	childRun, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, run)
 
 	childRun.Log.SetLevel(logrus.TraceLevel)
-	NewDockerMiddleware().Apply(
+	NewMiddleware().Apply(
 		childRun,
 		func(invocation *pipeline.Run) {},
 		nil,

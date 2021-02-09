@@ -1,4 +1,4 @@
-// Provides a composable data stream, which pipes multiple inputs to multiple outputs according to the defined compositions
+// Package datastream provides a composable data stream, which pipes multiple inputs to multiple outputs according to the defined compositions
 package datastream
 
 import (
@@ -8,6 +8,11 @@ import (
 	"sync"
 )
 
+// ComposableDataStream is a data stream that can be composed with other data streams
+//
+// You can combine an arbitrary number of io.WriteCloser inputs and io.Reader outputs.
+// Call Close when all compositions have been defined. This will start the data flow.
+// Once all data has been passed through (all inputs are closed), the data stream will complete.
 type ComposableDataStream struct {
 	errorHandler func(error)
 	inputWriter  io.WriteCloser
@@ -22,6 +27,9 @@ type ComposableDataStream struct {
 	result              *bytes.Buffer
 }
 
+// NewComposableDataStream creates a new ComposableDataStream
+//
+// name is a description of the data stream for debugging convenience
 func NewComposableDataStream(name string, errorHandler func(error)) *ComposableDataStream {
 	reader, writer := io.Pipe()
 	completionWaitGroup := &sync.WaitGroup{}
@@ -44,6 +52,7 @@ func NewComposableDataStream(name string, errorHandler func(error)) *ComposableD
 	}
 }
 
+// NewClosedComposableDataStreamFromBuffer creates an already closed ComposableDataStream with the specified result
 func NewClosedComposableDataStreamFromBuffer(buffer *bytes.Buffer) *ComposableDataStream {
 	completionWaitGroup := &sync.WaitGroup{}
 	return &ComposableDataStream{
@@ -56,6 +65,11 @@ func NewClosedComposableDataStreamFromBuffer(buffer *bytes.Buffer) *ComposableDa
 	}
 }
 
+// Close finalizes the data stream
+//
+// It should be called when all compositions have been defined
+// in order to start the data flow. It is a prerequisite
+// for the data stream to complete.
 func (stream *ComposableDataStream) Close() {
 	stream.finalizationMutex.Lock()
 	defer stream.finalizationMutex.Unlock()
@@ -92,26 +106,38 @@ func (stream *ComposableDataStream) Close() {
 	}()
 }
 
+// Closed indicates whether the data stream has been closed
 func (stream *ComposableDataStream) Closed() bool {
 	return stream.closed
 }
 
+// Wait pauses execution until the data stream has completed
 func (stream *ComposableDataStream) Wait() {
 	stream.completionWaitGroup.Wait()
 }
 
+// Completed indicates whether the data stream has completed
 func (stream *ComposableDataStream) Completed() bool {
 	return stream.completed
 }
 
+// String returns the result of a completed data stream as a string
+//
+// If you call String before the data stream has completed, the result is undefined.
 func (stream *ComposableDataStream) String() string {
 	return stream.result.String()
 }
 
+// Bytes returns the result of a completed data stream as a byte slice
+//
+// If you call Bytes before the data stream has completed, the result is undefined.
 func (stream *ComposableDataStream) Bytes() []byte {
 	return stream.result.Bytes()
 }
 
+// Len returns the size of the result of a completed data stream in number of bytes
+//
+// If you call Len before the data stream has completed, the result is undefined.
 func (stream *ComposableDataStream) Len() int {
 	return stream.result.Len()
 }

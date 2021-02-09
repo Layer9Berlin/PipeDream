@@ -9,12 +9,14 @@ import (
 	"path/filepath"
 )
 
+// Parser reads and parses pipeline files
 type Parser struct {
 	readFile              func(filename string) ([]byte, error)
 	findByGlob            func(pattern string) ([]string, error)
 	RecursivelyAddImports func(paths []string) ([]string, error)
 }
 
+// NewParser creates a new Parser
 func NewParser(options ...ParserOption) *Parser {
 	parser := &Parser{
 		readFile:   ioutil.ReadFile,
@@ -29,16 +31,17 @@ func NewParser(options ...ParserOption) *Parser {
 	return parser
 }
 
+// ParsePipelineFiles processes
 func (parser *Parser) ParsePipelineFiles(allPipelineFilePaths []string, builtIn bool) (
 	defaults pipeline.DefaultSettings,
-	definitions pipeline.PipelineDefinitionsLookup,
+	definitions pipeline.DefinitionsLookup,
 	files []pipeline.File,
 	returnErr error,
 ) {
 	// the parsed definitions have a slightly different format
 	// this allows the yaml to be concise
 	// GO types are not quite flexible enough for this
-	definitions = pipeline.PipelineDefinitionsLookup{}
+	definitions = pipeline.DefinitionsLookup{}
 	files = make([]pipeline.File, 0, len(allPipelineFilePaths))
 	// TODO: take care of hooks
 	for index, pipelineFilePath := range allPipelineFilePaths {
@@ -75,22 +78,23 @@ func (parser *Parser) ParsePipelineFiles(allPipelineFilePaths []string, builtIn 
 	return
 }
 
+// ProcessPipelineFile parses the specified yaml pipeline file
 func (parser *Parser) ProcessPipelineFile(
 	pipelineFile pipeline.File,
 	builtIn bool,
-) pipeline.PipelineDefinitionsLookup {
+) pipeline.DefinitionsLookup {
 	// iterate through the pipelines and create a new definition for each
-	pipelineDefinitions := pipeline.PipelineDefinitionsLookup{}
+	pipelineDefinitions := pipeline.DefinitionsLookup{}
 	for pipelineKey, pipelineValues := range pipelineFile.Public {
-		pipelineDefinition := pipeline.NewPipelineDefinition(pipelineValues, pipelineFile.FileName, true, builtIn)
-		pipelineDefinitions[pipelineKey] = []pipeline.PipelineDefinition{*pipelineDefinition}
+		pipelineDefinition := pipeline.NewDefinition(pipelineValues, pipelineFile.FileName, true, builtIn)
+		pipelineDefinitions[pipelineKey] = []pipeline.Definition{*pipelineDefinition}
 	}
 	for pipelineKey, pipelineValues := range pipelineFile.Private {
-		pipelineDefinition := pipeline.NewPipelineDefinition(pipelineValues, pipelineFile.FileName, false, builtIn)
+		pipelineDefinition := pipeline.NewDefinition(pipelineValues, pipelineFile.FileName, false, builtIn)
 		if existingPipelineDefinition, ok := pipelineDefinitions[pipelineKey]; ok {
 			pipelineDefinitions[pipelineKey] = append(existingPipelineDefinition, *pipelineDefinition)
 		} else {
-			pipelineDefinitions[pipelineKey] = []pipeline.PipelineDefinition{*pipelineDefinition}
+			pipelineDefinitions[pipelineKey] = []pipeline.Definition{*pipelineDefinition}
 		}
 	}
 	return pipelineDefinitions

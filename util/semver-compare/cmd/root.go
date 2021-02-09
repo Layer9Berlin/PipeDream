@@ -18,6 +18,7 @@ var log = logrus.New()
 var osStdin = os.Stdin
 var osStdout = os.Stdout
 
+// DependencyMismatch is a data structure containing information about a package's required and currently installed versions
 type DependencyMismatch struct {
 	Pm      string
 	Package string

@@ -12,13 +12,13 @@ import (
 )
 
 func TestCatchEach_Error(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerCalled := false
-	NewCatchEachMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		run.Stdout.Replace(strings.NewReader("output\n"))
 		run.Stderr.Replace(strings.NewReader("test error"))
 	}, middleware.NewExecutionContext(
@@ -37,13 +37,13 @@ func TestCatchEach_Error(t *testing.T) {
 }
 
 func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerInvocations := 0
-	NewCatchEachMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -62,7 +62,7 @@ func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
 		}()
 	}, middleware.NewExecutionContext(
 		middleware.WithExecutionFunction(func(errorRun *pipeline.Run) {
-			handlerInvocations += 1
+			handlerInvocations++
 			stdoutWriter := errorRun.Stdout.WriteCloser()
 			go func() {
 				_, err := io.WriteString(stdoutWriter, "handled\n")
@@ -80,12 +80,12 @@ func TestCatchEach_MultipleLinesOfErrorOutput(t *testing.T) {
 }
 
 func TestCatchEach_HandlerNotInvoked(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewCatchEachMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -104,10 +104,10 @@ func TestCatchEach_HandlerNotInvoked(t *testing.T) {
 }
 
 func TestCatchEach_NoCatchHandler(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{}, nil, nil)
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
-	NewCatchEachMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
@@ -126,13 +126,13 @@ func TestCatchEach_NoCatchHandler(t *testing.T) {
 }
 
 func TestCatchEach_HandlerThrowingError(t *testing.T) {
-	run, _ := pipeline.NewPipelineRun(nil, map[string]interface{}{
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"catchEach": "test-handler",
 	}, nil, nil)
 
 	run.Log.SetLevel(logrus.TraceLevel)
 	handlerCalled := false
-	NewCatchEachMiddleware().Apply(run, func(run *pipeline.Run) {
+	NewMiddleware().Apply(run, func(run *pipeline.Run) {
 		stdoutIntercept := run.Stdout.Intercept()
 		go func() {
 			_, err := ioutil.ReadAll(stdoutIntercept)
