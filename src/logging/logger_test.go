@@ -1,7 +1,9 @@
 package logging
 
 import (
+	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
+	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"strings"
@@ -137,4 +139,36 @@ func TestLogger_ColorOverrides(t *testing.T) {
 	log, _ = CustomFormatter{}.Format(entry)
 	// black
 	require.Contains(t, string(log), "\x1b[30m")
+
+	entry = fields.Color("green")(entry)
+	log, _ = CustomFormatter{}.Format(entry)
+	// green
+	require.Contains(t, string(log), "\x1b[32m")
+}
+
+func TestLogger_LongPrefix(t *testing.T) {
+	logger := logrus.New()
+	prefix := make([]byte, 0, 1024)
+	for i := 0; i < 1030; i++ {
+		prefix = append(prefix, byte(0x41+i%26))
+	}
+	entry := logrus.NewEntry(logger).
+		WithField("prefix", string(prefix))
+	entry.Level = logrus.DebugLevel
+	log, err := CustomFormatter{}.Format(entry)
+	require.Nil(t, err)
+	expectedResult := []byte(fmt.Sprintln(aurora.Gray(12, string(append(prefix[:1024], []byte("…")...)))))
+	require.Equal(t, expectedResult, log)
+}
+
+func TestLogger_LongMessage(t *testing.T) {
+	logger := logrus.New()
+	message := make([]byte, 0, 1024)
+	for i := 0; i < 1030; i++ {
+		message = append(message, byte(0x41+i%26))
+	}
+	log, err := CustomFormatter{}.Format(logrus.NewEntry(logger).
+		WithField("message", string(message)))
+	require.Nil(t, err)
+	require.Equal(t, append(message[:1024], []byte("…\n")...), log)
 }

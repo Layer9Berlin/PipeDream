@@ -6,6 +6,7 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io/ioutil"
+	"sync"
 )
 
 // Middleware is an output interceptor
@@ -54,13 +55,17 @@ func (outputMiddleware Middleware) Apply(
 			fields.Middleware(outputMiddleware),
 		)
 		stdoutIntercept := run.Stdout.Intercept()
+		waitGroup := &sync.WaitGroup{}
+		waitGroup.Add(1)
 		go func() {
+			defer waitGroup.Done()
 			_, err := ioutil.ReadAll(stdoutIntercept)
 			run.Log.PossibleError(err)
 		}()
 		go func() {
 			_, err := stdoutIntercept.Write([]byte(*arguments.Text))
 			run.Log.PossibleError(err)
+			waitGroup.Wait()
 			run.Log.PossibleError(stdoutIntercept.Close())
 		}()
 	}

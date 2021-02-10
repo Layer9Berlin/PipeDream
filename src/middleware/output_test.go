@@ -13,8 +13,9 @@ import (
 
 func TestRun_Output_outputResult(t *testing.T) {
 	buffer := new(bytes.Buffer)
+	stdoutStream := datastream.NewClosedComposableDataStreamFromBuffer(bytes.NewBuffer([]byte("test")))
 	outputResult(&pipeline.Run{
-		Stdout: datastream.NewClosedComposableDataStreamFromBuffer(bytes.NewBuffer([]byte("test"))),
+		Stdout: stdoutStream,
 	}, buffer)
 	require.Equal(t, fmt.Sprintln("===== RESULT =====")+fmt.Sprintln("test"), buffer.String())
 }

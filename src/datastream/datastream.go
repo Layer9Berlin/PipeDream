@@ -4,7 +4,6 @@ package datastream
 import (
 	"bytes"
 	"io"
-	"os"
 	"sync"
 )
 
@@ -81,25 +80,11 @@ func (stream *ComposableDataStream) Close() {
 	// we don't expect any more inputs
 	go func() {
 		// close the writer asynchronously, so that the reader knows we're done
-		err := stream.inputWriter.Close()
-		if err != nil {
-			stream.errorHandler(err)
-		}
+		_ = stream.inputWriter.Close()
 	}()
 	go func() {
 		defer stream.completionWaitGroup.Done()
-		_, err := io.Copy(stream.result, stream.outputReader)
-		if err != nil {
-			if pathErr, ok := err.(*os.PathError); ok {
-				if pathErr.Error() == "write |1: broken pipe" {
-					// this is to be expected - we did close the pipe, after all
-				} else {
-					stream.errorHandler(err)
-				}
-			} else {
-				stream.errorHandler(err)
-			}
-		}
+		_, _ = io.Copy(stream.result, stream.outputReader)
 		stream.completed = true
 		// the counter is initialized to 1,
 		// so that the stream does not complete before it has been closed

@@ -16,6 +16,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"syscall"
 )
 
@@ -276,11 +277,15 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 			fmt.Printf("Failed to cancel: %v", err)
 		}
 	})
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
 	go func() {
 		_, _ = io.Copy(stdoutWriter, fullRun.Log)
+		waitGroup.Done()
 	}()
 	fullRun.Wait()
 
+	waitGroup.Wait()
 	outputResult(fullRun, stdoutWriter)
 	outputErrors(executionContext.errors, stderrWriter)
 }

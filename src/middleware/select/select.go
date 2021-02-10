@@ -58,8 +58,6 @@ func (selectMiddleware Middleware) Apply(
 	}
 	pipeline.ParseArguments(&middlewareArguments, "select", run)
 
-	next(run)
-
 	if len(middlewareArguments.Options) > 0 {
 		label := "Please select an option"
 		if middlewareArguments.Prompt != nil {
@@ -143,7 +141,7 @@ func (selectMiddleware Middleware) Apply(
 					}()
 				}))
 		}()
-		next(run)
-		return
 	}
+
+	next(run)
 }

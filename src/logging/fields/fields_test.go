@@ -49,6 +49,16 @@ func TestLogFields_Middleware(t *testing.T) {
 	require.Equal(t, fmt.Sprint("test middleware", "\n"), string(result))
 }
 
+func TestLogFields_Run(t *testing.T) {
+	result, _ := logging.CustomFormatter{}.Format(
+		EntryWithFields(
+			Run("test run"),
+		),
+	)
+	// the run is not currently included in the output
+	require.Equal(t, fmt.Sprint("", "\n"), string(result))
+}
+
 func TestLogFields_Indentation(t *testing.T) {
 	result, _ := logging.CustomFormatter{}.Format(
 		EntryWithFields(

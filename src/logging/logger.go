@@ -88,6 +88,7 @@ func extractField(entry *logrus.Entry, key string) string {
 	result, ok := entry.Data[key]
 	if ok {
 		maxLength := 128
+		// only log the prefix at debug and trace level
 		if entry.Level >= logrus.DebugLevel {
 			maxLength = 1024
 		}

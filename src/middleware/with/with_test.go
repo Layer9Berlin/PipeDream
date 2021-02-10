@@ -3,6 +3,7 @@ package with
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"strings"
@@ -19,6 +20,7 @@ func TestWith_Pattern(t *testing.T) {
 
 	waitGroup := &sync.WaitGroup{}
 	allInputs := make([]string, 0, 3)
+	run.Log.SetLevel(logrus.DebugLevel)
 	NewMiddleware().Apply(
 		run,
 		func(pipelineRun *pipeline.Run) {
@@ -43,6 +45,7 @@ func TestWith_Pattern(t *testing.T) {
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Contains(t, run.Log.String(), "with")
 	require.Equal(t, "bla\nchild output\nbla\nchild output\nchild output\nend\n", run.Stdout.String())
 	require.Equal(t, "child stderr\nchild stderr\nchild stderr\n", run.Stderr.String())
 }

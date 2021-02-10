@@ -330,6 +330,111 @@ func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 	}, runArguments)
 }
 
+func TestInterpolate_EscapeAllQuotes(t *testing.T) {
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "all",
+		},
+		"arg": "test $!!",
+	}, nil, nil)
+	run.Stdin.Replace(strings.NewReader("' \" ` \\\" '"))
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {},
+		middleware.NewExecutionContext(
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+				defer waitGroup.Done()
+				runArguments = childRun.ArgumentsCopy()
+			}),
+		))
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "all",
+		},
+		"arg": "test \\\" \\\" ` \\\\\" \\\"",
+	}, runArguments)
+}
+
+func TestInterpolate_EscapeSingleQuotes(t *testing.T) {
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "single",
+		},
+		"arg": "test $!!",
+	}, nil, nil)
+	run.Stdin.Replace(strings.NewReader("' \" ` \\\" '"))
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {},
+		middleware.NewExecutionContext(
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+				defer waitGroup.Done()
+				runArguments = childRun.ArgumentsCopy()
+			}),
+		))
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "single",
+		},
+		"arg": "test \\\" \" ` \\\" \\\"",
+	}, runArguments)
+}
+
+func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "double",
+		},
+		"arg": "test $!!",
+	}, nil, nil)
+	run.Stdin.Replace(strings.NewReader("' \" ` \\\" '"))
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {},
+		middleware.NewExecutionContext(
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+				defer waitGroup.Done()
+				runArguments = childRun.ArgumentsCopy()
+			}),
+		))
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "double",
+		},
+		"arg": "test ' \\\" ` \\\\\" '",
+	}, runArguments)
+}
+
 type ErrorReader struct {
 	counter int
 }

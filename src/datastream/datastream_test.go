@@ -31,3 +31,21 @@ func TestComposableDataStream_Bytes(t *testing.T) {
 
 	require.Equal(t, []byte{1, 2, 3, 4}, stream.Bytes())
 }
+
+func TestComposableDataStream_NewClosedComposableDataStreamFromBuffer(t *testing.T) {
+	buffer := new(bytes.Buffer)
+	buffer.Write([]byte("test 123"))
+	stream := NewClosedComposableDataStreamFromBuffer(buffer)
+
+	stream.Wait()
+	require.Equal(t, []byte("test 123"), stream.Bytes())
+}
+
+func TestComposableDataStream_Len(t *testing.T) {
+	buffer := new(bytes.Buffer)
+	buffer.Write([]byte("test 123"))
+	stream := NewClosedComposableDataStreamFromBuffer(buffer)
+
+	stream.Wait()
+	require.Equal(t, 8, stream.Len())
+}

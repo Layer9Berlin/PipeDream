@@ -42,8 +42,8 @@ func copyValue(value interface{}) interface{} {
 		return result
 	case map[interface{}]interface{}:
 		result := map[interface{}]interface{}{}
-		for stringKey, subValue := range typedValue {
-			result[stringKey] = copyValue(subValue)
+		for interfaceKey, subValue := range typedValue {
+			result[interfaceKey] = copyValue(subValue)
 		}
 		return result
 	default:

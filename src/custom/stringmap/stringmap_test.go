@@ -23,6 +23,9 @@ func TestCopyMap_WithSuccess(t *testing.T) {
 				"test12": nil,
 			}),
 		},
+		"test13": map[interface{}]interface{}{
+			"test": "value",
+		},
 	}
 
 	map2 := CopyMap(map1)
@@ -48,6 +51,9 @@ func TestCopyMap_WithSuccess(t *testing.T) {
 	require.Equal(t, StringMap{
 		"test12": nil,
 	}, map2["test7"].([]interface{})[2])
+	require.Equal(t, map[interface{}]interface{}{
+		"test": "value",
+	}, map2["test13"])
 }
 
 func TestCopyMap_Nil(t *testing.T) {
