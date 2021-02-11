@@ -39,7 +39,7 @@ private:
       switch:
         - pattern: "Permission denied"
           text: "permission denied"
-        - pattern: "Everything up-to-date|To github\\.com:Layer9Berlin/PipeDream\\.git"
+        - pattern: "^Everything up-to-date|^To github"
           text: "successful"
         - pattern: ".*"
           text: "uncaught error ('$!!')"
