@@ -41,5 +41,7 @@ private:
           text: "permission denied"
         - pattern: "^Everything up-to-date|^To github"
           text: "successful"
+        - pattern: "signing failed"
+          text: "signing failed"
         - pattern: ".*"
           text: "uncaught error ('$!!')"
