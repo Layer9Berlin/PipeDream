@@ -105,10 +105,9 @@ func (outputMiddleware Middleware) Apply(
 				run.Log.PossibleError(err)
 				if err == nil && regex.Match(outputData) {
 					run.Log.Debug(
-						fields.Symbol("↗️️"),
-						fields.Message(*switchStatement.Pattern),
-						fields.Message("matching"),
-
+						fields.Symbol("🔢"),
+						fields.Message("match"),
+						fields.Info(*switchStatement.Pattern),
 						fields.Middleware(outputMiddleware),
 					)
 					foundMatch = true
@@ -118,9 +117,8 @@ func (outputMiddleware Middleware) Apply(
 				} else {
 					run.Log.Debug(
 						fields.Symbol("↗️️"),
-						fields.Message(*switchStatement.Pattern),
-						fields.Message("not matching"),
-
+						fields.Message("mismatch"),
+						fields.Info(*switchStatement.Pattern),
 						fields.Middleware(outputMiddleware),
 					)
 				}
