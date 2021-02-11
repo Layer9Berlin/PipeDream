@@ -23,26 +23,7 @@ public:
 
 
 private:
-#  publish::upload-to-github:
-#    interpolate:
-#      escapeQuotes: all
-#    pipe:
-#      - publish::perform-upload:
-#          each:
-#            - publish::version::increment
-#            - publish::push
-  #      - print::message:
-  #          when: "'$!!' !~ 'clean'"
-  #          message: "skipped"
-  #      - publish::report-upload-status:
-  #          shell:
-  #            args:
-  #              - amber: "^skipped$"
-  #              - green: "^published"
-  #              - prefix: "Git push"
-  #            run: "traffic-light"
-
-  publish::push:
+  publish::upload-to-github:
     interpolate:
       escapeQuotes: all
     pipe:
@@ -50,25 +31,15 @@ private:
           shell:
             run: "git push --follow-tags"
           catch: publish::handle-git-push-error
-          waitFor:
-            pipes:
-              - publish::version::increment
-  #      - print::message:
-  #          when: "'$!!' == ''"
-  #          message: "published $PIPEDREAM_PUBLISH_VERSION"
-  #          waitFor:
-  #            envVars:
-  #              - PIPEDREAM_PUBLISH_VERSION
 
-#  publish::handle-git-push-error:
-#    interpolate:
-#      escapeQuotes: all
-#    pipe:
-#      - print::message:
-#          when: "'$!!' =~ 'Permission denied'"
-#          message: "permission denied"
-#      - exec::noop:
-#          when: "'$!!' =~ 'Everything up-to-date'"
-#      - print::message:
-#          when: "'$!!' !~ 'Permission denied|Everything up-to-date|To github\\.com:Layer9Berlin/PipeDream\\.git'"
-#          message: "uncaught error ('$!!')"
+  publish::handle-git-push-error:
+    interpolate:
+      escapeQuotes: all
+    output:
+      switch:
+        - pattern: "Permission denied"
+          text: "permission denied"
+        - pattern: "Everything up-to-date|To github\\.com:Layer9Berlin/PipeDream\\.git"
+          text: "successful"
+        - pattern: ".*"
+          text: "uncaught error ('$!!')"

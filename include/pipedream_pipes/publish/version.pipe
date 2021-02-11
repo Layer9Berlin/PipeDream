@@ -39,6 +39,7 @@ private:
           env:
             save: PIPEDREAM_PUBLISH_VERSION
       - publish::version::increment-npm-version
+      - strings::remove-new-lines
 
   publish::version::increment-npm-version:
     shell:
