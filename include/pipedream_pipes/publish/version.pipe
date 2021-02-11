@@ -10,7 +10,7 @@ public:
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_PUBLISH_VERSION
-      - publish::version::increment-npm-version
+#      - publish::version::increment-npm-version
 
 private:
   publish::version::increment-npm-version:
