@@ -285,6 +285,14 @@ func (run *Run) SetArgumentAtPath(value interface{}, path ...string) error {
 	return err
 }
 
+// RemoveArgumentAtPath removes the run's argument at the specified path
+func (run *Run) RemoveArgumentAtPath(path ...string) error {
+	run.argumentsMutex.Lock()
+	defer run.argumentsMutex.Unlock()
+	err := stringmap.RemoveValueInMap(run.arguments, path...)
+	return err
+}
+
 // AddCancelHook adds a hook that will be executed when the run is cancelled
 //
 // Use this to implement cancel functionality in middleware.

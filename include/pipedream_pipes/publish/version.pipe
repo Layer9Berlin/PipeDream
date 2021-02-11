@@ -3,19 +3,16 @@ version: 0.0.1
 
 public:
   publish::version::bump:
+    waitFor:
+      envVars:
+        - PIPEDREAM_GIT_STATUS
     pipe:
       - publish::version::increment:
           when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
-          waitFor:
-            envVars:
-              - PIPEDREAM_GIT_STATUS
       - publish::version::bump-skip:
           output:
             text: "skipped"
           when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
-          waitFor:
-            envVars:
-              - PIPEDREAM_GIT_STATUS
       - publish::version::report:
           shell:
             args:

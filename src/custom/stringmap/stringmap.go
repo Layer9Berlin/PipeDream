@@ -131,3 +131,24 @@ func SetValueInMap(mapToChange map[string]interface{}, value interface{}, path .
 	}
 	return fmt.Errorf("failed to set new value, encountered something other than a string map")
 }
+
+// RemoveValueInMap removes the value of a nested StringMap at the specified path
+//
+// Trying to remove a non-existent value returns an error.
+func RemoveValueInMap(mapToChange map[string]interface{}, path ...string) error {
+	firstComponent, restOfPath := path[0], path[1:]
+	nextValue, haveNextValue := mapToChange[firstComponent]
+	if !haveNextValue {
+		return fmt.Errorf("failed to remove value, as it could not be found")
+	}
+	if len(restOfPath) == 0 {
+		delete(mapToChange, firstComponent)
+		return nil
+	}
+
+	nestedMap, haveNestedMap := nextValue.(map[string]interface{})
+	if haveNestedMap {
+		return RemoveValueInMap(nestedMap, restOfPath...)
+	}
+	return fmt.Errorf("failed to remove value, encountered something other than a string map")
+}

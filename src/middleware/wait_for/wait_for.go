@@ -70,13 +70,16 @@ func (waitForMiddleware Middleware) Apply(
 
 	if arguments.EnvVars != nil {
 		for _, envVar := range arguments.EnvVars {
-			run.StartWaitGroup.Add(1)
 			envVar := envVar
 			run.Log.Debug(
 				fields.Symbol("🕙"),
 				fields.Message(fmt.Sprintf("waiting for env var %q to be set", envVar)),
 				fields.Middleware(waitForMiddleware),
 			)
+			parentLogWriter := run.Log.AddWriteCloserEntry()
+			stdinCopy := run.Stdin.Copy()
+			stdoutAppender := run.Stdout.WriteCloser()
+			stderrAppender := run.Stderr.WriteCloser()
 			go func() {
 				for {
 					if _, ok := waitForMiddleware.LookupEnv(envVar); ok {
@@ -84,9 +87,39 @@ func (waitForMiddleware Middleware) Apply(
 					}
 					time.Sleep(200)
 				}
-				run.StartWaitGroup.Done()
+				run.Log.PossibleError(run.RemoveArgumentAtPath("waitFor"))
+				runArguments := run.ArgumentsCopy()
+				executionContext.FullRun(
+					middleware.WithIdentifier(run.Identifier),
+					middleware.WithParentRun(run),
+					middleware.WithLogWriter(parentLogWriter),
+					middleware.WithArguments(runArguments),
+					middleware.WithSetupFunc(func(childRun *pipeline.Run) {
+						childRun.Log.PossibleError(childRun.RemoveArgumentAtPath("waitFor"))
+						childRun.Log.Trace(
+							fields.DataStream(waitForMiddleware, "merging parent stdin into child stdin")...,
+						)
+						childRun.Stdin.MergeWith(stdinCopy)
+					}),
+					middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
+						childRun.Log.Trace(
+							fields.DataStream(waitForMiddleware, "merging child stdout into parent stdout")...,
+						)
+						childRun.Stdout.StartCopyingInto(stdoutAppender)
+						childRun.Log.Trace(
+							fields.DataStream(waitForMiddleware, "merging child stderr into parent stderr")...,
+						)
+						childRun.Stderr.StartCopyingInto(stderrAppender)
+						go func() {
+							childRun.Wait()
+							// need to clean up by closing the writers we created
+							childRun.Log.PossibleError(stdoutAppender.Close())
+							childRun.Log.PossibleError(stderrAppender.Close())
+						}()
+					}))
 			}()
 		}
+		return
 	}
 
 	next(run)

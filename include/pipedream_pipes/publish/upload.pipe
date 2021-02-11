@@ -3,19 +3,16 @@ version: 0.0.1
 
 public:
   publish::upload:
+    waitFor:
+      envVars:
+        - PIPEDREAM_GIT_STATUS
     pipe:
       - publish::upload-to-github:
           when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
-          waitFor:
-            envVars:
-              - PIPEDREAM_GIT_STATUS
       - publish::upload-to-github::skip:
           output:
             text: "skipped"
           when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
-          waitFor:
-            envVars:
-              - PIPEDREAM_GIT_STATUS
       - publish::upload::report:
           shell:
             args:
