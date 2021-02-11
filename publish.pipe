@@ -4,43 +4,17 @@ version: 0.0.1
 public:
   publish::all:
     pipe:
-      - publish::obtain-git-status:
-          shell:
-            run: git status
+      - publish::git::obtain-status
       - print::if-match:
           pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
           message: clean
           else: dirty
       - ~:
           each:
-            - publish::git-status-indicator
+            - publish::git::status-indicator
             - publish::upload
 
 private:
-  publish::calculate-shasum:
-    pipe:
-      - tarball-shasum:
-          dirs: "cmd include src util"
-          env:
-            save: PIPEDREAM_INSTALL_SHASUM
-
-  publish::catch-git-status-error:
-    pipe:
-      - print::message:
-          when: "'$!!' == 'Everything up-to-date\n'"
-          message: "clean"
-      - print::message:
-          when: "'$!!' != 'Everything up-to-date\n'"
-          message: "dirty"
-
-  publish::git-status-indicator:
-    shell:
-      args:
-        - prefix: "Local git repo status"
-        - text: "$!!"
-        - green: "clean"
-      run: "traffic-light"
-
   publish::upload:
     interpolate:
       escapeQuotes: all
@@ -48,7 +22,7 @@ private:
       - publish::perform-upload:
           when: "'$!!' =~ 'clean'"
           each:
-            - publish::increment-version
+            - publish::version::increment
             - publish::push
       - print::message:
           when: "'$!!' !~ 'clean'"
@@ -61,19 +35,6 @@ private:
               - prefix: "Git push"
             run: "traffic-light"
 
-  publish::increment-version:
-    each:
-      - publish::create-new-version-string:
-          shell:
-            run: "svu n"
-          env:
-            save: PIPEDREAM_PUBLISH_VERSION
-      - strings::remove-new-lines
-      - publish::increment-npm-version:
-          shell:
-            run: "npm version $PIPEDREAM_PUBLISH_VERSION --allow-same-version"
-
-
   publish::push:
     interpolate:
       escapeQuotes: all
@@ -82,6 +43,8 @@ private:
           shell:
             run: "git push --follow-tags"
           catch: publish::handle-git-push-error
+          sync:
+            - publish::version::increment
       - print::message:
           when: "'$!!' == ''"
           message: "published $PIPEDREAM_PUBLISH_VERSION"

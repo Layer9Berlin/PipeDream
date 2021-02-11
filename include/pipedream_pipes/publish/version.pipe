@@ -1,0 +1,15 @@
+---
+version: 0.0.1
+
+public:
+  publish::version::increment:
+    each:
+      - publish::create-new-version-string:
+          shell:
+            run: "svu n"
+          env:
+            save: PIPEDREAM_PUBLISH_VERSION
+      - strings::remove-new-lines
+      - publish::increment-npm-version:
+          shell:
+            run: "npm version $PIPEDREAM_PUBLISH_VERSION"

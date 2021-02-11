@@ -1,0 +1,10 @@
+---
+version: 0.0.1
+
+public:
+  publish::calculate-shasum:
+    pipe:
+      - tarball-shasum:
+          dirs: "cmd include src util"
+          env:
+            save: PIPEDREAM_INSTALL_SHASUM

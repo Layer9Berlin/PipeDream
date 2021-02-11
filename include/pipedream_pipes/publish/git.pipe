@@ -1,0 +1,26 @@
+---
+version: 0.0.1
+
+public:
+  publish::git::obtain-status:
+    shell:
+      run: git status
+    catch: publish::git::catch-status-error
+
+  publish::git::status-indicator:
+    shell:
+      args:
+        - prefix: "Local git repo status"
+        - text: "$!!"
+        - green: "clean"
+      run: "traffic-light"
+
+private:
+  publish::git::catch-status-error:
+    pipe:
+      - print::message:
+          when: "'$!!' == 'Everything up-to-date\n'"
+          message: "clean"
+      - print::message:
+          when: "'$!!' != 'Everything up-to-date\n'"
+          message: "dirty"
