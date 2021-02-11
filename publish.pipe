@@ -13,7 +13,7 @@ private:
       escapeQuotes: all
     pipe:
       - publish::perform-upload:
-          when: "'$!!' =~ 'clean$'"
+          when: "'$!!' =~ 'git repo status: clean'"
           each:
             - publish::version::increment
             - publish::push
