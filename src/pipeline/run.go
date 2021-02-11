@@ -172,7 +172,7 @@ func (run *Run) Close() {
 
 		run.completed = true
 
-		run.Log.Debug(
+		run.Log.Info(
 			fields.Symbol("✔"),
 			fields.Message("completed | "+run.String()),
 			fields.Color("green"),

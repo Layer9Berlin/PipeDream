@@ -23,7 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
-      <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pipeline/run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/run.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,12 +88,12 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.go test src">
+  <component name="RunManager" selected="Go Build.go build pipedream">
     <configuration name="go build pipedream" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
-      <parameters value="-f install.pipe" />
+      <parameters value="-v debug" />
       <kind value="PACKAGE" />
       <filePath value="$PROJECT_DIR$" />
       <package value="github.com/Layer9Berlin/pipedream" />
@@ -275,10 +276,10 @@
       <screen x="0" y="25" width="1680" height="947" />
     </state>
     <state x="640" y="336" key="#Go_Modules/0.25.1680.947@0.25.1680.947" timestamp="1610618862086" />
-    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1612807825478">
+    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1613040038687">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612807825478" />
+    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1613040038687" />
     <state x="304" y="157" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1680.947@0.25.1680.947" timestamp="1610618907474" />
     <state x="100" y="100" width="1480" height="850" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1612947484987">
       <screen x="0" y="0" width="1680" height="1050" />
@@ -300,34 +301,34 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="412" key="GridCell.Tab.0.bottom" timestamp="1613038193801">
+    <state width="1638" height="383" key="GridCell.Tab.0.bottom" timestamp="1613039974489">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="412" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613038193801" />
+    <state width="1638" height="383" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613039974489" />
     <state width="1638" height="536" key="GridCell.Tab.0.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.bottom/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="412" key="GridCell.Tab.0.center" timestamp="1613038193799">
+    <state width="1638" height="383" key="GridCell.Tab.0.center" timestamp="1613039974487">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="412" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613038193799" />
+    <state width="1638" height="383" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613039974487" />
     <state width="1638" height="536" key="GridCell.Tab.0.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129764" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.center/0.25.1680.956@0.25.1680.956" timestamp="1612896981753" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="412" key="GridCell.Tab.0.left" timestamp="1613038193798">
+    <state width="1638" height="383" key="GridCell.Tab.0.left" timestamp="1613039974486">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="412" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613038193798" />
+    <state width="1638" height="383" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613039974486" />
     <state width="1638" height="536" key="GridCell.Tab.0.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129763" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="333" key="GridCell.Tab.0.left/0.25.1680.956@0.25.1680.956" timestamp="1612896981752" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="412" key="GridCell.Tab.0.right" timestamp="1613038193800">
+    <state width="1638" height="383" key="GridCell.Tab.0.right" timestamp="1613039974488">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="412" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613038193800" />
+    <state width="1638" height="383" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613039974488" />
     <state width="1638" height="536" key="GridCell.Tab.0.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129765" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.right/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
@@ -380,14 +381,14 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612451414315" />
-    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1613038576668">
+    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1613039967599">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613038576668" />
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1612879831479">
+    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613039967599" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1613039964193">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1612879831479" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613039964193" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup/0.25.1680.947@0.25.1680.947" timestamp="1610619078061" />
   </component>
   <component name="XDebuggerManager">
