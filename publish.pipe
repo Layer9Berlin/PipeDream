@@ -49,6 +49,9 @@ private:
       - print::message:
           when: "'$!!' == ''"
           message: "published $PIPEDREAM_PUBLISH_VERSION"
+          sync:
+            envVars:
+              - PIPEDREAM_PUBLISH_VERSION
 
   publish::handle-git-push-error:
     interpolate:
