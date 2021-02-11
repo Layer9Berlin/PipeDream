@@ -4,15 +4,8 @@ version: 0.0.1
 public:
   publish::all:
     pipe:
-      - publish::git::obtain-status
-      - print::if-match:
-          pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
-          message: clean
-          else: dirty
-      - ~:
-          each:
-            - publish::git::status-indicator
-            - publish::upload
+      - publish::git::status
+      - publish::upload
 
 private:
   publish::upload:
@@ -20,7 +13,7 @@ private:
       escapeQuotes: all
     pipe:
       - publish::perform-upload:
-          when: "'$!!' =~ 'clean'"
+          when: "'$!!' =~ 'clean$'"
           each:
             - publish::version::increment
             - publish::push

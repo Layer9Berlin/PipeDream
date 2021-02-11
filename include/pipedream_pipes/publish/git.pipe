@@ -2,11 +2,20 @@
 version: 0.0.1
 
 public:
-  publish::git::obtain-status:
-    shell:
-      run: git status
-#    catch: publish::git::catch-status-error
+  publish::git::status:
+    pipe:
+      - publish::git::obtain-status:
+          shell:
+            run: git status
+          catch: publish::git::catch-status-error
+          output:
+            switch:
+              - pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
+                text: clean
+            else: dirty
+      - publish::git::status-indicator
 
+private:
   publish::git::status-indicator:
     shell:
       args:
@@ -15,7 +24,6 @@ public:
         - green: "clean"
       run: "traffic-light"
 
-private:
   publish::git::catch-status-error:
     pipe:
       - print::message:

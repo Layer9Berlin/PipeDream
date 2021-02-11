@@ -24,7 +24,12 @@
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/git.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/publish/git.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/output/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/stack/stack_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/stack/stack_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/wait_for/wait_for_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/wait_for/wait_for_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/coverage.out" beforeDir="false" afterPath="$PROJECT_DIR$/test/coverage.out" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +93,7 @@
       <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build pipedream">
+  <component name="RunManager" selected="Go Test.go test src">
     <configuration name="go build pipedream" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
@@ -241,8 +246,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="chore: convert middleware identifiers to snake-case" />
-    <MESSAGE value="feat: log run identifier in execution context errors" />
     <MESSAGE value="docs: improve README" />
     <MESSAGE value="docs: add badges to README" />
     <MESSAGE value="docs: test coverage in README" />
@@ -266,7 +269,9 @@
     <MESSAGE value="refactor: improve publish pipe" />
     <MESSAGE value="refactor: improve publish pipe (WIP)" />
     <MESSAGE value="refactor: rename `sync` -&gt; `waitFor`" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: rename `sync` -&gt; `waitFor`" />
+    <MESSAGE value="fix: don't wait for child run before writing log to parent" />
+    <MESSAGE value="refactor: publish pipeline (WIP)" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: publish pipeline (WIP)" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -301,60 +306,60 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="286" key="GridCell.Tab.0.bottom" timestamp="1613046708675">
+    <state width="1638" height="321" key="GridCell.Tab.0.bottom" timestamp="1613049417421">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613046708675" />
+    <state width="1638" height="321" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613049417421" />
     <state width="1638" height="536" key="GridCell.Tab.0.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.bottom/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="286" key="GridCell.Tab.0.center" timestamp="1613046708673">
+    <state width="1638" height="321" key="GridCell.Tab.0.center" timestamp="1613049417420">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613046708673" />
+    <state width="1638" height="321" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613049417420" />
     <state width="1638" height="536" key="GridCell.Tab.0.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129764" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.center/0.25.1680.956@0.25.1680.956" timestamp="1612896981753" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="286" key="GridCell.Tab.0.left" timestamp="1613046708670">
+    <state width="1638" height="321" key="GridCell.Tab.0.left" timestamp="1613049417419">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613046708670" />
+    <state width="1638" height="321" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613049417419" />
     <state width="1638" height="536" key="GridCell.Tab.0.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129763" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="333" key="GridCell.Tab.0.left/0.25.1680.956@0.25.1680.956" timestamp="1612896981752" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="286" key="GridCell.Tab.0.right" timestamp="1613046708674">
+    <state width="1638" height="321" key="GridCell.Tab.0.right" timestamp="1613049417421">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613046708674" />
+    <state width="1638" height="321" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613049417421" />
     <state width="1638" height="536" key="GridCell.Tab.0.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129765" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.right/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
-    <state width="1638" height="286" key="GridCell.Tab.1.bottom" timestamp="1613046711765">
+    <state width="1638" height="286" key="GridCell.Tab.1.bottom" timestamp="1613049395921">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613046711765" />
+    <state width="1638" height="286" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613049395921" />
     <state width="1638" height="536" key="GridCell.Tab.1.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129768" />
     <state width="1638" height="449" key="GridCell.Tab.1.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
-    <state width="1638" height="286" key="GridCell.Tab.1.center" timestamp="1613046711764">
+    <state width="1638" height="286" key="GridCell.Tab.1.center" timestamp="1613049395921">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613046711764" />
+    <state width="1638" height="286" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613049395921" />
     <state width="1638" height="536" key="GridCell.Tab.1.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129767" />
     <state width="1638" height="449" key="GridCell.Tab.1.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795917" />
-    <state width="1638" height="286" key="GridCell.Tab.1.left" timestamp="1613046711763">
+    <state width="1638" height="286" key="GridCell.Tab.1.left" timestamp="1613049395920">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613046711763" />
+    <state width="1638" height="286" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613049395920" />
     <state width="1638" height="536" key="GridCell.Tab.1.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="449" key="GridCell.Tab.1.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795916" />
-    <state width="1638" height="286" key="GridCell.Tab.1.right" timestamp="1613046711765">
+    <state width="1638" height="286" key="GridCell.Tab.1.right" timestamp="1613049395921">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="286" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613046711765" />
+    <state width="1638" height="286" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613049395921" />
     <state width="1638" height="536" key="GridCell.Tab.1.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129767" />
     <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
     <state x="349" y="161" key="SettingsEditor" timestamp="1612610769609">
@@ -405,9 +410,14 @@
           <option name="timeStamp" value="158" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/src/middleware/execution_context.go</url>
-          <line>140</line>
-          <option name="timeStamp" value="188" />
+          <url>file://$PROJECT_DIR$/src/middleware/wait_for/wait_for.go</url>
+          <line>62</line>
+          <option name="timeStamp" value="189" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DlvLineBreakpoint">
+          <url>file://$PROJECT_DIR$/src/middleware/wait_for/wait_for.go</url>
+          <line>55</line>
+          <option name="timeStamp" value="191" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

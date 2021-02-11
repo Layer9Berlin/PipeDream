@@ -17,7 +17,7 @@ func TestRun_MiddlewareStack_setUpMiddleware(t *testing.T) {
 	require.Contains(t, middlewareStrings, "env")
 	require.Contains(t, middlewareStrings, "catch")
 	require.Contains(t, middlewareStrings, "when")
-	require.Contains(t, middlewareStrings, "sync")
+	require.Contains(t, middlewareStrings, "waitFor")
 	require.Contains(t, middlewareStrings, "pipe")
 	require.Contains(t, middlewareStrings, "each")
 	require.Contains(t, middlewareStrings, "shell")

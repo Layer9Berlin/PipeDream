@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func TestSync_Pipes(t *testing.T) {
+func TestWaitFor_Pipes(t *testing.T) {
 	runIdentifier1 := "test1"
 	runIdentifier2 := "test2"
 	run1, _ := pipeline.NewRun(&runIdentifier1, map[string]interface{}{}, nil, nil)
@@ -53,7 +53,7 @@ func TestSync_Pipes(t *testing.T) {
 	require.Contains(t, run2.Log.String(), "🕙 waitFor | waiting for run \"test1\"")
 }
 
-func TestSync_EnvVars(t *testing.T) {
+func TestWaitFor_EnvVars(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"waitFor": map[string]interface{}{
 			"envVars": []string{"test"},
