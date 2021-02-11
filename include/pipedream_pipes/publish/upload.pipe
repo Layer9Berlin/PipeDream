@@ -16,7 +16,7 @@ public:
           waitFor:
             envVars:
               - PIPEDREAM_GIT_STATUS
-      - publish::version::report:
+      - publish::upload::report:
           shell:
             args:
               - prefix: "Push to GitHub"
