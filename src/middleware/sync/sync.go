@@ -22,8 +22,12 @@ func (syncMiddleware Middleware) String() string {
 
 // NewMiddleware creates a new middleware instance
 func NewMiddleware() Middleware {
+	return NewMiddlewareWithLookupImplementation(os.LookupEnv)
+}
+
+func NewMiddlewareWithLookupImplementation(lookupImplementation func(key string) (string, bool)) Middleware {
 	return Middleware{
-		LookupEnv: os.LookupEnv,
+		LookupEnv: lookupImplementation,
 	}
 }
 

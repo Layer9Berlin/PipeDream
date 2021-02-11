@@ -154,7 +154,6 @@ func (run *Run) Close() {
 		fields.Symbol("⏏️"),
 		fields.Color("lightgray"),
 	)
-
 	run.Stdin.Close()
 	run.Stdout.Close()
 	run.Stderr.Close()
@@ -162,6 +161,8 @@ func (run *Run) Close() {
 	run.completionWaitGroup.Add(1)
 	go func() {
 		defer run.completionWaitGroup.Done()
+
+		run.StartWaitGroup.Wait()
 
 		run.Stdout.Wait()
 		run.Stderr.Wait()
