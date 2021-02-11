@@ -104,10 +104,25 @@ func (outputMiddleware Middleware) Apply(
 				regex, err := regexp.Compile(*switchStatement.Pattern)
 				run.Log.PossibleError(err)
 				if err == nil && regex.Match(outputData) {
+					run.Log.Debug(
+						fields.Symbol("↗️️"),
+						fields.Message(*switchStatement.Pattern),
+						fields.Message("matching"),
+
+						fields.Middleware(outputMiddleware),
+					)
 					foundMatch = true
 					_, err = stdoutIntercept.Write([]byte(*switchStatement.Text))
 					run.Log.PossibleError(err)
 					break
+				} else {
+					run.Log.Debug(
+						fields.Symbol("↗️️"),
+						fields.Message(*switchStatement.Pattern),
+						fields.Message("not matching"),
+
+						fields.Middleware(outputMiddleware),
+					)
 				}
 			}
 
