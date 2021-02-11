@@ -1,0 +1,68 @@
+---
+version: 0.0.1
+
+public:
+  publish::upload:
+    pipe:
+      - publish::upload-to-github:
+          when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
+          waitFor:
+            envVars: PIPEDREAM_GIT_STATUS
+      - publish::upload-to-github::skip:
+          output:
+            text: "skipped"
+          when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
+          waitFor:
+            envVars: PIPEDREAM_GIT_STATUS
+
+
+private:
+#  publish::upload-to-github:
+#    interpolate:
+#      escapeQuotes: all
+#    pipe:
+#      - publish::perform-upload:
+#          each:
+#            - publish::version::increment
+#            - publish::push
+  #      - print::message:
+  #          when: "'$!!' !~ 'clean'"
+  #          message: "skipped"
+  #      - publish::report-upload-status:
+  #          shell:
+  #            args:
+  #              - amber: "^skipped$"
+  #              - green: "^published"
+  #              - prefix: "Git push"
+  #            run: "traffic-light"
+
+  publish::push:
+    interpolate:
+      escapeQuotes: all
+    pipe:
+      - publish::push-to-git-repo:
+          shell:
+            run: "git push --follow-tags"
+          catch: publish::handle-git-push-error
+          waitFor:
+            pipes:
+              - publish::version::increment
+  #      - print::message:
+  #          when: "'$!!' == ''"
+  #          message: "published $PIPEDREAM_PUBLISH_VERSION"
+  #          waitFor:
+  #            envVars:
+  #              - PIPEDREAM_PUBLISH_VERSION
+
+#  publish::handle-git-push-error:
+#    interpolate:
+#      escapeQuotes: all
+#    pipe:
+#      - print::message:
+#          when: "'$!!' =~ 'Permission denied'"
+#          message: "permission denied"
+#      - exec::noop:
+#          when: "'$!!' =~ 'Everything up-to-date'"
+#      - print::message:
+#          when: "'$!!' !~ 'Permission denied|Everything up-to-date|To github\\.com:Layer9Berlin/PipeDream\\.git'"
+#          message: "uncaught error ('$!!')"

@@ -9,17 +9,18 @@ public:
           waitFor:
             envVars: PIPEDREAM_GIT_STATUS
       - publish::version-bump::skip:
+          output:
+            text: "skipped"
           when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
           waitFor:
             envVars: PIPEDREAM_GIT_STATUS
       - publish::version::report:
           shell:
             args:
+              - prefix: "Create version"
               - amber: "^skipped$"
-              - green: "^bumped"
+              - green: "^v"
             run: "traffic-light"
-
-
 
 private:
   publish::version::increment:
@@ -51,9 +52,3 @@ private:
     waitFor:
       envVars:
         - PIPEDREAM_CURRENT_VERSION
-
-  publish::version-bump::skip:
-    pipe:
-      - publish::version-bump::skip::output:
-          output:
-            text: "skipped"
