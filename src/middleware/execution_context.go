@@ -139,13 +139,11 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 				))
 			go func() {
 				_, _ = runOptions.logWriter.Write(initialLogData)
-				pipelineRun.Wait()
 				_, _ = io.Copy(runOptions.logWriter, pipelineRun.Log)
 				_ = runOptions.logWriter.Close()
 			}()
 		} else {
 			go func() {
-				pipelineRun.Wait()
 				_, _ = io.Copy(runOptions.logWriter, pipelineRun.Log)
 				_ = runOptions.logWriter.Close()
 			}()
