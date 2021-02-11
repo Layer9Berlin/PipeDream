@@ -7,11 +7,13 @@ public:
       - publish::version::get-current-version:
           shell:
             run: "svu c"
+      - strings::remove-new-lines:
           env:
             save: "PIPEDREAM_CURRENT_VERSION"
       - publish::version::create-new-version-string:
           shell:
             run: "svu n"
+      - strings::remove-new-lines
       - publish::version::enforce-version-increase
       - strings::remove-new-lines:
           env:
