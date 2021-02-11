@@ -88,7 +88,7 @@ func (inputMiddleware Middleware) Apply(
 		)
 
 		// using the stdout intercept to be able to read and write stdout asynchronously
-		stdinCopy := run.Stdout.Copy()
+		stdinCopy := run.Stdin.Copy()
 		stdoutAppender := run.Stdout.WriteCloser()
 		// do not close log yet, we may still want to write errors to it...
 		run.LogClosingWaitGroup.Add(1)
