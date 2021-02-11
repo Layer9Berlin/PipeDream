@@ -116,7 +116,7 @@ func (outputMiddleware Middleware) Apply(
 					break
 				} else {
 					run.Log.Debug(
-						fields.Symbol("↗️️"),
+						fields.Symbol("🔢"),
 						fields.Message("mismatch"),
 						fields.Info(*switchStatement.Pattern),
 						fields.Middleware(outputMiddleware),
