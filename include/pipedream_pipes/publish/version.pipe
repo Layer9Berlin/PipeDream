@@ -13,6 +13,8 @@ public:
           output:
             text: "skipped"
           when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
+          env:
+            save: PIPEDREAM_PUBLISH_VERSION
       - publish::version::report:
           shell:
             args:
@@ -35,11 +37,11 @@ private:
             run: "svu n"
       - strings::remove-new-lines
       - publish::version::enforce-version-increase
+      - strings::remove-new-lines
+      - publish::version::increment-npm-version
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_PUBLISH_VERSION
-      - publish::version::increment-npm-version
-      - strings::remove-new-lines
 
   publish::version::increment-npm-version:
     shell:

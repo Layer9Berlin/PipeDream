@@ -5,7 +5,7 @@ public:
   publish::upload:
     waitFor:
       envVars:
-        - PIPEDREAM_GIT_STATUS
+        - PIPEDREAM_PUBLISH_VERSION
     pipe:
       - publish::upload-to-github:
           when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
