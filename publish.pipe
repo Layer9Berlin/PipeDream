@@ -23,17 +23,17 @@ private:
           when: "'$!!' =~ 'clean'"
           each:
             - publish::version::increment
-            - publish::push
-      - print::message:
-          when: "'$!!' !~ 'clean'"
-          message: "skipped"
-      - publish::report-upload-status:
-          shell:
-            args:
-              - amber: "^skipped$"
-              - green: "^published"
-              - prefix: "Git push"
-            run: "traffic-light"
+#            - publish::push
+#      - print::message:
+#          when: "'$!!' !~ 'clean'"
+#          message: "skipped"
+#      - publish::report-upload-status:
+#          shell:
+#            args:
+#              - amber: "^skipped$"
+#              - green: "^published"
+#              - prefix: "Git push"
+#            run: "traffic-light"
 
   publish::push:
     interpolate:
