@@ -5,7 +5,7 @@ public:
   publish::git::obtain-status:
     shell:
       run: git status
-    catch: publish::git::catch-status-error
+#    catch: publish::git::catch-status-error
 
   publish::git::status-indicator:
     shell:
