@@ -3,14 +3,14 @@ version: 0.0.1
 
 public:
   publish::version::increment:
-    each:
+    pipe:
       - publish::version::create-new-version-string:
           shell:
             run: "svu n"
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_PUBLISH_VERSION
-#      - publish::version::increment-npm-version
+      - publish::version::increment-npm-version
 
 private:
   publish::version::increment-npm-version:
