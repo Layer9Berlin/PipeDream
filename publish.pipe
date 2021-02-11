@@ -24,16 +24,16 @@ private:
           each:
             - publish::version::increment
             - publish::push
-      - print::message:
-          when: "'$!!' !~ 'clean'"
-          message: "skipped"
-      - publish::report-upload-status:
-          shell:
-            args:
-              - amber: "^skipped$"
-              - green: "^published"
-              - prefix: "Git push"
-            run: "traffic-light"
+#      - print::message:
+#          when: "'$!!' !~ 'clean'"
+#          message: "skipped"
+#      - publish::report-upload-status:
+#          shell:
+#            args:
+#              - amber: "^skipped$"
+#              - green: "^published"
+#              - prefix: "Git push"
+#            run: "traffic-light"
 
   publish::push:
     interpolate:
@@ -46,12 +46,12 @@ private:
           sync:
             pipes:
               - publish::version::increment
-      - print::message:
-          when: "'$!!' == ''"
-          message: "published $PIPEDREAM_PUBLISH_VERSION"
-          sync:
-            envVars:
-              - PIPEDREAM_PUBLISH_VERSION
+#      - print::message:
+#          when: "'$!!' == ''"
+#          message: "published $PIPEDREAM_PUBLISH_VERSION"
+#          sync:
+#            envVars:
+#              - PIPEDREAM_PUBLISH_VERSION
 
   publish::handle-git-push-error:
     interpolate:
