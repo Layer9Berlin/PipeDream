@@ -7,6 +7,10 @@ public:
       - publish::version::create-new-version-string:
           shell:
             run: "svu n"
+      - publish::version::enforce-version-increase:
+          when: "'$!!' == '$(svu c)'"
+          shell:
+            run: "svu p"
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_PUBLISH_VERSION
