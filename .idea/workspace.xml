@@ -24,7 +24,12 @@
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/binary.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/build.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/build.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/install/pipes.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/install/pipes.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/version.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/publish/version.pipe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/publish.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/publish.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/stack/stack.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/stack/stack.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,7 +246,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="fix: crash when execution context has no errors" />
     <MESSAGE value="chore: convert middleware identifiers to snake-case" />
     <MESSAGE value="feat: log run identifier in execution context errors" />
     <MESSAGE value="docs: improve README" />
@@ -266,7 +270,8 @@
     <MESSAGE value="test: improve coverage" />
     <MESSAGE value="refactor: improve publish pipe" />
     <MESSAGE value="refactor: improve publish pipe (WIP)" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: improve publish pipe (WIP)" />
+    <MESSAGE value="refactor: rename `sync` -&gt; `waitFor`" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: rename `sync` -&gt; `waitFor`" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -301,34 +306,34 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="426" key="GridCell.Tab.0.bottom" timestamp="1613042581412">
+    <state width="1638" height="426" key="GridCell.Tab.0.bottom" timestamp="1613045580931">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="426" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613042581412" />
+    <state width="1638" height="426" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613045580931" />
     <state width="1638" height="536" key="GridCell.Tab.0.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.bottom/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="426" key="GridCell.Tab.0.center" timestamp="1613042581411">
+    <state width="1638" height="426" key="GridCell.Tab.0.center" timestamp="1613045580929">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="426" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613042581411" />
+    <state width="1638" height="426" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613045580929" />
     <state width="1638" height="536" key="GridCell.Tab.0.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129764" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.center/0.25.1680.956@0.25.1680.956" timestamp="1612896981753" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="426" key="GridCell.Tab.0.left" timestamp="1613042581410">
+    <state width="1638" height="426" key="GridCell.Tab.0.left" timestamp="1613045580928">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="426" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613042581410" />
+    <state width="1638" height="426" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613045580928" />
     <state width="1638" height="536" key="GridCell.Tab.0.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129763" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="333" key="GridCell.Tab.0.left/0.25.1680.956@0.25.1680.956" timestamp="1612896981752" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="426" key="GridCell.Tab.0.right" timestamp="1613042581412">
+    <state width="1638" height="426" key="GridCell.Tab.0.right" timestamp="1613045580930">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="426" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613042581412" />
+    <state width="1638" height="426" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613045580930" />
     <state width="1638" height="536" key="GridCell.Tab.0.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129765" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.right/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
@@ -381,10 +386,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612451414315" />
-    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1613041434500">
+    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1613045577564">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613041434500" />
+    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613045577564" />
     <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1613039964193">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>

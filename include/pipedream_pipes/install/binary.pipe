@@ -52,7 +52,7 @@ private:
     pipe:
       - env::load:
           var: PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
-          sync:
+          waitFor:
             envVars:
               - PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
       - print::if-empty:
@@ -113,13 +113,13 @@ private:
           pattern: "$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
           message: "unchanged"
           else: "changed"
-          sync:
+          waitFor:
             envVars:
               - "PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
       - print::message:
           when: "'$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}' == ''"
           message: "n/a (no checksum)"
-          sync:
+          waitFor:
             envVars:
               - "PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
       - util::traffic-light:

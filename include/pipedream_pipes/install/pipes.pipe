@@ -29,7 +29,7 @@ private:
           when: "'$!!' != ''"
           source: $!!/include/pipedream_pipes
           target: $PIPEDREAM_BIN_INSTALL_PATH
-#          sync:
+#          waitFor:
 #            envVars:
 #              - PIPEDREAM_BIN_INSTALL_PATH
 

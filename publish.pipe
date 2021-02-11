@@ -43,13 +43,13 @@ private:
           shell:
             run: "git push --follow-tags"
           catch: publish::handle-git-push-error
-          sync:
+          waitFor:
             pipes:
               - publish::version::increment
 #      - print::message:
 #          when: "'$!!' == ''"
 #          message: "published $PIPEDREAM_PUBLISH_VERSION"
-#          sync:
+#          waitFor:
 #            envVars:
 #              - PIPEDREAM_PUBLISH_VERSION
 

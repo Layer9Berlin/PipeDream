@@ -29,6 +29,6 @@ private:
     when: "'$!!' == '$PIPEDREAM_CURRENT_VERSION'"
     shell:
       run: "svu p"
-    sync:
+    waitFor:
       envVars:
         - PIPEDREAM_CURRENT_VERSION
