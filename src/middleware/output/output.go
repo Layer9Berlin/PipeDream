@@ -84,7 +84,6 @@ func (outputMiddleware Middleware) Apply(
 		run.Log.Debug(
 			fields.Symbol("↗️️"),
 			fields.Message("switch"),
-			fields.Info(*arguments.Text),
 			fields.Middleware(outputMiddleware),
 		)
 

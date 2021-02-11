@@ -28,6 +28,7 @@ func SetUpMiddleware() []middleware.Middleware {
 		timer.NewMiddleware(),
 		inherit.NewMiddleware(),
 		interpolate.NewMiddleware(),
+		outputmiddleware.NewMiddleware(),
 		env.NewMiddleware(),
 		catch.NewMiddleware(),
 		when.NewMiddleware(),
@@ -39,6 +40,5 @@ func SetUpMiddleware() []middleware.Middleware {
 		docker.NewMiddleware(),
 		dir.NewMiddleware(),
 		inputmiddleware.NewMiddleware(),
-		outputmiddleware.NewMiddleware(),
 	}
 }
