@@ -7,13 +7,22 @@ public:
       - publish::upload-to-github:
           when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
           waitFor:
-            envVars: PIPEDREAM_GIT_STATUS
+            envVars:
+              - PIPEDREAM_GIT_STATUS
       - publish::upload-to-github::skip:
           output:
             text: "skipped"
           when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
           waitFor:
-            envVars: PIPEDREAM_GIT_STATUS
+            envVars:
+              - PIPEDREAM_GIT_STATUS
+      - publish::version::report:
+          shell:
+            args:
+              - prefix: "Push to GitHub"
+              - amber: "^skipped$"
+              - green: "^successful"
+            run: "traffic-light"
 
 
 private:
