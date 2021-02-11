@@ -35,7 +35,7 @@ private:
   publish::handle-git-push-error:
     interpolate:
       escapeQuotes: all
-    output:
+    input:
       switch:
         - pattern: "Permission denied"
           text: "permission denied"

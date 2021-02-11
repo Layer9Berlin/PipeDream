@@ -6,6 +6,7 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io/ioutil"
+	"regexp"
 	"sync"
 )
 
@@ -24,12 +25,19 @@ func NewMiddleware() Middleware {
 }
 
 type middlewareArguments struct {
+	Else   *string
+	Switch []struct {
+		Pattern *string
+		Text    *string
+	}
 	Text *string
 }
 
 func newMiddlewareArguments() middlewareArguments {
 	return middlewareArguments{
-		Text: nil,
+		Else:   nil,
+		Switch: nil,
+		Text:   nil,
 	}
 }
 
@@ -67,6 +75,64 @@ func (inputMiddleware Middleware) Apply(
 			run.Log.PossibleError(err)
 			waitGroup.Wait()
 			run.Log.PossibleError(stdinIntercept.Close())
+		}()
+	}
+
+	// switch is provided a list of regex patterns
+	// it will use the first match to replace the output
+	if arguments.Switch != nil {
+		run.Log.Debug(
+			fields.Symbol("↘️"),
+			fields.Message("switch"),
+			fields.Middleware(inputMiddleware),
+		)
+
+		// using the stdout intercept to be able to read and write stdout asynchronously
+		stdinCopy := run.Stdout.Copy()
+		stdoutAppender := run.Stdout.WriteCloser()
+		// do not close log yet, we may still want to write errors to it...
+		run.LogClosingWaitGroup.Add(1)
+		go func() {
+			defer run.LogClosingWaitGroup.Done()
+			// read the entire input data
+			inputData, _ := ioutil.ReadAll(stdinCopy)
+
+			foundMatch := false
+			for _, switchStatement := range arguments.Switch {
+				if switchStatement.Pattern == nil || switchStatement.Text == nil {
+					continue
+				}
+				regex, err := regexp.Compile(*switchStatement.Pattern)
+				run.Log.PossibleError(err)
+				if err == nil && regex.Match(inputData) {
+					run.Log.Debug(
+						fields.Symbol("🔢"),
+						fields.Message("match"),
+						fields.Info(*switchStatement.Pattern),
+						fields.Middleware(inputMiddleware),
+					)
+					foundMatch = true
+					_, err = stdoutAppender.Write([]byte(*switchStatement.Text))
+					run.Log.PossibleError(err)
+					break
+				} else {
+					run.Log.Debug(
+						fields.Symbol("🔢"),
+						fields.Message("mismatch"),
+						fields.Info(*switchStatement.Pattern),
+						fields.Middleware(inputMiddleware),
+					)
+				}
+			}
+
+			if !foundMatch {
+				if arguments.Else != nil {
+					_, err := stdoutAppender.Write([]byte(*arguments.Else))
+					run.Log.PossibleError(err)
+				}
+			}
+
+			run.Log.PossibleError(stdoutAppender.Close())
 		}()
 	}
 }

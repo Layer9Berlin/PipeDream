@@ -93,7 +93,7 @@ func (outputMiddleware Middleware) Apply(
 		run.LogClosingWaitGroup.Add(1)
 		go func() {
 			defer run.LogClosingWaitGroup.Done()
-			// read the entire input data
+			// read the entire output data
 			outputData, _ := ioutil.ReadAll(stdoutIntercept)
 
 			foundMatch := false
