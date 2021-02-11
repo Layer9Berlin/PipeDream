@@ -1,5 +1,5 @@
-// Package syncmiddleware provides a middleware to defer execution until a condition is fulfilled
-package syncmiddleware
+// Package waitformiddleware provides a middleware to defer execution until a condition is fulfilled
+package waitformiddleware
 
 import (
 	"fmt"
@@ -16,8 +16,8 @@ type Middleware struct {
 }
 
 // String is a human-readable description
-func (syncMiddleware Middleware) String() string {
-	return "sync"
+func (waitForMiddleware Middleware) String() string {
+	return "waitFor"
 }
 
 // NewMiddleware creates a new middleware instance
@@ -41,13 +41,13 @@ type middlewareArguments struct {
 // It adapts the run based on its slice of the run's arguments.
 // It may also trigger side effects such as executing shell commands or full runs of other pipelines.
 // When done, this function should call next in order to continue unwinding the stack.
-func (syncMiddleware Middleware) Apply(
+func (waitForMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(*pipeline.Run),
 	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := middlewareArguments{}
-	pipeline.ParseArguments(&arguments, "sync", run)
+	pipeline.ParseArguments(&arguments, "waitFor", run)
 
 	if arguments.Pipes != nil {
 		for _, pipelineIdentifier := range arguments.Pipes {
@@ -57,7 +57,7 @@ func (syncMiddleware Middleware) Apply(
 					run.Log.Debug(
 						fields.Symbol("🕙"),
 						fields.Message(fmt.Sprintf("waiting for run %q", pipelineIdentifier)),
-						fields.Middleware(syncMiddleware),
+						fields.Middleware(waitForMiddleware),
 					)
 					go func() {
 						dependentRun.Wait()
@@ -75,11 +75,11 @@ func (syncMiddleware Middleware) Apply(
 			run.Log.Debug(
 				fields.Symbol("🕙"),
 				fields.Message(fmt.Sprintf("waiting for env var %q to be set", envVar)),
-				fields.Middleware(syncMiddleware),
+				fields.Middleware(waitForMiddleware),
 			)
 			go func() {
 				for {
-					if _, ok := syncMiddleware.LookupEnv(envVar); ok {
+					if _, ok := waitForMiddleware.LookupEnv(envVar); ok {
 						break
 					}
 					time.Sleep(200)

@@ -1,5 +1,5 @@
 // Package catcheach provides a middleware for graceful handling of stderr output based on regex patterns
-package catcheach
+package catch_each
 
 import (
 	"bufio"

@@ -1,4 +1,4 @@
-package catcheach
+package catch_each
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"

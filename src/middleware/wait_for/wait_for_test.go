@@ -1,4 +1,4 @@
-package syncmiddleware
+package waitformiddleware
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"
@@ -14,7 +14,7 @@ func TestSync_Pipes(t *testing.T) {
 	runIdentifier2 := "test2"
 	run1, _ := pipeline.NewRun(&runIdentifier1, map[string]interface{}{}, nil, nil)
 	run2, _ := pipeline.NewRun(&runIdentifier2, map[string]interface{}{
-		"sync": map[string]interface{}{
+		"waitFor": map[string]interface{}{
 			"pipes": []string{"test1"},
 		},
 	}, nil, nil)
@@ -50,12 +50,12 @@ func TestSync_Pipes(t *testing.T) {
 
 	require.Equal(t, 0, run1.Log.ErrorCount())
 	require.Equal(t, 0, run2.Log.ErrorCount())
-	require.Contains(t, run2.Log.String(), "🕙 sync | waiting for run \"test1\"")
+	require.Contains(t, run2.Log.String(), "🕙 waitFor | waiting for run \"test1\"")
 }
 
 func TestSync_EnvVars(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
-		"sync": map[string]interface{}{
+		"waitFor": map[string]interface{}{
 			"envVars": []string{"test"},
 		},
 	}, nil, nil)
@@ -82,5 +82,5 @@ func TestSync_EnvVars(t *testing.T) {
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
-	require.Contains(t, run.Log.String(), "🕙 sync | waiting for env var \"test\" to be set")
+	require.Contains(t, run.Log.String(), "🕙 waitFor | waiting for env var \"test\" to be set")
 }
