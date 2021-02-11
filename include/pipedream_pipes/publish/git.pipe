@@ -13,6 +13,8 @@ public:
               - pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
                 text: clean
             else: dirty
+          env:
+            save: PIPEDREAM_GIT_STATUS
       - publish::git::status-indicator
 
 private:

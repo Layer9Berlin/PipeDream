@@ -2,6 +2,26 @@
 version: 0.0.1
 
 public:
+  publish::version-bump:
+    pipe:
+      - publish::version::increment:
+          when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
+          waitFor:
+            envVars: PIPEDREAM_GIT_STATUS
+      - publish::version-bump::skip:
+          when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
+          waitFor:
+            envVars: PIPEDREAM_GIT_STATUS
+      - publish::version::report:
+          shell:
+            args:
+              - amber: "^skipped$"
+              - green: "^bumped"
+            run: "traffic-light"
+
+
+
+private:
   publish::version::increment:
     pipe:
       - publish::version::get-current-version:
@@ -20,7 +40,6 @@ public:
             save: PIPEDREAM_PUBLISH_VERSION
       - publish::version::increment-npm-version
 
-private:
   publish::version::increment-npm-version:
     shell:
       run: "npm version $!!"
@@ -32,3 +51,9 @@ private:
     waitFor:
       envVars:
         - PIPEDREAM_CURRENT_VERSION
+
+  publish::version-bump::skip:
+    pipe:
+      - publish::version-bump::skip::output:
+          output:
+            text: "skipped"

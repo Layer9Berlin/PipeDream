@@ -3,12 +3,18 @@ version: 0.0.1
 
 public:
   publish::all:
-    pipe:
+    each:
       - publish::git::status
+      - publish::version::bump
       - publish::upload
 
 private:
-  publish::upload:
+
+
+
+
+
+  publish::upload-to-github:
     interpolate:
       escapeQuotes: all
     pipe:
