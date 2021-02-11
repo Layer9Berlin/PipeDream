@@ -1,6 +1,6 @@
 {
   "name": "@l9/pipedream",
-  "version": "0.32.24",
+  "version": "0.32.25",
   "description": "PipeDream - Maintainable Script Automation",
   "main": "index.js",
   "directories": {
