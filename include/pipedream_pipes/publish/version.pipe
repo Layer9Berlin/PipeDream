@@ -7,9 +7,9 @@ public:
       - publish::version::create-new-version-string:
           shell:
             run: "svu n"
-#      - strings::remove-new-lines:
-#          env:
-#            save: PIPEDREAM_PUBLISH_VERSION
+      - strings::remove-new-lines:
+          env:
+            save: PIPEDREAM_PUBLISH_VERSION
 #      - publish::version::increment-npm-version
 
 private:
