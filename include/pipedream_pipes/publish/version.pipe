@@ -4,10 +4,21 @@ version: 0.0.1
 public:
   publish::version::increment:
     pipe:
+      - publish::version::get-current-version:
+          shell:
+            run: "svu c"
+          env:
+            save: "PIPEDREAM_CURRENT_VERSION"
       - publish::version::create-new-version-string:
           shell:
             run: "svu n"
-      - publish::version::enforce-version-increase
+      - publish::version::enforce-version-increase:
+          when: "'$!!' == '$PIPEDREAM_CURRENT_VERSION'"
+          shell:
+            run: "svu p"
+          sync:
+            envVars:
+              - PIPEDREAM_CURRENT_VERSION
       - strings::remove-new-lines:
           env:
             save: PIPEDREAM_PUBLISH_VERSION
@@ -17,8 +28,3 @@ private:
   publish::version::increment-npm-version:
     shell:
       run: "npm version $!!"
-
-  publish::version::enforce-version-increase:
-    when: "'$!!' == '$(svu c)'"
-    shell:
-      run: "svu p"
