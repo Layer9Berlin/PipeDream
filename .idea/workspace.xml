@@ -22,29 +22,7 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
-      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/git/git.pipe" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/middleware/switch/switch.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/git.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/publish/git.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/shasum.pipe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/test/expect.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/test/expect.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/input/input.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/input/input.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/input/input_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/input/input_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/output/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/output/output_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/select/select.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/select/select_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/stack/stack.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/stack/stack.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/wait_for/wait_for.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/wait_for/wait_for.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/middleware/wait_for/wait_for_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/wait_for/wait_for_test.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parsing/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/parser.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/parsing/pipelines.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/pipelines.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/pipeline/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/file.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/run/run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/publish/git.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/publish/git.test.pipe" afterDir="false" />
-    </list>
+    <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -260,7 +238,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="docs: improve README" />
     <MESSAGE value="docs: add badges to README" />
     <MESSAGE value="docs: test coverage in README" />
     <MESSAGE value="fix: remove .DS_Store files" />
@@ -285,7 +262,8 @@
     <MESSAGE value="refactor: rename `sync` -&gt; `waitFor`" />
     <MESSAGE value="fix: don't wait for child run before writing log to parent" />
     <MESSAGE value="refactor: publish pipeline (WIP)" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: publish pipeline (WIP)" />
+    <MESSAGE value="test: add publish pipeline pipe tests (WIP)" />
+    <option name="LAST_COMMIT_MESSAGE" value="test: add publish pipeline pipe tests (WIP)" />
   </component>
   <component name="VgoProject">
     <integration-enabled>true</integration-enabled>
@@ -320,34 +298,34 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="556" key="GridCell.Tab.0.bottom" timestamp="1613120905616">
+    <state width="1638" height="556" key="GridCell.Tab.0.bottom" timestamp="1613120947065">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="556" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905616" />
+    <state width="1638" height="556" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613120947065" />
     <state width="1638" height="536" key="GridCell.Tab.0.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.bottom/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="556" key="GridCell.Tab.0.center" timestamp="1613120905615">
+    <state width="1638" height="556" key="GridCell.Tab.0.center" timestamp="1613120947063">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="556" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905615" />
+    <state width="1638" height="556" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613120947063" />
     <state width="1638" height="536" key="GridCell.Tab.0.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129764" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.center/0.25.1680.956@0.25.1680.956" timestamp="1612896981753" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="556" key="GridCell.Tab.0.left" timestamp="1613120905614">
+    <state width="1638" height="556" key="GridCell.Tab.0.left" timestamp="1613120947062">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="556" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905614" />
+    <state width="1638" height="556" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613120947062" />
     <state width="1638" height="536" key="GridCell.Tab.0.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129763" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="333" key="GridCell.Tab.0.left/0.25.1680.956@0.25.1680.956" timestamp="1612896981752" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="556" key="GridCell.Tab.0.right" timestamp="1613120905615">
+    <state width="1638" height="556" key="GridCell.Tab.0.right" timestamp="1613120947064">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="556" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905615" />
+    <state width="1638" height="556" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613120947064" />
     <state width="1638" height="536" key="GridCell.Tab.0.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129765" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.right/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
