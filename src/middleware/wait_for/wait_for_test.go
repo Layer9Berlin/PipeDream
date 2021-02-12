@@ -1,4 +1,4 @@
-package waitformiddleware
+package _waitfor
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/middleware"

@@ -1,33 +1,31 @@
 version: 0.0.1
 
-import:
-  - ../dependencies.pipe
-
-default:
-  command: install
-
-pipelines:
+public:
   test::publish::feature-tests:
     each:
-      - test::publish::
-          name: Apply ignores (1/1)
+      - test::publish::test-git-repo-dirty:
+          name: Dirty git repo should cause version bump and upload to be skipped
 
-  test::go-mod::apply-ignores-1:
-    selectable: false
+private:
+  git::status:
+    output:
+      text: |
+        On branch main
+        Your branch is up to date with 'origin/main'.
+
+        Changes to be committed:
+          (use "git restore --staged <file>..." to unstage)
+          deleted: include/pipedream_pipes/publish/shasum.pipe
+
+        Changes not staged for commit:
+          (use "git add <file>..." to update what will be committed)
+          (use "git restore <file>..." to discard changes in working directory)
+          modified: test/publish/git.test.pipe
+
+
+  test::publish::test-git-repo-dirty:
     pipe:
-      - print::message:
-          file: vectors/go-mod-list.0.stdin.txt
-      - go-mod::apply-ignores:
-          ignore-packages:
-            - github.com/envoyproxy/protoc-gen-validate
-            - github.com/codahale/hdrhistogram
-            - go.etcd.io/etcd
-            - github.com/lyft/protoc-gen-validate
-            - sourcegraph.com/sourcegraph/go-diff
-            - github.com/etcd-io/bbolt
-            - go.etcd.io/bbolt
-            - github.com/golang/lint
-            - golang.org/x/exp
-            - golang.org/x/sys
-      - expect:
-          file: results/go-mod-list.0.stdout.txt
+      - publish::git::status
+      - test::expect::output-pattern:
+          pattern: 'Local git repo status: dirty'
+          testName: "Dirty repo should cause rest to be skipped"

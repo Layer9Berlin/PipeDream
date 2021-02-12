@@ -9,29 +9,31 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/middleware/each"
 	"github.com/Layer9Berlin/pipedream/src/middleware/env"
 	"github.com/Layer9Berlin/pipedream/src/middleware/inherit"
-	inputmiddleware "github.com/Layer9Berlin/pipedream/src/middleware/input"
+	_input "github.com/Layer9Berlin/pipedream/src/middleware/input"
 	"github.com/Layer9Berlin/pipedream/src/middleware/interpolate"
-	outputmiddleware "github.com/Layer9Berlin/pipedream/src/middleware/output"
+	_output "github.com/Layer9Berlin/pipedream/src/middleware/output"
 	"github.com/Layer9Berlin/pipedream/src/middleware/pipe"
-	selectmiddleware "github.com/Layer9Berlin/pipedream/src/middleware/select"
+	_select "github.com/Layer9Berlin/pipedream/src/middleware/select"
 	"github.com/Layer9Berlin/pipedream/src/middleware/shell"
 	"github.com/Layer9Berlin/pipedream/src/middleware/ssh"
+	_switch "github.com/Layer9Berlin/pipedream/src/middleware/switch"
 	"github.com/Layer9Berlin/pipedream/src/middleware/timer"
-	waitformiddleware "github.com/Layer9Berlin/pipedream/src/middleware/wait_for"
+	_waitfor "github.com/Layer9Berlin/pipedream/src/middleware/wait_for"
 	"github.com/Layer9Berlin/pipedream/src/middleware/when"
 )
 
 // SetUpMiddleware returns the stack of middleware items that will be unwound during the run's execution
 func SetUpMiddleware() []middleware.Middleware {
 	return []middleware.Middleware{
-		selectmiddleware.NewMiddleware(),
+		_select.NewMiddleware(),
 		timer.NewMiddleware(),
 		inherit.NewMiddleware(),
-		waitformiddleware.NewMiddleware(),
+		_waitfor.NewMiddleware(),
 		interpolate.NewMiddleware(),
 		env.NewMiddleware(),
 		when.NewMiddleware(),
-		outputmiddleware.NewMiddleware(),
+		_output.NewMiddleware(),
+		_switch.NewMiddleware(),
 		catch.NewMiddleware(),
 		pipe.NewMiddleware(),
 		each.NewMiddleware(),
@@ -39,6 +41,6 @@ func SetUpMiddleware() []middleware.Middleware {
 		ssh.NewMiddleware(),
 		docker.NewMiddleware(),
 		dir.NewMiddleware(),
-		inputmiddleware.NewMiddleware(),
+		_input.NewMiddleware(),
 	}
 }

@@ -1,5 +1,5 @@
-// Package selectmiddleware provides a middleware that shows a selection prompt to the user
-package selectmiddleware
+// Package _select provides a middleware that shows a selection prompt to the user
+package _select
 
 import (
 	"bytes"

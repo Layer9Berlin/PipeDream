@@ -23,11 +23,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2304d920-a682-4f14-9150-6f564789068a" name="Default Changelist" comment="fix: module path">
-      <change afterPath="$PROJECT_DIR$/test/publish/git.test.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/include/pipedream_pipes/git/git.pipe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/middleware/switch/switch.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/upload.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/publish/upload.pipe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/version.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/publish/version.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/git.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/publish/git.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/publish/shasum.pipe" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/pipedream_pipes/test/expect.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/include/pipedream_pipes/test/expect.pipe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/execution_context.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/execution_context.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/input/input.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/input/input.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/input/input_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/input/input_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/output/output.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/output/output_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/output/output_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/select/select.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/select/select_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/select/select_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/stack/stack.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/stack/stack.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/middleware/wait_for/wait_for.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/wait_for/wait_for.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware/wait_for/wait_for_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware/wait_for/wait_for_test.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parsing/parser.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/parser.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/parsing/pipelines.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/parsing/pipelines.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/pipeline/file.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/pipeline/file.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/run/run.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/run/run.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/publish/git.test.pipe" beforeDir="false" afterPath="$PROJECT_DIR$/test/publish/git.test.pipe" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,12 +86,19 @@
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.tried.to.enable.integration.vgo.integrator" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/middleware/output" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/middleware/switch" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/middleware/switch" />
+      <recent name="$PROJECT_DIR$/src/middleware/output" />
+      <recent name="$PROJECT_DIR$/src/middleware/input" />
+      <recent name="$PROJECT_DIR$/src/custom/io" />
+      <recent name="$PROJECT_DIR$/src/logging" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/middleware" />
       <recent name="$PROJECT_DIR$/src/middleware/stack" />
@@ -83,20 +106,13 @@
       <recent name="$PROJECT_DIR$/src/arguments" />
       <recent name="$PROJECT_DIR$/src/executioncontext" />
     </key>
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/middleware/output" />
-      <recent name="$PROJECT_DIR$/src/middleware/input" />
-      <recent name="$PROJECT_DIR$/src/custom/io" />
-      <recent name="$PROJECT_DIR$/src/logging" />
-      <recent name="$PROJECT_DIR$/src" />
-    </key>
   </component>
   <component name="RunManager" selected="Go Build.go build pipedream">
     <configuration name="go build pipedream" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="PipeDream" />
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
-      <parameters value="-v debug" />
+      <parameters value="-v debug -f test/publish/git.test.pipe" />
       <kind value="PACKAGE" />
       <filePath value="$PROJECT_DIR$" />
       <package value="github.com/Layer9Berlin/pipedream" />
@@ -279,19 +295,19 @@
       <screen x="0" y="25" width="1680" height="947" />
     </state>
     <state x="640" y="336" key="#Go_Modules/0.25.1680.947@0.25.1680.947" timestamp="1610618862086" />
-    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1613040038687">
+    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1613070542490">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1613040038687" />
+    <state x="367" y="195" width="1071" height="731" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1613070542490" />
     <state x="304" y="157" width="1071" height="730" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.25.1680.947@0.25.1680.947" timestamp="1610618907474" />
     <state x="100" y="100" width="1480" height="850" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog" timestamp="1612947484987">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="#com.intellij.execution.junit2.states.ComparisonFailureState$DiffDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612947484987" />
-    <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1613052729585">
+    <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1613069685884">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1613052729585" />
+    <state x="569" y="331" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1680.1050@0.0.1680.1050" timestamp="1613069685884" />
     <state x="653" y="245" key="#com.intellij.ide.util.MemberChooser" timestamp="1612879289291">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -304,60 +320,60 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="100" y="100" width="1480" height="850" key="DiffContextDialog/0.0.1680.1050@0.0.1680.1050" timestamp="1612288147091" />
-    <state width="1638" height="423" key="GridCell.Tab.0.bottom" timestamp="1613069232892">
+    <state width="1638" height="556" key="GridCell.Tab.0.bottom" timestamp="1613120905616">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232892" />
+    <state width="1638" height="556" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905616" />
     <state width="1638" height="536" key="GridCell.Tab.0.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="252" key="GridCell.Tab.0.bottom/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.bottom/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795915" />
-    <state width="1638" height="423" key="GridCell.Tab.0.center" timestamp="1613069232891">
+    <state width="1638" height="556" key="GridCell.Tab.0.center" timestamp="1613120905615">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232891" />
+    <state width="1638" height="556" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905615" />
     <state width="1638" height="536" key="GridCell.Tab.0.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129764" />
     <state width="1638" height="252" key="GridCell.Tab.0.center/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.center/0.25.1680.956@0.25.1680.956" timestamp="1612896981753" />
     <state width="1638" height="449" key="GridCell.Tab.0.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795913" />
-    <state width="1638" height="423" key="GridCell.Tab.0.left" timestamp="1613069232890">
+    <state width="1638" height="556" key="GridCell.Tab.0.left" timestamp="1613120905614">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232890" />
+    <state width="1638" height="556" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905614" />
     <state width="1638" height="536" key="GridCell.Tab.0.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129763" />
     <state width="1638" height="252" key="GridCell.Tab.0.left/0.25.1680.947@0.25.1680.947" timestamp="1610618909287" />
     <state width="1638" height="333" key="GridCell.Tab.0.left/0.25.1680.956@0.25.1680.956" timestamp="1612896981752" />
     <state width="1638" height="449" key="GridCell.Tab.0.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795912" />
-    <state width="1638" height="423" key="GridCell.Tab.0.right" timestamp="1613069232891">
+    <state width="1638" height="556" key="GridCell.Tab.0.right" timestamp="1613120905615">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232891" />
+    <state width="1638" height="556" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613120905615" />
     <state width="1638" height="536" key="GridCell.Tab.0.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129765" />
     <state width="1638" height="252" key="GridCell.Tab.0.right/0.25.1680.947@0.25.1680.947" timestamp="1610618909289" />
     <state width="1638" height="333" key="GridCell.Tab.0.right/0.25.1680.956@0.25.1680.956" timestamp="1612896981754" />
     <state width="1638" height="449" key="GridCell.Tab.0.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795914" />
-    <state width="1638" height="423" key="GridCell.Tab.1.bottom" timestamp="1613069232895">
+    <state width="1638" height="423" key="GridCell.Tab.1.bottom" timestamp="1613120604959">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232895" />
+    <state width="1638" height="423" key="GridCell.Tab.1.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1613120604959" />
     <state width="1638" height="536" key="GridCell.Tab.1.bottom/0.25.1680.940@0.25.1680.940" timestamp="1612998129768" />
     <state width="1638" height="449" key="GridCell.Tab.1.bottom/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
-    <state width="1638" height="423" key="GridCell.Tab.1.center" timestamp="1613069232893">
+    <state width="1638" height="423" key="GridCell.Tab.1.center" timestamp="1613120604958">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232893" />
+    <state width="1638" height="423" key="GridCell.Tab.1.center/0.0.1680.1050@0.0.1680.1050" timestamp="1613120604958" />
     <state width="1638" height="536" key="GridCell.Tab.1.center/0.25.1680.940@0.25.1680.940" timestamp="1612998129767" />
     <state width="1638" height="449" key="GridCell.Tab.1.center/0.25.1680.969@0.25.1680.969" timestamp="1611939795917" />
-    <state width="1638" height="423" key="GridCell.Tab.1.left" timestamp="1613069232892">
+    <state width="1638" height="423" key="GridCell.Tab.1.left" timestamp="1613120604958">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232892" />
+    <state width="1638" height="423" key="GridCell.Tab.1.left/0.0.1680.1050@0.0.1680.1050" timestamp="1613120604958" />
     <state width="1638" height="536" key="GridCell.Tab.1.left/0.25.1680.940@0.25.1680.940" timestamp="1612998129766" />
     <state width="1638" height="449" key="GridCell.Tab.1.left/0.25.1680.969@0.25.1680.969" timestamp="1611939795916" />
-    <state width="1638" height="423" key="GridCell.Tab.1.right" timestamp="1613069232893">
+    <state width="1638" height="423" key="GridCell.Tab.1.right" timestamp="1613120604958">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="1638" height="423" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613069232893" />
+    <state width="1638" height="423" key="GridCell.Tab.1.right/0.0.1680.1050@0.0.1680.1050" timestamp="1613120604958" />
     <state width="1638" height="536" key="GridCell.Tab.1.right/0.25.1680.940@0.25.1680.940" timestamp="1612998129767" />
     <state width="1638" height="449" key="GridCell.Tab.1.right/0.25.1680.969@0.25.1680.969" timestamp="1611939795918" />
     <state x="349" y="161" key="SettingsEditor" timestamp="1612610769609">
@@ -372,10 +388,10 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="440" y="262" key="Vcs.Push.Dialog.v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612611749340" />
-    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1613069256134">
+    <state width="840" height="525" key="XDebugger.FullValuePopup" timestamp="1613120449247">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1613069256134" />
+    <state width="840" height="525" key="XDebugger.FullValuePopup/0.0.1680.1050@0.0.1680.1050" timestamp="1613120449247" />
     <state x="100" y="100" width="1480" height="850" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612436421238">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
@@ -384,14 +400,14 @@
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
     <state x="642" y="443" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1680.1050@0.0.1680.1050" timestamp="1612451414315" />
-    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1613045577564">
+    <state x="252" y="231" width="597" height="550" key="find.popup" timestamp="1613075622423">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613045577564" />
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1613064172030">
+    <state x="252" y="231" width="597" height="550" key="find.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613075622423" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup" timestamp="1613075679127">
       <screen x="0" y="0" width="1680" height="1050" />
     </state>
-    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613064172030" />
+    <state x="505" y="230" width="670" height="750" key="search.everywhere.popup/0.0.1680.1050@0.0.1680.1050" timestamp="1613075679127" />
     <state x="505" y="232" width="670" height="676" key="search.everywhere.popup/0.25.1680.947@0.25.1680.947" timestamp="1610619078061" />
   </component>
   <component name="XDebuggerManager">

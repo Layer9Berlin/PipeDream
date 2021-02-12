@@ -1,4 +1,4 @@
-package inputmiddleware
+package _input
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/pipeline"

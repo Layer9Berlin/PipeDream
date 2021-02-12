@@ -1,4 +1,4 @@
-package outputmiddleware
+package _output
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/pipeline"

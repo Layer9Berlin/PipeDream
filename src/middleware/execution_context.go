@@ -215,7 +215,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 // PipelineFileAtPath returns a *pipeline.File corresponding to the parsed pipeline file at the given path, if any
 func (executionContext *ExecutionContext) PipelineFileAtPath(path string) (*pipeline.File, error) {
 	for _, file := range executionContext.PipelineFiles {
-		if file.FileName == path {
+		if file.Path == path {
 			return &file, nil
 		}
 	}
@@ -289,7 +289,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 }
 
 // SetUpPipelines collects and parses all relevant pipeline files
-func (executionContext *ExecutionContext) SetUpPipelines(args []string) error {
+func (executionContext *ExecutionContext) SetUpPipelines(fileFlag string, args []string) error {
 	executionContext.Log.Tracef("Setting up pipelines...")
 
 	filePaths, err := executionContext.parser.BuiltInPipelineFilePaths(executionContext.ProjectPath)
@@ -302,7 +302,7 @@ func (executionContext *ExecutionContext) SetUpPipelines(args []string) error {
 		return err
 	}
 
-	localPipelineFilePaths, err := executionContext.parser.UserPipelineFilePaths(args)
+	localPipelineFilePaths, err := executionContext.parser.UserPipelineFilePaths(fileFlag)
 	if err != nil {
 		return err
 	}

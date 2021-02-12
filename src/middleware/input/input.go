@@ -1,5 +1,5 @@
-// Package inputmiddleware provides a middleware to overwrite a pipe's input directly
-package inputmiddleware
+// Package _input provides a middleware to overwrite a pipe's input directly
+package _input
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"

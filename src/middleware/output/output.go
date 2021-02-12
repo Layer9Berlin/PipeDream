@@ -1,5 +1,5 @@
-// Package outputmiddleware provides a middleware to overwrite a pipe's output directly
-package outputmiddleware
+// Package _output provides a middleware to overwrite a pipe's output directly
+package _output
 
 import (
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"

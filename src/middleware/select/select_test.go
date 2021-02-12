@@ -1,4 +1,4 @@
-package selectmiddleware
+package _select
 
 import (
 	"bytes"

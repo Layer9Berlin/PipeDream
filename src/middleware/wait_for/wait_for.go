@@ -1,5 +1,5 @@
 // Package waitformiddleware provides a middleware to defer execution until a condition is fulfilled
-package waitformiddleware
+package _waitfor
 
 import (
 	"fmt"

@@ -38,12 +38,11 @@ func Cmd(_ *cobra.Command, args []string) {
 	executableDir := path.Dir(executableLocation)
 	projectPath, _ := filepath.EvalSymlinks(executableDir)
 	executionContext := executionContextFactory(
-		//middleware.WithActivityIndicator(logging.NewBarActivityIndicator(osStdout)),
 		middleware.WithMiddlewareStack(stack.SetUpMiddleware()),
 		middleware.WithProjectPath(projectPath),
 		middleware.WithLogger(Log),
 	)
-	err := executionContext.SetUpPipelines(args)
+	err := executionContext.SetUpPipelines(FileFlag, args)
 	if err != nil {
 		executionContext.Log.Error(err)
 		return

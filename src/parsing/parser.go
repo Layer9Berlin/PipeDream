@@ -51,6 +51,7 @@ func (parser *Parser) ParsePipelineFiles(allPipelineFilePaths []string, builtIn 
 			return
 		}
 		pipelineFile := pipeline.File{
+			Path:     pipelineFilePath,
 			FileName: filepath.Base(pipelineFilePath),
 		}
 		err = yaml.Unmarshal(fileData, &pipelineFile)

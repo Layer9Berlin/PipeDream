@@ -5,6 +5,7 @@ package pipeline
 // Note that this struct does not have exactly the same structure as the yaml file
 type File struct {
 	Default  DefaultSettings
+	Path     string
 	FileName string
 	Hooks    HookDefinitions
 	Import   []string

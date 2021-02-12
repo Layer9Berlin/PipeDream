@@ -34,11 +34,11 @@ func (parser *Parser) BuiltInPipelineFilePaths(projectPath string) ([]string, er
 }
 
 // UserPipelineFilePaths lists the file paths of all user-defined pipelines
-func (parser *Parser) UserPipelineFilePaths(args []string) ([]string, error) {
+func (parser *Parser) UserPipelineFilePaths(explicitFileName string) ([]string, error) {
 	pipelineFilePaths := make([]string, 0, 10)
-	if len(args) == 1 {
-		pipelineName := args[0]
-		extension := filepath.Ext(args[0])
+	if explicitFileName != "" {
+		pipelineName := explicitFileName
+		extension := filepath.Ext(pipelineName)
 		if extension == "" {
 			pipelineName = pipelineName + ".pipe"
 		}

@@ -5,6 +5,32 @@ default:
   command: install
 
 public:
+  test::expect::output:
+    inherit:
+      - testName
+    pipe:
+      - expect::check-output:
+          expectedOutput: "@{text}"
+      - ~:
+          shell:
+            args:
+              - green: "^passed$"
+              - prefix: "@{testName|Test}"
+            run: "traffic-light"
+
+  test::expect::output-pattern:
+    inherit:
+      - testName
+    pipe:
+      - expect::check-output-pattern:
+          expectedOutputPattern: "@{pattern}"
+      - ~:
+          shell:
+            args:
+              - green: "^passed$"
+              - prefix: "@{testName|Test}"
+            run: "traffic-light"
+
   test::expect:
     inherit:
       - testName
@@ -46,19 +72,21 @@ private:
           message: ""
 
   expect::check-output:
-    each:
+    interpolate:
+      escapeQuotes: all
+    pipe:
       - print::message:
           when: "'$!!' != '@{expectedOutput}'"
-          message: "output mismatch\nActual:\n$!!\nExpected:\n@{expectedOutput}\n"
+          message: "failed\nActual output:\n$!!\nExpected output:\n@{expectedOutput}\n"
       - print::message:
           when: "'$!!' == '@{expectedOutput}'"
-          message: ""
+          message: "passed"
 
   expect::check-output-pattern:
-    each:
+    pipe:
       - print::message:
           when: "'$!!' !~ '@{expectedOutputPattern}'"
-          message: "output pattern mismatch\nActual:\n$!!\nExpected pattern:\n@{expectedOutputPattern}\n"
+          message: "failed\nActual output:\n$!!\nExpected pattern:\n@{expectedOutputPattern}\n"
       - print::message:
-          when: "'$!!' !~ '^output pattern mismatch'"
-          message: ""
+          when: "'$!!' =~ '@{expectedOutputPattern}'"
+          message: "passed"
