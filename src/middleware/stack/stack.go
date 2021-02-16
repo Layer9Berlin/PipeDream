@@ -16,7 +16,6 @@ import (
 	_select "github.com/Layer9Berlin/pipedream/src/middleware/select"
 	"github.com/Layer9Berlin/pipedream/src/middleware/shell"
 	"github.com/Layer9Berlin/pipedream/src/middleware/ssh"
-	_switch "github.com/Layer9Berlin/pipedream/src/middleware/switch"
 	"github.com/Layer9Berlin/pipedream/src/middleware/timer"
 	_waitfor "github.com/Layer9Berlin/pipedream/src/middleware/wait_for"
 	"github.com/Layer9Berlin/pipedream/src/middleware/when"
@@ -33,7 +32,6 @@ func SetUpMiddleware() []middleware.Middleware {
 		env.NewMiddleware(),
 		when.NewMiddleware(),
 		_output.NewMiddleware(),
-		_switch.NewMiddleware(),
 		catch.NewMiddleware(),
 		pipe.NewMiddleware(),
 		each.NewMiddleware(),

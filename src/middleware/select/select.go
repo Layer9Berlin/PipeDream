@@ -12,7 +12,7 @@ import (
 	"os"
 )
 
-// Middleware is a user selection handler
+// Middleware is a user selection prompter
 type Middleware struct {
 	osStdin  io.ReadCloser
 	osStdout io.WriteCloser

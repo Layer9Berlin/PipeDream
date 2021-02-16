@@ -8,7 +8,7 @@ It takes a single string argument indicating the name of the Docker service in w
 
 > Note that for convenience, the `docker` argument is inherited automatically. Child pipes without a `docker` argument will look within their direct ancestors and apply the most recent definition, if any.
 
-# Inline Shell Command
+## Inline Shell Command
 ```yaml
 private:
     some-pipe:
@@ -19,7 +19,7 @@ private:
             run: "command"
 ```
 
-# Automatic Inheritance
+## Automatic Inheritance
 ```yaml
 private:
     some-pipe:

@@ -7,10 +7,11 @@ public:
       - git::status:
           catch: publish::git::catch-status-error
       - git::status::process:
-          switch:
-            - pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
-              text: clean
-            - text: dirty
+          input:
+            switch:
+              - pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
+                text: clean
+              - text: dirty
           env:
             save: PIPEDREAM_GIT_STATUS
       - publish::git::status-indicator
