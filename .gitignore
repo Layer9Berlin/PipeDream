@@ -3,3 +3,5 @@
 
 # Intellij IDEA
 .idea
+
+test/coverage.out
