@@ -10,28 +10,28 @@ import (
 )
 
 func TestLogFields_Message(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(Message("test message")),
 	)
 	require.Contains(t, string(result), "test message")
 }
 
 func TestLogFields_Info(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(Info("test info")),
 	)
 	require.Contains(t, string(result), "test info")
 }
 
 func TestLogFields_Symbol(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(Symbol("😇")),
 	)
 	require.Contains(t, string(result), "😇")
 }
 
 func TestLogFields_Color(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(
 			Message("test message"),
 			Color("green"),
@@ -41,7 +41,7 @@ func TestLogFields_Color(t *testing.T) {
 }
 
 func TestLogFields_Middleware(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(
 			Middleware("test middleware"),
 		),
@@ -50,7 +50,7 @@ func TestLogFields_Middleware(t *testing.T) {
 }
 
 func TestLogFields_Run(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(
 			Run("test run"),
 		),
@@ -60,13 +60,13 @@ func TestLogFields_Run(t *testing.T) {
 }
 
 func TestLogFields_Indentation(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(
 			Indentation(0),
 		),
 	)
 	require.NotContains(t, string(result), "    ")
-	result, _ = logging.CustomFormatter{}.Format(
+	result, _ = logging.LogFormatter{}.Format(
 		EntryWithFields(
 			Indentation(4),
 		),
@@ -75,14 +75,14 @@ func TestLogFields_Indentation(t *testing.T) {
 }
 
 func TestMiddlewareLogEntries_WithReader(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(WithReader(strings.NewReader("test"))),
 	)
 	require.Equal(t, "test", string(result))
 }
 
 func TestMiddlewareLogEntries_DataStream(t *testing.T) {
-	result, _ := logging.CustomFormatter{}.Format(
+	result, _ := logging.LogFormatter{}.Format(
 		EntryWithFields(DataStream("test", "message")...),
 	)
 	require.Equal(t, fmt.Sprint(aurora.Gray(18, "⎇ test | message"), "\n"), string(result))

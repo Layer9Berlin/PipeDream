@@ -47,7 +47,7 @@ type Logger struct {
 // NewLogger creates a new Logger
 func NewLogger(run *Run, indentation int) *Logger {
 	logger := logrus.New()
-	logger.Formatter = logging.CustomFormatter{}
+	logger.Formatter = logging.LogFormatter{}
 	logger.SetLevel(logging.UserPipeLogLevel)
 	numTraceLogs := 0
 	numDebugLogs := 0
@@ -185,7 +185,7 @@ func (logger *Logger) Error(err error, logFields ...fields.LogEntryField) {
 	logEntry.Level = logrus.ErrorLevel
 	logger.logEntries.PushBack(logEntry)
 	if logger.ErrorCallback != nil {
-		if logger.run.Identifier == nil {
+		if logger.run == nil || logger.run.Identifier == nil {
 			logger.ErrorCallback(fmt.Errorf("%v:\n%w", "anonymous", err))
 		} else {
 			logger.ErrorCallback(fmt.Errorf("%v:\n%w", *logger.run.Identifier, err))
@@ -296,7 +296,7 @@ func (logger *Logger) Read(p []byte) (int, error) {
 			}
 			return logger.readFromLogEntry(p, logEntry)
 		}
-		panic(fmt.Sprintf("unknown log entry type: %v", firstItem.Value))
+		panic(fmt.Sprintf("unknown log entry type: %T", firstItem.Value))
 	}
 	if logger.Closed() {
 		return 0, io.EOF
@@ -342,10 +342,7 @@ func (logger *Logger) readFromLogEntry(p []byte, logEntry *logrus.Entry) (int, e
 	}
 	indentedLogEntry := logEntry.WithField("indentation", indentation)
 	indentedLogEntry.Level = logEntry.Level
-	result, logErr := logging.CustomFormatter{}.Format(indentedLogEntry)
-	if logErr != nil {
-		logger.Error(logErr)
-	}
+	result, _ := logging.LogFormatter{}.Format(indentedLogEntry)
 	if len(result) > len(p) {
 		result, logger.unreadBuffer = result[:len(p)], result[len(p):]
 	}

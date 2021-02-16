@@ -129,7 +129,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 	} else {
 		if pipelineRun.Log.Level() >= logrus.DebugLevel {
 			indentation := math.MaxInt(pipelineRun.Log.Indentation-2, 0)
-			initialLogData, _ := logging.CustomFormatter{}.Format(
+			initialLogData, _ := logging.LogFormatter{}.Format(
 				fields.EntryWithFields(
 					fields.Symbol("🏃"),
 					fields.Message("full run"),

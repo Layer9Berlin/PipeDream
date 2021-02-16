@@ -299,3 +299,81 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_defaultPreselection(t *test
 	require.Equal(t, "test_public_2", pipeline)
 	require.Equal(t, "test1.pipe", file)
 }
+
+func TestSelect_letUserSelectPipelineFileAndPipeline_pipelineFlag(t *testing.T) {
+	PipelineFlag = "test_public_2"
+	testFile1 := pipeline2.File{
+		FileName: "test1.pipe",
+		Path:     "test1.pipe",
+		Public: map[string]map[string]interface{}{
+			"test_public_1": nil,
+			"test_public_2": nil,
+		},
+		Private: map[string]map[string]interface{}{
+			"test_private": nil,
+		},
+	}
+	executionContext := middleware.NewExecutionContext()
+	executionContext.PipelineFiles = []pipeline2.File{
+		testFile1,
+	}
+	executionContext.SelectableFiles = []string{
+		"test1.pipe",
+	}
+	reader, writer := io.Pipe()
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	go func() {
+		_, _ = ioutil.ReadAll(reader)
+		waitGroup.Done()
+	}()
+	pipeline, file, err := letUserSelectPipelineFileAndPipeline(
+		executionContext,
+		10,
+		ioutil.NopCloser(bytes.NewBuffer([]byte{10, 0})),
+		writer)
+	go func() {
+		_ = writer.Close()
+	}()
+	waitGroup.Wait()
+	require.Nil(t, err)
+	require.Equal(t, "test_public_2", pipeline)
+	require.Equal(t, "test1.pipe", file)
+}
+
+func TestSelect_letUserSelectPipeline_fileFlag(t *testing.T) {
+	FileFlag = "test.file"
+	testFile1 := pipeline2.File{
+		FileName: "test.file",
+		Path:     "test.file",
+		Public: map[string]map[string]interface{}{
+			"test_public_1": nil,
+			"test_public_2": nil,
+		},
+		Private: map[string]map[string]interface{}{
+			"test_private": nil,
+		},
+	}
+	executionContext := middleware.NewExecutionContext()
+	executionContext.PipelineFiles = []pipeline2.File{
+		testFile1,
+	}
+	reader, writer := io.Pipe()
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	go func() {
+		_, _ = ioutil.ReadAll(reader)
+		waitGroup.Done()
+	}()
+	file, err := letUserSelectPipelineFile(
+		executionContext,
+		10,
+		ioutil.NopCloser(bytes.NewBuffer([]byte{10, 0})),
+		writer)
+	go func() {
+		_ = writer.Close()
+	}()
+	waitGroup.Wait()
+	require.Nil(t, err)
+	require.Equal(t, testFile1, *file)
+}

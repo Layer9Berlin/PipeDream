@@ -1,11 +1,13 @@
 package pipeline
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/logrusorgru/aurora/v3"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	"sync"
 	"testing"
 )
 
@@ -252,4 +254,136 @@ func TestPipelineRunLogger_NestedReaders(t *testing.T) {
 	require.Contains(t, result, "logger test entry")
 	require.Contains(t, result, "logger2 test entry")
 	require.Contains(t, result, "logger3 test entry")
+}
+
+func TestLogger_Read_unreadBuffer(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	logger.unreadBuffer = []byte("test")
+	buffer := make([]byte, 1024)
+	count, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, 4, count)
+	require.Equal(t, "test", string(buffer[:4]))
+}
+
+func TestLogger_Read_largeUnreadBuffer(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	logger.unreadBuffer = []byte("test")
+	buffer := make([]byte, 2)
+	count, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, 2, count)
+	require.Equal(t, "te", string(buffer[:2]))
+}
+
+func TestLogger_Read_empty(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	buffer := make([]byte, 1024)
+	count, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, 0, count)
+}
+
+func TestLogger_Read_unknownLogEntryType(t *testing.T) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Errorf("expected panic did not occur")
+		}
+		require.Equal(t, "unknown log entry type: string", r)
+	}()
+	logger := NewLogger(nil, 0)
+	logger.logEntries.PushBack("test")
+	buffer := make([]byte, 1024)
+	_, err := logger.Read(buffer)
+	require.NotNil(t, err)
+}
+
+func TestLogger_readFromLogEntry_longEntry(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	logger.Info(fields.Message("test"))
+	buffer := make([]byte, 2)
+	count, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, 2, count)
+}
+
+func TestLogger_NewClosedLoggerWithResult(t *testing.T) {
+	logger := NewClosedLoggerWithResult(bytes.NewBuffer([]byte("test")))
+	require.Equal(t, "test", logger.String())
+}
+
+func TestLogger_readFromNestedReader_invalidType(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	logger.logEntries.PushBack(logrus.WithFields(logrus.Fields{"reader": "invalid"}))
+	buffer := make([]byte, 1024)
+	count, err := logger.Read(buffer)
+	require.NotNil(t, err)
+	require.Equal(t, "invalid type for `reader` data field", err.Error())
+	require.Equal(t, 0, count)
+}
+
+func TestLogger_StderrOutput(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	logger.StderrOutput("test stderr output")
+	buffer := make([]byte, 1024)
+	count, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, 35, count)
+	require.Contains(t, string(buffer), "test stderr output")
+
+}
+
+func TestLogger_Error_WithCallback_anonymous(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	errMessage := ""
+	logger.ErrorCallback = func(err error) {
+		errMessage = err.Error()
+	}
+	logger.Error(fmt.Errorf("test error"))
+	buffer := make([]byte, 1024)
+	_, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, "anonymous:\ntest error", errMessage)
+}
+
+func TestLogger_Error_WithCallback_namedPipe(t *testing.T) {
+	identifier := "test"
+	run, _ := NewRun(&identifier, nil, nil, nil)
+	logger := NewLogger(run, 0)
+	errMessage := ""
+	logger.ErrorCallback = func(err error) {
+		errMessage = err.Error()
+	}
+	logger.Error(fmt.Errorf("test error"))
+	buffer := make([]byte, 1024)
+	_, err := logger.Read(buffer)
+	require.Nil(t, err)
+	require.Equal(t, "test:\ntest error", errMessage)
+}
+
+func TestLogger_AddWriteCloserEntry(t *testing.T) {
+	logger := NewLogger(nil, 0)
+	writeCloser := logger.AddWriteCloserEntry()
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	go func() {
+		defer waitGroup.Done()
+		_, _ = writeCloser.Write([]byte("test"))
+		_ = writeCloser.Close()
+	}()
+	result := ""
+
+	waitGroup.Add(1)
+	go func() {
+		defer waitGroup.Done()
+		buffer := make([]byte, 1024)
+		count, err := logger.Read(buffer)
+		require.Nil(t, err)
+		result = string(buffer[:count])
+	}()
+	waitGroup.Wait()
+
+	require.Equal(t, "test", result)
 }

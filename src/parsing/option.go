@@ -29,3 +29,12 @@ func WithRecursivelyAddImportsImplementation(recursivelyAddImports func(paths []
 		parser.RecursivelyAddImports = recursivelyAddImports
 	}
 }
+
+// WithRecursivelyAddImportsImplementation sets the implementation of the function that evaluates symlinks
+//
+// Useful for tests.
+func WithEvalSymlinksImplementation(evalSymlinks func(path string) (string, error)) ParserOption {
+	return func(parser *Parser) {
+		parser.evalSymlinks = evalSymlinks
+	}
+}

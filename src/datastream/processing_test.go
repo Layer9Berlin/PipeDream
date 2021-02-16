@@ -2,7 +2,7 @@ package datastream
 
 import (
 	"bytes"
-	"fmt"
+	customio "github.com/Layer9Berlin/pipedream/src/custom/io"
 	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
@@ -248,7 +248,7 @@ func TestComposableDataStream_MergeWith_CloseError(t *testing.T) {
 			errorMessage = caughtErr.Error()
 		}
 	})
-	stream.MergeWith(NewErrorReader(1))
+	stream.MergeWith(customio.NewErrorReader())
 	stream.Close()
 	stream.Wait()
 
@@ -306,7 +306,7 @@ func TestComposableDataStream_Replace_CloseError(t *testing.T) {
 			errorMessage = caughtErr.Error()
 		}
 	})
-	stream.Replace(NewErrorReader(1))
+	stream.Replace(customio.NewErrorReader())
 	stream.Close()
 	stream.Wait()
 
@@ -406,22 +406,4 @@ func TestComposableDataStream_WriteCloser_AfterClosure(t *testing.T) {
 	_ = stream.WriteCloser()
 
 	require.True(t, expectedErrorEncountered)
-}
-
-type ErrorReader struct {
-	counter int
-}
-
-func NewErrorReader(counter int) *ErrorReader {
-	return &ErrorReader{
-		counter: counter,
-	}
-}
-
-func (errorWriter *ErrorReader) Read(p []byte) (int, error) {
-	if errorWriter.counter <= 0 {
-		return 0, io.EOF
-	}
-	errorWriter.counter = errorWriter.counter - 1
-	return 0, fmt.Errorf("test error")
 }

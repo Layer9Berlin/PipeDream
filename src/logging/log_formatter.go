@@ -18,12 +18,12 @@ var UserPipeLogLevel = logrus.InfoLevel
 // BuiltInPipeLogLevel is the level at which built-in pipes will be logged
 var BuiltInPipeLogLevel = logrus.ErrorLevel
 
-// CustomFormatter prints log entries in a format suitable for output to the console
-type CustomFormatter struct {
+// LogFormatter prints log entries in a format suitable for output to the console
+type LogFormatter struct {
 }
 
 // Format turns a log entry into a string
-func (formatter CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+func (formatter LogFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	if readerField, ok := entry.Data["reader"]; ok {
 		if reader, ok := readerField.(io.Reader); ok {
 			result, err := ioutil.ReadAll(reader)

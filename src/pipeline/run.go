@@ -128,9 +128,8 @@ func NewRun(
 		run.Log.SetLevel(parent.Log.Level())
 	}
 
-	errorCallback := func(err error) {
-		run.Log.PossibleError(err)
-	}
+	errorCallback := run.Log.PossibleError
+
 	run.Stdin = datastream.NewComposableDataStream("stdin", errorCallback)
 	run.Stdout = datastream.NewComposableDataStream("stdout", errorCallback)
 	run.Stderr = datastream.NewComposableDataStream("stderr", errorCallback)

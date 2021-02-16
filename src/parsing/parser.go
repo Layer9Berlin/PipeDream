@@ -11,16 +11,18 @@ import (
 
 // Parser reads and parses pipeline files
 type Parser struct {
-	readFile              func(filename string) ([]byte, error)
+	evalSymlinks          func(path string) (string, error)
 	findByGlob            func(pattern string) ([]string, error)
+	readFile              func(filename string) ([]byte, error)
 	RecursivelyAddImports func(paths []string) ([]string, error)
 }
 
 // NewParser creates a new Parser
 func NewParser(options ...ParserOption) *Parser {
 	parser := &Parser{
-		readFile:   ioutil.ReadFile,
-		findByGlob: filepath.Glob,
+		evalSymlinks: filepath.EvalSymlinks,
+		findByGlob:   filepath.Glob,
+		readFile:     ioutil.ReadFile,
 	}
 	parser.RecursivelyAddImports = func(filePaths []string) ([]string, error) {
 		return parser.recursiveImportStep(filePaths, []string{})

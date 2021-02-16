@@ -3,10 +3,15 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/parsing"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/require"
+	"io"
+	"io/ioutil"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -82,6 +87,63 @@ func TestExecutionContext_FullRun_WithSetupFunction(t *testing.T) {
 	)
 	require.NotNil(t, run)
 	require.True(t, setupCalled)
+}
+
+func TestExecutionContext_FullRun_WithTearDownFunction(t *testing.T) {
+	tearDownCalled := false
+	tearDownFunc := func(run *pipeline.Run) {
+		tearDownCalled = true
+	}
+	executionContext := NewExecutionContext()
+	identifier := "test"
+	run := executionContext.FullRun(
+		WithIdentifier(&identifier),
+		WithTearDownFunc(tearDownFunc),
+	)
+	require.NotNil(t, run)
+	require.True(t, tearDownCalled)
+}
+
+func TestExecutionContext_FullRun_WithParentRun(t *testing.T) {
+	parentRun, _ := pipeline.NewRun(nil, nil, nil, nil)
+	executionContext := NewExecutionContext()
+	identifier := "test"
+	run := executionContext.FullRun(
+		WithIdentifier(&identifier),
+		WithParentRun(parentRun),
+	)
+	require.NotNil(t, run)
+	require.Equal(t, parentRun, run.Parent)
+}
+
+func TestExecutionContext_FullRun_WithLogWriter(t *testing.T) {
+	logReader, logWriter := io.Pipe()
+	executionContext := NewExecutionContext(WithExecutionFunction(func(run *pipeline.Run) {
+		run.Log.Info(fields.Message("test"))
+	}),
+	)
+	identifier := "test"
+	run := executionContext.FullRun(
+		WithIdentifier(&identifier),
+		WithLogWriter(logWriter),
+		WithSetupFunc(func(run *pipeline.Run) {
+			run.Log.SetLevel(logrus.InfoLevel)
+		}),
+	)
+	log := ""
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	go func() {
+		defer waitGroup.Done()
+		logData, _ := ioutil.ReadAll(logReader)
+		log = string(logData)
+	}()
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.NotNil(t, run)
+	require.Contains(t, log, "test")
 }
 
 func TestExecutionContext_UnwindStack(t *testing.T) {

@@ -16,6 +16,9 @@ import (
 func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
 	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"shell": map[string]interface{}{
 			"run": "test @{arg}",
 		},
@@ -54,6 +57,9 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"shell": map[string]interface{}{
 			"run": "test value",
 		},
@@ -79,6 +85,9 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 func TestInterpolate_SingleSubstitution(t *testing.T) {
 	identifier := "child identifier"
 	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg":  "value",
 		"arg2": "@{arg}",
 	}, nil, nil)
@@ -102,6 +111,9 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg":  "value",
 		"arg2": "value",
 	}, runArguments)
@@ -114,6 +126,9 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
 	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg":  "value",
 		"arg2": "@{arg} $!!",
 	}, nil, nil)
@@ -138,6 +153,9 @@ func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg":  "value",
 		"arg2": "value TestInput value",
 	}, runArguments)
@@ -229,7 +247,7 @@ func TestInterpolate_InputReadError(t *testing.T) {
 	require.Equal(t, 1, run.Log.ErrorCount())
 	require.Contains(t, run.Log.LastError().Error(), "test error")
 	require.Equal(t, map[string]interface{}{
-		"arg": "",
+		"arg": "''",
 	}, runArguments)
 }
 
@@ -259,6 +277,9 @@ func TestInterpolate_ValueMissing(t *testing.T) {
 func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
 	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg": "@{arg2}",
 		"arg2": map[string]interface{}{
 			"test": "not a valid substitution",
@@ -287,6 +308,9 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, 1, run.Log.WarnCount())
 	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg": "@{arg2}",
 		"arg2": map[string]interface{}{
 			"test": "not a valid substitution",
@@ -298,6 +322,9 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
 	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg":  "@{arg2}",
 		"arg2": "test",
 		"arg3": "@{missing}",
@@ -324,6 +351,9 @@ func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, 1, run.Log.WarnCount())
 	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"quote": "none",
+		},
 		"arg":  "test",
 		"arg2": "test",
 		"arg3": "@{missing}",
@@ -334,6 +364,7 @@ func TestInterpolate_EscapeAllQuotes(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"escapeQuotes": "all",
+			"quote":        "none",
 		},
 		"arg": "test $!!",
 	}, nil, nil)
@@ -360,8 +391,9 @@ func TestInterpolate_EscapeAllQuotes(t *testing.T) {
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"escapeQuotes": "all",
+			"quote":        "none",
 		},
-		"arg": "test \\\" \\\" ` \\\\\" \\\"",
+		"arg": "test \\' \\\" \\` \\\\\" \\'",
 	}, runArguments)
 }
 
@@ -369,6 +401,7 @@ func TestInterpolate_EscapeSingleQuotes(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"escapeQuotes": "single",
+			"quote":        "none",
 		},
 		"arg": "test $!!",
 	}, nil, nil)
@@ -395,8 +428,9 @@ func TestInterpolate_EscapeSingleQuotes(t *testing.T) {
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"escapeQuotes": "single",
+			"quote":        "none",
 		},
-		"arg": "test \\\" \" ` \\\" \\\"",
+		"arg": "test \\' \" ` \\\" \\'",
 	}, runArguments)
 }
 
@@ -404,6 +438,7 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"escapeQuotes": "double",
+			"quote":        "none",
 		},
 		"arg": "test $!!",
 	}, nil, nil)
@@ -430,6 +465,7 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"escapeQuotes": "double",
+			"quote":        "none",
 		},
 		"arg": "test ' \\\" ` \\\\\" '",
 	}, runArguments)
@@ -438,7 +474,7 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 func TestInterpolate_Nesting(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"escapeQuotes": "double",
+			"quote": "none",
 		},
 		"arg1": "value",
 		"arg2": "@{arg1}",
@@ -497,6 +533,10 @@ func TestInterpolate_QuotingCombinations(t *testing.T) {
 			"escapeQuotes": "double",
 			"quote":        "backtick",
 		},
+		{
+			"escapeQuotes": "single",
+			"quote":        "double",
+		},
 	}
 	results := []string{
 		"'\"value\" \\\\'with\\\\' `quotes`'",
@@ -506,6 +546,7 @@ func TestInterpolate_QuotingCombinations(t *testing.T) {
 		"'\"value\" \\'with\\' \\`quotes\\`'",
 		"\"value\" 'with' \\`quotes\\`",
 		"`\\\"value\\\" 'with' \\`quotes\\``",
+		"\"\\\"value\\\" \\'with\\' `quotes`\"",
 	}
 	for index, testCase := range testCases {
 		run, _ := pipeline.NewRun(nil, map[string]interface{}{

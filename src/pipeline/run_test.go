@@ -204,3 +204,39 @@ func TestPipelineRun_Close(t *testing.T) {
 
 	require.True(t, run.Completed())
 }
+
+func TestPipelineRun_RemoveArgumentAtPath(t *testing.T) {
+	run, _ := NewRun(nil, map[string]interface{}{
+		"test1": map[string]interface{}{
+			"test2": map[string]interface{}{
+				"test3": "test4",
+			},
+			"test5": "test6",
+		},
+	}, nil, nil)
+
+	err := run.RemoveArgumentAtPath("test1", "test2")
+
+	require.Nil(t, err)
+	require.Equal(t, map[string]interface{}{
+		"test1": map[string]interface{}{
+			"test5": "test6",
+		},
+	}, run.arguments)
+}
+
+func TestPipelineRun_Cancel(t *testing.T) {
+	run, _ := NewRun(nil, nil, nil, nil)
+	run.AddCancelHook(func() error {
+		return fmt.Errorf("test error")
+	})
+
+	require.False(t, run.Cancelled())
+
+	err := run.Cancel()
+
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "test error")
+
+	require.True(t, run.Cancelled())
+}

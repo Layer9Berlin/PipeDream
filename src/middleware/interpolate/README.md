@@ -203,6 +203,8 @@ Nested argument interpolation is supported up to a nesting level of 5 (this beha
 ```yaml
 private:
     some-pipe:
+        interpolate:
+ 	        quote: "none"
         arg1: "value"
         # simple substitution
         arg2: "@{arg1}"

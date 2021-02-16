@@ -221,3 +221,48 @@ func TestSetValueInMap_NonExistentLeaf(t *testing.T) {
 	require.Nil(t, err)
 	require.Equal(t, "test5", value)
 }
+
+func TestSetValueInMap_RemoveValueInMap(t *testing.T) {
+	vector := map[string]interface{}{
+		"test1": map[string]interface{}{
+			"test2": map[string]interface{}{},
+			"test3": map[string]interface{}{
+				"test4": "test5",
+			},
+		},
+	}
+	err := RemoveValueInMap(vector, "test1", "test3")
+	require.Nil(t, err)
+	require.Equal(t, map[string]interface{}{
+		"test1": map[string]interface{}{
+			"test2": map[string]interface{}{},
+		},
+	}, vector)
+}
+
+func TestSetValueInMap_RemoveValueInMap_notFound(t *testing.T) {
+	vector := map[string]interface{}{
+		"test1": map[string]interface{}{
+			"test2": map[string]interface{}{},
+			"test3": map[string]interface{}{
+				"test4": "test5",
+			},
+		},
+	}
+	err := RemoveValueInMap(vector, "test1", "test6")
+	require.NotNil(t, err)
+	require.Equal(t, "failed to remove value, as it could not be found", err.Error())
+}
+
+func TestSetValueInMap_RemoveValueInMap_notStringMap(t *testing.T) {
+	vector := map[string]interface{}{
+		"test1": []string{
+			"test2",
+			"test3",
+			"test4",
+		},
+	}
+	err := RemoveValueInMap(vector, "test1", "test3")
+	require.NotNil(t, err)
+	require.Equal(t, "failed to remove value, encountered something other than a string map", err.Error())
+}

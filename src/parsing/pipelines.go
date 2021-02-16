@@ -10,7 +10,7 @@ import (
 
 // BuiltInPipelineFilePaths lists the file paths of all built-in pipelines
 func (parser *Parser) BuiltInPipelineFilePaths(projectPath string) ([]string, error) {
-	resolvedPipesPath, err := filepath.EvalSymlinks(path.Join(projectPath, "pipedream_pipes"))
+	resolvedPipesPath, err := parser.evalSymlinks(path.Join(projectPath, "pipedream_pipes"))
 	if err != nil {
 		if pathErr, ok := err.(*os.PathError); ok {
 			if pathErr.Err == syscall.ENOENT {

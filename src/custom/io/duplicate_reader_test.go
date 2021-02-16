@@ -1,9 +1,7 @@
 package io
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/require"
-	systemio "io"
 	"io/ioutil"
 	"strings"
 	"sync"
@@ -38,7 +36,7 @@ func TestDuplicateReader(t *testing.T) {
 }
 
 func TestDuplicateReader_CloseError(t *testing.T) {
-	reader := NewErrorReader(1)
+	reader := NewErrorReader()
 	errors := make([]error, 0, 10)
 	reader1, reader2 := DuplicateReader(reader, func(err error) {
 		errors = append(errors, err)
@@ -65,22 +63,4 @@ func TestDuplicateReader_CloseError(t *testing.T) {
 
 	require.Equal(t, 1, len(errors))
 	require.Equal(t, "test error", errors[0].Error())
-}
-
-type ErrorReader struct {
-	counter int
-}
-
-func NewErrorReader(counter int) *ErrorReader {
-	return &ErrorReader{
-		counter: counter,
-	}
-}
-
-func (errorWriter *ErrorReader) Read(p []byte) (int, error) {
-	if errorWriter.counter <= 0 {
-		return 0, systemio.EOF
-	}
-	errorWriter.counter = errorWriter.counter - 1
-	return 0, fmt.Errorf("test error")
 }
