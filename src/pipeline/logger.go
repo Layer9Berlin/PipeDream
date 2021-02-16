@@ -296,7 +296,7 @@ func (logger *Logger) Read(p []byte) (int, error) {
 			}
 			return logger.readFromLogEntry(p, logEntry)
 		}
-		panic("unknown log entry type")
+		panic(fmt.Sprintf("unknown log entry type: %v", firstItem.Value))
 	}
 	if logger.Closed() {
 		return 0, io.EOF

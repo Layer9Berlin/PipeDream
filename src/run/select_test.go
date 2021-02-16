@@ -22,7 +22,7 @@ func TestSelect_letUserSelectPipelineFile_noFiles(t *testing.T) {
 }
 
 func TestSelect_letUserSelectPipelineFile_singleFile(t *testing.T) {
-	testFile := pipeline2.File{FileName: "test"}
+	testFile := pipeline2.File{Path: "test"}
 	executionContext := middleware.NewExecutionContext()
 	executionContext.PipelineFiles = []pipeline2.File{
 		testFile,
@@ -38,12 +38,12 @@ func TestSelect_letUserSelectPipelineFile_singleFile(t *testing.T) {
 	)
 	require.Nil(t, err)
 	require.NotNil(t, file)
-	require.Equal(t, "test", file.FileName)
+	require.Equal(t, "test", file.Path)
 }
 
 func TestSelect_letUserSelectPipelineFile_userSelection(t *testing.T) {
-	testFile1 := pipeline2.File{FileName: "test1.pipe"}
-	testFile2 := pipeline2.File{FileName: "test2.pipe"}
+	testFile1 := pipeline2.File{Path: "test1.pipe", FileName: "Test1"}
+	testFile2 := pipeline2.File{Path: "test2.pipe", FileName: "Test2"}
 	executionContext := middleware.NewExecutionContext()
 	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
@@ -72,7 +72,7 @@ func TestSelect_letUserSelectPipelineFile_userSelection(t *testing.T) {
 	waitGroup.Wait()
 	require.Nil(t, err)
 	require.NotNil(t, file)
-	require.Equal(t, "test1.pipe", file.FileName)
+	require.Equal(t, "test1.pipe", file.Path)
 }
 
 func TestSelect_letUserSelectPipelineFile_fileSelectionError(t *testing.T) {
@@ -136,7 +136,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_noSelectableFiles(t *testin
 }
 
 func TestSelect_letUserSelectPipelineFileAndPipeline_pipelineSelectionError(t *testing.T) {
-	testFile1 := pipeline2.File{FileName: "test1.pipe"}
+	testFile1 := pipeline2.File{FileName: "test1.pipe", Path: "test1.pipe"}
 	executionContext := middleware.NewExecutionContext()
 	executionContext.PipelineFiles = []pipeline2.File{
 		testFile1,
@@ -156,6 +156,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_pipelineSelectionError(t *t
 func TestSelect_letUserSelectPipelineFileAndPipeline_singleFile(t *testing.T) {
 	testFile1 := pipeline2.File{
 		FileName: "test1.pipe",
+		Path:     "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test": nil,
 		},
@@ -190,6 +191,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singleFile(t *testing.T) {
 func TestSelect_letUserSelectPipelineFileAndPipeline_singlePipeline(t *testing.T) {
 	testFile1 := pipeline2.File{
 		FileName: "test1.pipe",
+		Path:     "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test_public": nil,
 		},
@@ -218,6 +220,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_singlePipeline(t *testing.T
 func TestSelect_letUserSelectPipelineFileAndPipeline_userSelectsPipeline(t *testing.T) {
 	testFile1 := pipeline2.File{
 		FileName: "test1.pipe",
+		Path:     "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test_public_1": nil,
 			"test_public_2": nil,
@@ -260,6 +263,7 @@ func TestSelect_letUserSelectPipelineFileAndPipeline_defaultPreselection(t *test
 			Command: "test_public_2",
 		},
 		FileName: "test1.pipe",
+		Path:     "test1.pipe",
 		Public: map[string]map[string]interface{}{
 			"test_public_1": nil,
 			"test_public_2": nil,

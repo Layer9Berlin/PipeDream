@@ -104,13 +104,13 @@ func TestExecutionContext_PipelineFileAtPath(t *testing.T) {
 	executionContext := ExecutionContext{
 		PipelineFiles: []pipeline.File{
 			{
-				FileName: "test1",
+				Path: "test1",
 			},
 			{
-				FileName: "test2",
+				Path: "test2",
 			},
 			{
-				FileName: "test3",
+				Path: "test3",
 			},
 		},
 	}
@@ -202,7 +202,7 @@ func TestExecutionContext_SetUpPipelines(t *testing.T) {
 	buffer := new(bytes.Buffer)
 	executionContext.Log.SetOutput(buffer)
 
-	err := executionContext.SetUpPipelines([]string{})
+	err := executionContext.SetUpPipelines("")
 	require.Nil(t, err)
 	require.NotNil(t, executionContext.PipelineFiles)
 
@@ -217,7 +217,7 @@ func TestExecutionContext_SetUpPipelines_BuiltInPipelineFilePathsError(t *testin
 					return []string{}, fmt.Errorf("test error")
 				}),
 			)))
-	err := executionContext.SetUpPipelines([]string{})
+	err := executionContext.SetUpPipelines("")
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "test error")
 	require.Nil(t, executionContext.PipelineFiles)
@@ -234,7 +234,7 @@ func TestExecutionContext_SetUpPipelines_ParseBuiltInPipelineFilesError(t *testi
 					return nil, fmt.Errorf("test error")
 				}),
 			)))
-	err := executionContext.SetUpPipelines([]string{})
+	err := executionContext.SetUpPipelines("")
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "test error")
 	require.Nil(t, executionContext.PipelineFiles)
@@ -254,7 +254,7 @@ func TestExecutionContext_SetUpPipelines_UserPipelineFilePathsError(t *testing.T
 					return []byte{}, nil
 				}),
 			)))
-	err := executionContext.SetUpPipelines([]string{})
+	err := executionContext.SetUpPipelines("")
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "test error")
 	require.Nil(t, executionContext.PipelineFiles)
@@ -274,7 +274,7 @@ func TestExecutionContext_SetUpPipelines_RecursivelyAddImportsError(t *testing.T
 					return nil, fmt.Errorf("test error")
 				}),
 			)))
-	err := executionContext.SetUpPipelines([]string{})
+	err := executionContext.SetUpPipelines("")
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "test error")
 	require.Nil(t, executionContext.PipelineFiles)
@@ -297,7 +297,7 @@ func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 					return []string{"test.file"}, nil
 				}),
 			)))
-	err := executionContext.SetUpPipelines([]string{})
+	err := executionContext.SetUpPipelines("")
 	require.NotNil(t, err)
 	require.Contains(t, err.Error(), "test error")
 	require.Nil(t, executionContext.PipelineFiles)

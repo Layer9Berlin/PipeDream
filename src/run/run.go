@@ -42,7 +42,7 @@ func Cmd(_ *cobra.Command, args []string) {
 		middleware.WithProjectPath(projectPath),
 		middleware.WithLogger(Log),
 	)
-	err := executionContext.SetUpPipelines(FileFlag, args)
+	err := executionContext.SetUpPipelines(FileFlag, args...)
 	if err != nil {
 		executionContext.Log.Error(err)
 		return

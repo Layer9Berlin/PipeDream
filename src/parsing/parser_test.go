@@ -128,6 +128,7 @@ private:
 	require.Equal(t, []pipeline.File{
 		{
 			Default:  pipeline.DefaultSettings{Command: "test-command", Dir: "test-dir"},
+			Path:     "file1",
 			FileName: "file1",
 			Public: map[string]map[string]interface{}{
 				"test": {
@@ -163,6 +164,7 @@ private:
 		},
 		{
 			Default:  pipeline.DefaultSettings{Command: "", Dir: ""},
+			Path:     "file2",
 			FileName: "file2",
 			Public: map[string]map[string]interface{}{
 				"test": {

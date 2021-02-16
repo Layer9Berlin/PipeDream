@@ -289,7 +289,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 }
 
 // SetUpPipelines collects and parses all relevant pipeline files
-func (executionContext *ExecutionContext) SetUpPipelines(fileFlag string, args []string) error {
+func (executionContext *ExecutionContext) SetUpPipelines(fileFlag string, args ...string) error {
 	executionContext.Log.Tracef("Setting up pipelines...")
 
 	filePaths, err := executionContext.parser.BuiltInPipelineFilePaths(executionContext.ProjectPath)

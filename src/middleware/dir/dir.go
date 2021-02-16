@@ -21,6 +21,7 @@ func (Middleware) String() string {
 
 // NewMiddleware creates a new Middleware instance
 func NewMiddleware() Middleware {
+	// @TODO: do we need to resolve symlinks here?
 	workingDir, _ := os.Getwd()
 	return Middleware{
 		DirChanger: os.Chdir,
@@ -47,6 +48,7 @@ func (dirMiddleware Middleware) Apply(
 			fields.Message(dirArgument),
 			fields.Middleware(dirMiddleware),
 		)
+		// @TODO: provide a way of resolving the path relative to the pipeline file's location
 		dirMiddleware.changeDirectory(dirArgument, run)
 	}
 
@@ -56,12 +58,9 @@ func (dirMiddleware Middleware) Apply(
 	dirMiddleware.changeDirectory(dirMiddleware.WorkingDir, run)
 }
 
-func (dirMiddleware Middleware) changeDirectory(directory interface{}, run *pipeline.Run) {
-	dir, ok := directory.(string)
-	if ok && dir != "" {
-		err := dirMiddleware.DirChanger(dir)
-		if err != nil {
-			run.Log.Error(err)
-		}
+func (dirMiddleware Middleware) changeDirectory(directory string, run *pipeline.Run) {
+	err := dirMiddleware.DirChanger(directory)
+	if err != nil {
+		run.Log.Error(err)
 	}
 }

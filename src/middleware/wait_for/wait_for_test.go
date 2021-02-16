@@ -69,7 +69,7 @@ func TestWaitFor_EnvVars(t *testing.T) {
 	}).Apply(
 		run,
 		func(run *pipeline.Run) {},
-		nil,
+		middleware.NewExecutionContext(),
 	)
 	run.Close()
 
