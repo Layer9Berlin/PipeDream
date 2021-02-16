@@ -1,9 +1,12 @@
 # `env` - Environment Variable Manager
 
+The `env` middleware manages the handling of environment variables.
+
 ## Arguments
 
-The `each` middleware manages the handling of environment variables. It takes two arguments:
+It takes two arguments:
 
+### Save
 The `save` argument is an optional string that causes the result of the pipe's execution to be stored in an environment variable of that name (excluding the `$`). The output is not swallowed, but still passed on as usual. This behavior might change in a future version of pipedream.
 
 ```yaml
@@ -15,6 +18,8 @@ private:
             # the result of "command" will be saved in the environment as $ENV_VAR
             save: ENV_VAR
 ```
+
+### Interpolate
 
 The `interpolate` argument is a string that determines how environment variables will be interpolated when the pipe is invoked. Possible values are:
     - `deep`:
@@ -32,11 +37,16 @@ private:
         env:
             # added for clarity, `none` is the default value
             # note that using `deep` could cause problems here,
-            # if the value of ENV_VAR is not yet set at the time of
+            # if the value of ENV_VAR is not yet set at the time of parent invocation
             interpolate: none
         pipe:
             - child-pipe:
                 env:
                     interpolate: shallow
+                # this value will be evaluated at child invocation time
+                # note that if the value is set by another pipe,
+                # the child's invocation must be delayed
+                # until after the env var has been set
+                # e.g. using the `waitFor` middleware
                 when: "'$ENV_VAR' == 'YES!!'"
 ```

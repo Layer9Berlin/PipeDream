@@ -435,6 +435,107 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 	}, runArguments)
 }
 
+func TestInterpolate_Nesting(t *testing.T) {
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"escapeQuotes": "double",
+		},
+		"arg1": "value",
+		"arg2": "@{arg1}",
+		//this should evaluate to "value"
+		"arg3": "@{arg4}@{arg5}@{arg6}",
+		"arg4": "@{",
+		"arg5": "arg2",
+		"arg6": "}",
+	}, nil, nil)
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {},
+		middleware.NewExecutionContext(
+			middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+				defer waitGroup.Done()
+				runArguments = childRun.ArgumentsCopy()
+			}),
+		))
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Equal(t, "value", runArguments["arg3"])
+}
+
+func TestInterpolate_QuotingCombinations(t *testing.T) {
+	testCases := []map[string]string{
+		{
+			"escapeQuotes": "single",
+		},
+		{
+			"escapeQuotes": "single",
+			"quote":        "none",
+		},
+		{
+			"escapeQuotes": "double",
+		},
+		{
+			"escapeQuotes": "double",
+			"quote":        "none",
+		},
+		{
+			"escapeQuotes": "backtick",
+		},
+		{
+			"escapeQuotes": "backtick",
+			"quote":        "none",
+		},
+		{
+			"escapeQuotes": "double",
+			"quote":        "backtick",
+		},
+	}
+	results := []string{
+		"'\"value\" \\\\'with\\\\' `quotes`'",
+		"\"value\" \\'with\\' `quotes`",
+		"'\\\"value\\\" \\'with\\' `quotes`'",
+		"\\\"value\\\" 'with' `quotes`",
+		"'\"value\" \\'with\\' \\`quotes\\`'",
+		"\"value\" 'with' \\`quotes\\`",
+		"`\\\"value\\\" 'with' \\`quotes\\``",
+	}
+	for index, testCase := range testCases {
+		run, _ := pipeline.NewRun(nil, map[string]interface{}{
+			"interpolate": testCase,
+			"arg1":        "\"value\" 'with' `quotes`",
+			"arg2":        "@{arg1}",
+		}, nil, nil)
+
+		waitGroup := &sync.WaitGroup{}
+		waitGroup.Add(1)
+		runArguments := make(map[string]interface{}, 0)
+		run.Log.SetLevel(logrus.DebugLevel)
+		NewMiddleware().Apply(
+			run,
+			func(run *pipeline.Run) {},
+			middleware.NewExecutionContext(
+				middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+					defer waitGroup.Done()
+					runArguments = childRun.ArgumentsCopy()
+				}),
+			))
+		run.Close()
+		run.Wait()
+		waitGroup.Wait()
+
+		require.Equal(t, 0, run.Log.ErrorCount())
+		require.Equal(t, results[index], runArguments["arg2"], testCase)
+	}
+}
+
 type ErrorReader struct {
 	counter int
 }

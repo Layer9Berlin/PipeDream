@@ -23,7 +23,7 @@ type interpolateMiddlewareArguments struct {
 	Quote          string
 }
 
-// Middleware is a value replacer
+// Middleware is a argument replacer
 type Middleware struct{}
 
 // String is a human-readable description
@@ -50,7 +50,7 @@ func (interpolateMiddleware Middleware) Apply(
 		Enable:         true,
 		EscapeQuotes:   "none",
 		IgnoreWarnings: false,
-		Quote:          "none",
+		Quote:          "single",
 	}
 	pipeline.ParseArguments(&arguments, "interpolate", run)
 
@@ -238,7 +238,7 @@ func (interpolator *interpolator) interpolateInput(value string) string {
 	if strings.Contains(value, "$!!") {
 		interpolator.NeedCompleteInput = true
 		if interpolator.completeInput != nil {
-			replacement := escapeQuotes(string(interpolator.completeInput), interpolator.MiddlewareArguments)
+			replacement := handleQuotes(string(interpolator.completeInput), interpolator.MiddlewareArguments)
 			interpolator.Substitutions["$!!"] = replacement
 			return strings.Replace(value, "$!!", replacement, -1)
 		}
@@ -278,11 +278,12 @@ func (interpolator *interpolator) interpolateArguments(value string) (string, er
 
 			// note that match[3] might be "", but we do want to allow expressions
 			// of the form `@{key|}` that do not throw an error if the value can't be found
-			interpolator.Substitutions[key] = match[3]
+			interpolator.Substitutions[key] = handleQuotes(match[3], interpolator.MiddlewareArguments)
 			value = strings.Replace(value, match[0], match[3], 1)
 		} else {
 			switch typedReplacement := replacement.(type) {
 			case string:
+				typedReplacement = handleQuotes(typedReplacement, interpolator.MiddlewareArguments)
 				interpolator.Substitutions[key] = typedReplacement
 				value = strings.Replace(value, match[0], typedReplacement, 1)
 			case []interface{}:
@@ -294,10 +295,12 @@ func (interpolator *interpolator) interpolateArguments(value string) (string, er
 					}
 				}
 				stringReplacement := strings.Join(stringValues, "\n")
+				stringReplacement = handleQuotes(stringReplacement, interpolator.MiddlewareArguments)
 				interpolator.Substitutions[key] = stringReplacement
 				value = strings.Replace(value, match[0], stringReplacement, 1)
 			case int:
 				stringReplacement := strconv.Itoa(typedReplacement)
+				stringReplacement = handleQuotes(stringReplacement, interpolator.MiddlewareArguments)
 				interpolator.Substitutions[key] = stringReplacement
 				value = strings.Replace(value, match[0], stringReplacement, 1)
 			default:
@@ -339,15 +342,37 @@ func (interpolator *interpolator) log(logger *pipeline.Logger, interpolateMiddle
 	}
 }
 
-func escapeQuotes(message string, arguments interpolateMiddlewareArguments) string {
-	switch arguments.EscapeQuotes {
+func handleQuotes(value string, arguments interpolateMiddlewareArguments) string {
+	return quoteValue(escapeQuotes(value, arguments.EscapeQuotes), arguments.Quote)
+}
+
+func escapeQuotes(message string, escapeQuotesArgument string) string {
+	switch escapeQuotesArgument {
 	case "all":
-		return strings.Replace(strings.Replace(message, "\"", "\\\"", -1), "'", "\\\"", -1)
+		return strings.Replace(strings.Replace(strings.Replace(
+			message, "\"", "\\\"", -1),
+			"'", "\\'", -1),
+			"`", "\\`", -1)
 	case "double":
 		return strings.Replace(message, "\"", "\\\"", -1)
 	case "single":
-		return strings.Replace(message, "'", "\\\"", -1)
+		return strings.Replace(message, "'", "\\'", -1)
+	case "backtick":
+		return strings.Replace(message, "`", "\\`", -1)
 	default:
 		return message
+	}
+}
+
+func quoteValue(value string, quoteArgument string) string {
+	switch quoteArgument {
+	case "double":
+		return fmt.Sprintf("\"%v\"", strings.Replace(value, "\"", "\\\"", -1))
+	case "single":
+		return fmt.Sprintf("'%v'", strings.Replace(value, "'", "\\'", -1))
+	case "backtick":
+		return fmt.Sprintf("`%v`", strings.Replace(value, "`", "\\`", -1))
+	default:
+		return value
 	}
 }

@@ -1,4 +1,4 @@
-// Package env provides a middleware handling environment variables
+// Package env provides a middleware managing environment variables
 package env
 
 import (
@@ -15,7 +15,7 @@ type envMiddlewareArguments struct {
 	Save        *string
 }
 
-// Middleware is an environment variable handler
+// Middleware is an environment variable manager
 type Middleware struct {
 	Setenv    func(string, string) error
 	ExpandEnv func(string) string
@@ -64,8 +64,7 @@ func (envMiddleware Middleware) Apply(
 	case "deep":
 		structparse.Strings(envInterpolator, interpolatedArguments)
 		run.SetArguments(interpolatedArguments)
-	case "none":
-	default:
+	case "shallow":
 		newArguments := run.ArgumentsCopy()
 		for argumentKey, argumentValue := range interpolatedArguments {
 			if argumentValueAsString, argumentValueIsString := argumentValue.(string); argumentValueIsString {
@@ -73,6 +72,8 @@ func (envMiddleware Middleware) Apply(
 			}
 		}
 		run.SetArguments(newArguments)
+	default:
+		// don't do any interpolation at this stage - we will interpolate at execution time
 	}
 	switch len(envInterpolator.Substitutions) {
 	case 0:
