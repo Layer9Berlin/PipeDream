@@ -5,16 +5,23 @@ public:
   install:
     description: Install
     each:
-      - install::setup:
-          pipe:
-            - install::path::set
-            - install::path::check
-      - install::metadata::collect-current
+      # set an appropriate install dir
+      - install::path::determine-install-dir
+      # verify that the install dir is in the path and output result
+      - install::path::verify-install-dir-in-path
+      # collect metadata from the current state of the repo
+      - install::metadata::current::collect
+      # build pipedream and the utility tool binaries and output result
       - install::build::all
+      # create a symlink in the install dir pointing to the built-in pipes directory and output result
       - install::pipes::link
-      - install::metadata::collect-installed
+      # collect metadata from the output of the installed binaries
+      - install::metadata::installed::collect
+      # compare current state of repo to installed metadata and output result
       - install::binary::check-all
+      # check that there is a symlink to the built-in pipes in the install dir and output result
       - install::pipes::check
+      # output a little call-to-action info message
       - install::output::quick-start-message:
           output:
             text: "\nCheck out the Quick-Start Guide for some ideas on how to get started with PipeDream:\nhttps://github.com/Layer9Berlin/PipeDream/tree/main/docs/quick-start\n"
@@ -22,7 +29,7 @@ public:
   check-installation:
     description: Check installation
     each:
-      - install::metadata::collect-current
-      - install::metadata::collect-installed
+      - install::metadata::current::collect
+      - install::metadata::installed::collect
       - install::binary::check-all
       - install::pipes::check

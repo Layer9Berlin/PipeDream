@@ -6,3 +6,5 @@ public:
     pipe:
       - shell::env:
           var: GOOS
+      - shell::env:
+          var: GOOS

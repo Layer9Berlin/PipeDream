@@ -21,11 +21,11 @@ public:
       ignoreWarnings: true
     pipe:
       - print::if-empty::when:
-          when: "@?{message} && '$!!' == ''"
+          when: "@?{message} && '@!!' == ''"
           shell:
             run: "printf \"@{message|''}\""
       - print::if-empty::else:
-          when: "@?{else} && '$!!' != ''"
+          when: "@?{else} && '@!!' != ''"
           shell:
             run: "printf \"@{else|''}\""
 
@@ -47,10 +47,10 @@ private:
       ignoreWarnings: true
     pipe:
       - print::message:
-          when: '@?{message} && @?{pattern} && "$!!" =~ "@{pattern}"'
+          when: '@?{message} && @?{pattern} && "@!!" =~ "@{pattern}"'
           message: "@{message}"
       - print::message:
-          when: '!@?{message} || !@?{pattern} || "$!!" !~ "@{pattern}"'
+          when: '!@?{message} || !@?{pattern} || "@!!" !~ "@{pattern}"'
           message: ""
 
   print::if-match::no-match-branch:
@@ -59,8 +59,8 @@ private:
       ignoreWarnings: true
     pipe:
       - print::message:
-          when: "@?{else} && @?{pattern} && '$!!' !~ '@{pattern}'"
+          when: "@?{else} && @?{pattern} && '@!!' !~ '@{pattern}'"
           message: "@{else}"
       - print::message:
-          when: "!@?{else} || !@?{pattern} || '$!!' =~ '@{pattern}'"
+          when: "!@?{else} || !@?{pattern} || '@!!' =~ '@{pattern}'"
           message: ""

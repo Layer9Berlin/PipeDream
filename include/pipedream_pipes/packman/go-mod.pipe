@@ -131,7 +131,7 @@ private:
     pipe:
       - ~:
           shell:
-            run: "go get -u $!!"
+            run: "go get -u @!!"
           catch: go-mod::catch-upgrade-errors
 
   packman::go-mod::catch-upgrade-errors:
@@ -144,8 +144,8 @@ private:
           with:
             pattern: "(?m)^go: .* upgrade => .*"
       - error:
-          when: "'$!!' != ''"
-          message: "updating dependencies failed: $!!"
+          when: "'@!!' != ''"
+          message: "updating dependencies failed: @!!"
 
   packman::go-mod::catch-grep-error:
     io: merge
@@ -155,6 +155,6 @@ private:
             # we can ignore exit status 1, as it may simply indicate a lack of results
             pattern: "exit status 1"
       - error:
-          when: "'$!!' != ''"
-          message: "$!!"
+          when: "'@!!' != ''"
+          message: "@!!"
 

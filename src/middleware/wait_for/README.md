@@ -1,4 +1,0 @@
-# `waitFor` - Execution Synchronizer
-
-
-

@@ -36,15 +36,16 @@ func (inheritMiddleware Middleware) Apply(
 
 	if run.Parent != nil {
 		substitutions := make(map[string]interface{}, len(arguments))
-		pipelineArguments := run.ArgumentsCopy()
-		parentArguments := run.Parent.ArgumentsCopy()
-		for _, inheritedArgument := range arguments {
-			parentValue, haveParentValue := parentArguments[inheritedArgument]
-			_, haveExistingValue := pipelineArguments[inheritedArgument]
-			if !haveExistingValue && haveParentValue {
-				err := run.SetArgumentAtPath(parentValue, inheritedArgument)
+		for _, argumentKey := range arguments {
+			inheritedArgument, haveInheritedArgument := inheritArgument(run, argumentKey)
+			if haveInheritedArgument {
+				substitutions[argumentKey] = inheritedArgument
+			}
+
+			haveExistingValue := run.HaveArgumentAtPath(argumentKey)
+			if !haveExistingValue && haveInheritedArgument {
+				err := run.SetArgumentAtPath(inheritedArgument, argumentKey)
 				run.Log.PossibleError(err)
-				substitutions[inheritedArgument] = parentValue
 			}
 		}
 		if len(substitutions) > 0 {
@@ -57,4 +58,15 @@ func (inheritMiddleware Middleware) Apply(
 		}
 	}
 	next(run)
+}
+
+func inheritArgument(run *pipeline.Run, argumentKey string) (interface{}, bool) {
+	parentArgument, err := run.ArgumentAtPath(argumentKey)
+	if err == nil {
+		return parentArgument, true
+	}
+	if run.Parent != nil {
+		return inheritArgument(run.Parent, argumentKey)
+	}
+	return nil, false
 }

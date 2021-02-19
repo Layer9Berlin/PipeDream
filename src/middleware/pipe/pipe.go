@@ -2,7 +2,6 @@
 package pipe
 
 import (
-	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
@@ -37,23 +36,7 @@ func (pipeMiddleware Middleware) Apply(
 
 	haveChildren := len(arguments) > 0
 	if haveChildren {
-		childIdentifiers := make([]*string, 0, len(arguments))
-		childArguments := make([]map[string]interface{}, 0, len(arguments))
-		for _, childReference := range arguments {
-			for pipelineIdentifier, pipelineArguments := range childReference {
-				childIdentifiers = append(childIdentifiers, pipelineIdentifier)
-				childArguments = append(childArguments, stringmap.CopyMap(pipelineArguments))
-			}
-		}
-
-		info := make([]string, 0, len(childIdentifiers))
-		for _, childIdentifier := range childIdentifiers {
-			if childIdentifier == nil {
-				info = append(info, "anonymous")
-			} else {
-				info = append(info, *childIdentifier)
-			}
-		}
+		childIdentifiers, childArguments, info := pipeline.CollectReferences(arguments)
 
 		switch len(info) {
 		case 0:
@@ -78,6 +61,7 @@ func (pipeMiddleware Middleware) Apply(
 			)
 		}
 		var previousOutput io.Reader = nil
+		previousRun := run
 		for index, childIdentifier := range childIdentifiers {
 			identifier := childIdentifier
 			childRunArguments := childArguments[index]
@@ -102,9 +86,12 @@ func (pipeMiddleware Middleware) Apply(
 					childRun.Log.Trace(
 						fields.DataStream(pipeMiddleware, "copying stdout")...,
 					)
+					executionContext.Connections = append(executionContext.Connections,
+						pipeline.NewDataConnection(previousRun, childRun, "pipe"))
 					// write to the next run's input
 					// or the parent's output, if this is the last child
 					previousOutput = childRun.Stdout.Copy()
+					previousRun = childRun
 				}))
 		}
 		run.Log.Trace(

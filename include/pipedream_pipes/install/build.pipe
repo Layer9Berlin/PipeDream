@@ -7,40 +7,34 @@ public:
     each:
       - install::build::binary:
           binary: pipedream
-          inject-dir: src/version
-          uppercase_identifier: PIPEDREAM
+          injectDir: src/version
       - install::build::binary:
           binary: semver-compare
           build-dir: util/semver-compare
           inject-dir: util/semver-compare
-          uppercase_identifier: SEMVER_COMPARE
       - install::build::binary:
           binary: traffic-light
           build-dir: util/traffic-light
           inject-dir: util/traffic-light
-          uppercase_identifier: TRAFFIC_LIGHT
 
 private:
   install::build::binary:
     description: "Install binary \"@{binary}\""
     pipe:
       - go::build:
-          binary-install-path: "$PIPEDREAM_BIN_INSTALL_PATH"
+          interpolate:
+            - install::metadata::current::version
+            - install::metadata::current::commit
+            - install::metadata::current::@{binary}::checksum
+            - install::metadata::current::date
           inherit:
-            - build-dir
             - binary
-            - inject-dir
-          flags: "-X 'pipedream/@{inject-dir}/cmd.Version=$PIPEDREAM_CURRENT_METADATA_version' -X 'pipedream/@{inject-dir}/cmd.CommitHash=$PIPEDREAM_CURRENT_METADATA_commit' -X 'pipedream/@{inject-dir}/cmd.RepoChecksum=$PIPEDREAM_CURRENT_METADATA_@{uppercase_identifier}_checksum' -X 'pipedream/@{inject-dir}/cmd.Date=$PIPEDREAM_CURRENT_METADATA_date'"
+            - injectDir
+          flags: "-X 'pipedream/@{injectDir}/cmd.Version=@|0' -X 'pipedream/@{injectDir}/cmd.CommitHash=@|1' -X 'pipedream/@{injectDir}/cmd.RepoChecksum=@|2' -X 'pipedream/@{injectDir}/cmd.Date=@|3'"
           catch:
             install::build::binary::error-handler:
               output:
                 text: "failed"
-#          waitFor:
-#            envVars:
-#              - PIPEDREAM_CURRENT_METADATA_version
-#              - PIPEDREAM_CURRENT_METADATA_commit
-#              - "PIPEDREAM_CURRENT_METADATA_@{uppercase_identifier}_checksum"
-#              - PIPEDREAM_CURRENT_METADATA_date
       - install::build::output-results
 
   install::build::output-results:
@@ -48,7 +42,7 @@ private:
       - binary
     pipe:
       - install::build::binary::success:
-          when: "'$!!' == ''"
+          when: "'@!!' == ''"
           output:
             text: "successful"
       - util::traffic-light:

@@ -110,6 +110,27 @@ func GetValueInMap(searchedMap map[string]interface{}, path ...string) (interfac
 	return nil, fmt.Errorf("value does not exist at path")
 }
 
+// HaveValueInMap indicates whether the nested StringMap has a value at the specified path
+func HaveValueInMap(searchedMap map[string]interface{}, path ...string) bool {
+	if len(path) == 0 {
+		return false
+	}
+	firstComponent, restOfPath := path[0], path[1:]
+	existingValue, haveExistingValue := searchedMap[firstComponent]
+	if haveExistingValue {
+		if len(restOfPath) == 0 {
+			return true
+		}
+
+		nestedMap, haveNestedMap := existingValue.(map[string]interface{})
+		if haveNestedMap {
+			return HaveValueInMap(nestedMap, restOfPath...)
+		}
+		return false
+	}
+	return false
+}
+
 // SetValueInMap fixes the value of a nested StringMap at the specified path
 //
 // Additional levels of nesting will be created if necessary.

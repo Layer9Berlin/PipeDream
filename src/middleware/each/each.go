@@ -83,6 +83,8 @@ func (eachMiddleware Middleware) Apply(
 						fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
 					)
 					run.Stderr.MergeWith(childRun.Stderr.Copy())
+					executionContext.Connections = append(executionContext.Connections,
+						pipeline.NewDataConnection(run, childRun, "each"))
 				}))
 		}
 	}

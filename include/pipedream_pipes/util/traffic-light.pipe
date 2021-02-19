@@ -4,8 +4,7 @@ version: 0.0.1
 public:
   util::traffic-light:
     interpolate:
-      escapeQuotes: 'all'
-      ignoreWarnings: true
+      quote: none
     shell:
       args:
         - prefix: "@{prefix}"
@@ -15,14 +14,16 @@ public:
       run: traffic-light
     catch:
       util::traffic-light::command-not-found:
-        message: "@{prefix}: $!!"
-        redMatch: "('@{red|}' != '' && '$!!' =~ '@{red|}')"
-        amberMatch: "('@{amber|}' != '' && '$!!' =~ '@{amber|}')"
-        greenMismatch: "('@{green|}' != '' && '$!!' !~ '@{green|}')"
+        message: "@{prefix}: @!!"
+        redMatch: "('@{red|}' != '' && '@!!' =~ '@{red|}')"
+        amberMatch: "('@{amber|}' != '' && '@!!' =~ '@{amber|}')"
+        greenMismatch: "('@{green|}' != '' && '@!!' !~ '@{green|}')"
 
 private:
   util::traffic-light::command-not-found:
-    when: "'$!!' =~ 'command not found'"
+    interpolate:
+      quote: false
+    when: "'@!!' =~ 'command not found'"
     pipe:
       - print::message:
           description: "Show red traffic light"

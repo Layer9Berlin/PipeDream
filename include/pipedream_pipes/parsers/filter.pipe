@@ -23,6 +23,6 @@ private:
             # we can ignore exit status 1, as it may simply indicate a lack of results
             pattern: "exit status 1"
       - error:
-          when: "'$!!' != ''"
-          message: "$!!"
+          when: "'@!!' != ''"
+          message: "@!!"
 

@@ -2,26 +2,57 @@
 version: 0.0.1
 
 public:
-  install::path::set:
+  install::path::determine-install-dir:
     pipe:
-      - install::path::use-gopath:
+      - install::path::determine-install-dir::print-dir:
+          # TODO: do we need other options here?
           shell:
             run: "printf \"$GOPATH/bin\""
-          env:
-            save: PIPEDREAM_BIN_INSTALL_PATH
+      # don't need any output
       - noop
 
-  install::path::check:
+  # check that the install dir is in the PATH
+  # so that binaries can be called from any directory
+  install::path::verify-install-dir-in-path:
     pipe:
+      - install::path::verify-directory-in-path:
+          interpolate:
+            - install::path::find
+          directory: "@|0"
+
+  # check that the passed `dir` is in the path
+  # so that a binary located there can be called from anywhere on the system
+  install::path::verify-directory-in-path:
+    pipe:
+      # fetch the PATH environment variable and separate entries by line break
       - env::load:
           var: PATH
-      - strings::convert-colons-to-line-breaks
-      - install::check-for-presence-of-install-path:
+          output:
+            process: strings::convert-colons-to-line-breaks
+      # check that there is a line corresponding to the install path
+      - install::path::verify-dir-in-path::look-for-install-path:
           shell:
-            run: "grep -x \"$PIPEDREAM_BIN_INSTALL_PATH\" || printf \"\""
-      - print::if-empty:
-          message: "no"
-          else: "yes"
+            run: "grep -x \"@{directory}\" || printf \"\""
+          when: "@{directory} != ''"
+          else:
+            # fallback in case we have been passed an empty `dir` argument
+            install::path::verify-dir-in-path::fallback:
+              output:
+                text: "n/a"
+      # an empty result indicates no match, anything else is success
+      # (we may have several matches)
+      - install::path::verify-dir-in-path::process-result:
+          switch:
+            # "n/a" output from the `else` pipe will be kept as-is
+            - pattern: "^n/a$"
+              text: "n/a"
+            # in any other case, empty output denotes failure to find a match
+            - pattern: "^$"
+              text: "no"
+            # if the output is not empty and not "n/a", we assume that we have found a match
+            - text: "yes"
+      # show the result - red if "no", amber if "n/a", green if "yes"
       - util::traffic-light:
           prefix: "Install dir in PATH"
           red: "^no"
+

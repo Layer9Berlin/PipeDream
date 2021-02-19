@@ -2,6 +2,7 @@ package pipeline
 
 import (
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
 	"github.com/mitchellh/mapstructure"
 	"reflect"
 )
@@ -85,4 +86,25 @@ func ParseArgumentsIncludingParents(
 		currentRun = currentRun.Parent
 	}
 	return currentRun != nil
+}
+
+func CollectReferences(references []Reference) ([]*string, []map[string]interface{}, []string) {
+	childIdentifiers := make([]*string, 0, len(references))
+	childArguments := make([]map[string]interface{}, 0, len(references))
+	for _, childReference := range references {
+		for pipelineIdentifier, pipelineArguments := range childReference {
+			childIdentifiers = append(childIdentifiers, pipelineIdentifier)
+			childArguments = append(childArguments, stringmap.CopyMap(pipelineArguments))
+		}
+	}
+
+	info := make([]string, 0, len(childIdentifiers))
+	for _, childIdentifier := range childIdentifiers {
+		if childIdentifier == nil {
+			info = append(info, "anonymous")
+		} else {
+			info = append(info, *childIdentifier)
+		}
+	}
+	return childIdentifiers, childArguments, info
 }

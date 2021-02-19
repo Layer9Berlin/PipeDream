@@ -42,4 +42,4 @@ private:
         - pattern: "^Everything up-to-date|^To github"
           text: "successful"
         - pattern: ".*"
-          text: "uncaught error ('$!!')"
+          text: "uncaught error ('@!!')"

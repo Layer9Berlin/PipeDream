@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCopyMap_WithSuccess(t *testing.T) {
+func TestStringMap_CopyMap_WithSuccess(t *testing.T) {
 	map1 := StringMap{
 		"test1": "test3",
 		"test2": map[string]interface{}{
@@ -56,13 +56,13 @@ func TestCopyMap_WithSuccess(t *testing.T) {
 	}, map2["test13"])
 }
 
-func TestCopyMap_Nil(t *testing.T) {
+func TestStringMap_CopyMap_Nil(t *testing.T) {
 	copiedMap := CopyMap(nil)
 
 	require.Equal(t, map[string]interface{}{}, copiedMap)
 }
 
-func TestMergeIntoMap_WithSuccess(t *testing.T) {
+func TestStringMap_MergeIntoMap_WithSuccess(t *testing.T) {
 	map1 := StringMap{
 		"test1": "test3",
 		"test2": map[string]interface{}{
@@ -142,7 +142,7 @@ func TestMergeIntoMap_WithSuccess(t *testing.T) {
 	require.Equal(t, map2["test17"].(StringMap)["test18"], "test19")
 }
 
-func TestMergeIntoMap_WithErrors(t *testing.T) {
+func TestStringMap_MergeIntoMap_WithErrors(t *testing.T) {
 	// one of the maps being nil should be handled gracefully
 	// after all, this will often be the case for pipe arguments
 	require.Nil(t, MergeIntoMap(nil, StringMap{
@@ -169,7 +169,7 @@ func TestMergeIntoMap_WithErrors(t *testing.T) {
 	}))
 }
 
-func TestGetValueInMap_Nested(t *testing.T) {
+func TestStringMap_GetValueInMap_Nested(t *testing.T) {
 	vector := map[string]interface{}{
 		"test1": map[string]interface{}{
 			"test2": map[string]interface{}{
@@ -184,14 +184,14 @@ func TestGetValueInMap_Nested(t *testing.T) {
 	require.Equal(t, "test5", value)
 }
 
-func TestGetValueInMap_NotExisting(t *testing.T) {
+func TestStringMap_GetValueInMap_NotExisting(t *testing.T) {
 	vector := map[string]interface{}{}
 	_, err := GetValueInMap(vector, "impossible")
 	require.NotNil(t, err)
 	require.Equal(t, "value does not exist at path", err.Error())
 }
 
-func TestGetValueInMap_InvalidMap(t *testing.T) {
+func TestStringMap_GetValueInMap_InvalidMap(t *testing.T) {
 	vector := map[string]interface{}{
 		"test": []string{"invalid"},
 	}
@@ -200,7 +200,7 @@ func TestGetValueInMap_InvalidMap(t *testing.T) {
 	require.Equal(t, "value does not exist at path", err.Error())
 }
 
-func TestSetValueInMap_InvalidMap(t *testing.T) {
+func TestStringMap_SetValueInMap_InvalidMap(t *testing.T) {
 	vector := map[string]interface{}{
 		"test": []string{"invalid"},
 	}
@@ -209,7 +209,7 @@ func TestSetValueInMap_InvalidMap(t *testing.T) {
 	require.Equal(t, "failed to set new value, encountered something other than a string map", err.Error())
 }
 
-func TestSetValueInMap_NonExistentLeaf(t *testing.T) {
+func TestStringMap_SetValueInMap_NonExistentLeaf(t *testing.T) {
 	vector := map[string]interface{}{
 		"test1": map[string]interface{}{
 			"test2": map[string]interface{}{},
@@ -222,7 +222,7 @@ func TestSetValueInMap_NonExistentLeaf(t *testing.T) {
 	require.Equal(t, "test5", value)
 }
 
-func TestSetValueInMap_RemoveValueInMap(t *testing.T) {
+func TestStringMap_RemoveValueInMap(t *testing.T) {
 	vector := map[string]interface{}{
 		"test1": map[string]interface{}{
 			"test2": map[string]interface{}{},
@@ -240,7 +240,7 @@ func TestSetValueInMap_RemoveValueInMap(t *testing.T) {
 	}, vector)
 }
 
-func TestSetValueInMap_RemoveValueInMap_notFound(t *testing.T) {
+func TestStringMap_RemoveValueInMap_notFound(t *testing.T) {
 	vector := map[string]interface{}{
 		"test1": map[string]interface{}{
 			"test2": map[string]interface{}{},
@@ -254,7 +254,7 @@ func TestSetValueInMap_RemoveValueInMap_notFound(t *testing.T) {
 	require.Equal(t, "failed to remove value, as it could not be found", err.Error())
 }
 
-func TestSetValueInMap_RemoveValueInMap_notStringMap(t *testing.T) {
+func TestStringMap_RemoveValueInMap_notStringMap(t *testing.T) {
 	vector := map[string]interface{}{
 		"test1": []string{
 			"test2",
@@ -265,4 +265,24 @@ func TestSetValueInMap_RemoveValueInMap_notStringMap(t *testing.T) {
 	err := RemoveValueInMap(vector, "test1", "test3")
 	require.NotNil(t, err)
 	require.Equal(t, "failed to remove value, encountered something other than a string map", err.Error())
+}
+
+func TestStringMap_HaveValueInMap(t *testing.T) {
+	vector := map[string]interface{}{
+		"test1": map[string]interface{}{
+			"test2": map[string]interface{}{
+				"test3": "test4",
+			},
+			"test5": []string{
+				"test6",
+				"test7",
+			},
+		},
+	}
+	require.False(t, HaveValueInMap(vector))
+	require.True(t, HaveValueInMap(vector, "test1", "test2"))
+	require.False(t, HaveValueInMap(vector, "test1", "test6"))
+	require.True(t, HaveValueInMap(vector, "test1", "test2", "test3"))
+	require.True(t, HaveValueInMap(vector, "test1", "test5"))
+	require.False(t, HaveValueInMap(vector, "test1", "test5", "test6"))
 }

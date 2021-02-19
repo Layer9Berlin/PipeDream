@@ -21,15 +21,15 @@ private:
     shell:
       args:
         - prefix: "Local git repo status"
-        - text: "$!!"
+        - text: "@!!"
         - green: "clean"
       run: "traffic-light"
 
   publish::git::catch-status-error:
     pipe:
       - print::message:
-          when: "'$!!' == 'Everything up-to-date\n'"
+          when: "'@!!' == 'Everything up-to-date\n'"
           message: "clean"
       - print::message:
-          when: "'$!!' != 'Everything up-to-date\n'"
+          when: "'@!!' != 'Everything up-to-date\n'"
           message: "dirty"

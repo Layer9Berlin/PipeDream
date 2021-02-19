@@ -5,34 +5,40 @@ public:
   install::pipes::link:
     pipe:
       - shell::working-dir
-      - install::pipes::create-symlink:
-          output:
-            text: ''
+      - shell::symlink::create:
+          interpolate:
+            pipes:
+              - install::path::determine-install-dir::print-dir
+          when: "@!! != '' && @|0 != ''"
+          source: "@|0"
+          target: "@!!/include/pipedream_pipes"
 
   install::pipes::check:
     pipe:
       - shell::which:
           binary: pipedream
-      - print::if-match:
-          pattern: "^$|not found"
-          message: "n/a"
-          else: ""
-      - install::pipes::try-navigating-into-dir
+          output:
+            process: strings::remove-new-lines
+      - install::pipes::which::pipedream::process-result:
+          description: Process result of `which pipedream`
+          when: "@!! =~ '^$|not found|\n'"
+          output:
+            text: "n/a"
+          else: install::pipes::navigate-into-pipes-dir
       - util::traffic-light:
           prefix: "Built-in pipes"
           red: "not linked"
 
 private:
-  install::pipes::create-symlink:
+  install::pipes::navigate-into-pipes-dir:
+    interpolate:
+      quote: none
     pipe:
-      - shell::symlink::create:
-          when: "'$!!' != ''"
-          source: $!!/include/pipedream_pipes
-          target: $PIPEDREAM_BIN_INSTALL_PATH
-#          waitFor:
-#            envVars:
-#              - PIPEDREAM_BIN_INSTALL_PATH
-
-  install::pipes::try-navigating-into-dir:
-    shell:
-      run: "cd $!!_pipes"
+      - install::pipes::navigate-into-pipes-dir::try:
+          shell:
+            run: "cd @!!_pipes"
+      - install::pipes::navigate-into-pipes-dir::process:
+          switch:
+            - pattern: "'^$'"
+              text: "linked"
+            - text: "not linked"

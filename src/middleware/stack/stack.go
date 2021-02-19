@@ -7,6 +7,7 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/middleware/dir"
 	"github.com/Layer9Berlin/pipedream/src/middleware/docker"
 	"github.com/Layer9Berlin/pipedream/src/middleware/each"
+	_else "github.com/Layer9Berlin/pipedream/src/middleware/else"
 	"github.com/Layer9Berlin/pipedream/src/middleware/env"
 	"github.com/Layer9Berlin/pipedream/src/middleware/inherit"
 	_input "github.com/Layer9Berlin/pipedream/src/middleware/input"
@@ -16,8 +17,8 @@ import (
 	_select "github.com/Layer9Berlin/pipedream/src/middleware/select"
 	"github.com/Layer9Berlin/pipedream/src/middleware/shell"
 	"github.com/Layer9Berlin/pipedream/src/middleware/ssh"
+	_switch "github.com/Layer9Berlin/pipedream/src/middleware/switch"
 	"github.com/Layer9Berlin/pipedream/src/middleware/timer"
-	_waitfor "github.com/Layer9Berlin/pipedream/src/middleware/wait_for"
 	"github.com/Layer9Berlin/pipedream/src/middleware/when"
 )
 
@@ -27,10 +28,11 @@ func SetUpMiddleware() []middleware.Middleware {
 		_select.NewMiddleware(),
 		timer.NewMiddleware(),
 		inherit.NewMiddleware(),
-		_waitfor.NewMiddleware(),
 		interpolate.NewMiddleware(),
 		env.NewMiddleware(),
+		_switch.NewMiddleware(),
 		when.NewMiddleware(),
+		_else.NewMiddleware(),
 		_output.NewMiddleware(),
 		catch.NewMiddleware(),
 		pipe.NewMiddleware(),

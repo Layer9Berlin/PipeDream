@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 )
 
 // ExecutionContext is the data model keeping track of everything required to execute a pipeline file
@@ -49,7 +50,8 @@ type ExecutionContext struct {
 
 	rootRun *pipeline.Run
 
-	Runs []*pipeline.Run
+	Runs        []*pipeline.Run
+	Connections []*pipeline.DataConnection
 
 	errors *multierror.Error
 
@@ -355,4 +357,26 @@ func setUpCancelHandler(handler func()) {
 		close(signalChannel)
 		signal.Reset(os.Interrupt, syscall.SIGTERM)
 	}()
+}
+
+func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipeline.Run {
+	for {
+		for _, run := range executionContext.Runs {
+			if run != nil && run.Identifier != nil && *run.Identifier == identifier {
+				run.Wait()
+				return run
+			}
+		}
+		time.Sleep(250)
+	}
+}
+
+func (executionContext *ExecutionContext) UserRuns() []*pipeline.Run {
+	result := make([]*pipeline.Run, 0, len(executionContext.Runs))
+	for _, run := range executionContext.Runs {
+		//if run.Definition != nil && !run.Definition.BuiltIn {
+		result = append(result, run)
+		//}
+	}
+	return result
 }

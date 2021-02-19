@@ -2,127 +2,103 @@
 version: 0.0.1
 
 public:
+  # for each binary, check that it is installed correctly and up-to-date
   install::binary::check-all:
     description: Check all installed binaries
-    each:
-      - install::binary::check:
-          binary: pipedream
-          uppercase_identifier: PIPEDREAM
-          dirs: "cmd include src install.pipe"
-      - install::binary::check:
-          binary: semver-compare
-          uppercase_identifier: SEMVER_COMPARE
-          dirs: util/semver-compare
-      - install::binary::check:
-          binary: traffic-light
-          uppercase_identifier: TRAFFIC_LIGHT
-          dirs: util/traffic-light
+    # TODO: might want to implement a `for` middleware for cases like this
+    pipe:
+      - install::binary::get-locations
+      - install::check-each-binary:
+          each:
+            - install::binary::check:
+                binary: pipedream
+            - install::binary::check:
+                binary: semver-compare
+            - install::binary::check:
+                binary: traffic-light
 
 private:
+  install::binary::get-locations:
+    pipe:
+      - install::binary::get-location::pipedream:
+          description: Get location of binary pipedream
+          shell:
+            run: "which pipedream"
+          output:
+            process: strings::remove-new-lines
+      - install::binary::get-location::semver-compare:
+          description: Get location of binary semver-compare
+          shell:
+            run: "which semver-compare"
+          output:
+            process: strings::remove-new-lines
+      - install::binary::get-location::traffic-light:
+          description: Get location of binary traffic-light
+          shell:
+            run: "which traffic-light"
+          output:
+            process: strings::remove-new-lines
+      - noop
+
   install::binary::check:
-    inherit:
-      - dirs
+    interpolate:
+      quote: none
     each:
       - install::binary::check-presence:
-          inherit:
-            - binary
-            - uppercase_identifier
-      - install::binary::check-installation:
-          inherit:
-            - binary
-            - uppercase_identifier
-            - dirs
-          when: "'$PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location' != ''"
-          each:
-            - install::binary::check-location-in-path:
-                inherit:
-                  - binary
-                  - uppercase_identifier
-            - install::binary::verify-commit-hash:
-                inherit:
-                  - binary
-                  - uppercase_identifier
-            - install::binary::verify-checksum:
-                inherit:
-                  - binary
-                  - uppercase_identifier
-                  - dirs
-
-  install::binary::check-presence:
-    pipe:
-      - env::load:
-          var: PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
-          waitFor:
-            envVars:
-              - PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location
-      - print::if-empty:
-          message: "not installed"
-          else: "installed"
-      - util::traffic-light:
-          prefix: "Binary \"@{binary}\""
-          red: "not installed$"
-
-  install::binary::check-location-in-path:
-    pipe:
-      - shell::env:
-          var: PATH
-      - strings::convert-colons-to-line-breaks
-      - install::binary::check-for-presence-of-install-path:
-          shell:
-            run: "grep -x \"PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_location\" || printf \"\""
-      - print::if-empty:
-          message: "yes"
-          else: "no"
-      - util::traffic-light:
-          prefix: "Binary \"@{binary}\" in PATH"
-          red: "^no"
-
-  install::binary::verify-commit-hash:
-    description: Check if there have been new commits since the binary was installed
-    pipe:
-      - install::metadata::extract-installed:
-          key: commit
-          uppercase_identifier: COMMIT_HASH
-          inherit:
-            - binary
-      - print::if-match:
-          pattern: "$PIPEDREAM_INSTALL_REPO_COMMIT_HASH"
-          message: "current"
-          else: "out of date"
-      - util::traffic-light:
+          pipe:
+            - install::binary::output-location:
+                interpolate:
+                  pipes:
+                    - install::binary::get-location::@{binary}
+                output:
+                  text: "@|0"
+            - install::binary::process-location:
+                description: Process location of binary @{binary}
+                switch:
+                  - pattern: "^$"
+                    text: "not installed"
+                  - text: "installed"
+            - util::traffic-light:
+                prefix: "Binary \"@{binary}\""
+                red: "not installed$"
+      # check that the actual location of the binary is in the path
+      # so that it can be called from any directory
+      - install::binary::verify-directory-in-path:
+          interpolate:
+            quote: none
+            pipes:
+              - "install::binary::get-location::@{binary}"
+      - install::binary::compare-values:
           prefix: "Commit hash for \"@{binary}\""
-          red: "out of date"
+          interpolate:
+            pipes:
+              - "install::metadata::installed::@{binary}::commit"
+              - "install::metadata::current::commit"
+      - install::binary::compare-values:
+          prefix: "Checksum for \"@{binary}\""
+          interpolate:
+            pipes:
+              - "install::metadata::installed::@{binary}::checksum"
+              - "install::metadata::current::@{binary}::checksum"
 
-  install::binary::verify-checksum:
-    inherit:
-      - dirs
-    description: Check if changes have been made to repo since last build
+  install::binary::verify-directory-in-path:
     pipe:
-      - tar::shasum:
-          inherit:
-            - dirs
-          env:
-            save: PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}
-      - install::metadata::extract-installed:
-          key: checksum
-          uppercase_identifier: CHECKSUM
-          inherit:
-            - binary
-      - print::if-match:
-          when: "'$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}' != ''"
-          pattern: "$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
-          message: "unchanged"
-          else: "changed"
-          waitFor:
-            envVars:
-              - "PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
-      - print::message:
-          when: "'$PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}' == ''"
-          message: "n/a (no checksum)"
-          waitFor:
-            envVars:
-              - "PIPEDREAM_INSTALL_REPO_CHECKSUM_@{uppercase_identifier}"
+      - install::path::verify-directory-in-path:
+          directory: "@|0"
+
+  install::binary::compare-values:
+    inherit:
+      - binary
+    pipe:
+      - install::binary::compare:
+          when: "@|0 != @|1"
+          output:
+            text: "current"
+          else:
+            ~:
+              output:
+                text: "out of date"
       - util::traffic-light:
-          prefix: "Repo state for \"@{binary}\""
-          amber: "^n/a"
-          red: "^changed|^error"
+          inherit:
+            - prefix
+          red: "out of date"

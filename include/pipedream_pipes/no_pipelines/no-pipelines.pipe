@@ -31,7 +31,7 @@ private:
 
   no-pipelines::copy-example-file:
     shell:
-      run: "cp $!!_pipes/default/example._pipe ./example.pipe"
+      run: "cp @!!_pipes/default/example._pipe ./example.pipe"
 
   no-pipelines::open-readme:
     pipe:

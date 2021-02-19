@@ -45,10 +45,10 @@ private:
 
   publish::version::increment-npm-version:
     shell:
-      run: "npm version $!!"
+      run: "npm version @!!"
 
   publish::version::enforce-version-increase:
-    when: "'$!!' == '$PIPEDREAM_CURRENT_VERSION'"
+    when: "'@!!' == '$PIPEDREAM_CURRENT_VERSION'"
     shell:
       run: "svu p"
     waitFor:

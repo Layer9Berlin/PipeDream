@@ -476,6 +476,9 @@ func (executor *TestCommandExecutor) String() string {
 	return fmt.Sprintf("%v %v", executor.StartCommand, executor.StartArgs)
 }
 
+func (executor *TestCommandExecutor) Clear() {
+}
+
 func NewTestCommandExecutor() *TestCommandExecutor {
 	stdinReader, stdinWriter := io.Pipe()
 	stdoutReader, stdoutWriter := io.Pipe()

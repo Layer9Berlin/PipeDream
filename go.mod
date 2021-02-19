@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0
+	github.com/hashicorp/go-uuid v1.0.1
 	github.com/kr/text v0.2.0 // indirect
 	github.com/logrusorgru/aurora/v3 v3.0.0
 	github.com/lunixbochs/vtclean v1.0.0 // indirect

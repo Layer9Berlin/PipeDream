@@ -49,7 +49,7 @@ public:
       - expect::output-result:
           pipe:
             - print::message:
-                when: "'$!!' == ''"
+                when: "'@!!' == ''"
                 message: "passed"
             - ~:
                 shell:
@@ -65,10 +65,10 @@ private:
           shell:
             run: "diff -s \"@{file}\" - | head -n 10"
       - print::message:
-          when: "\"$!!\" !~ *are identical"
+          when: "\"@!!\" !~ *are identical"
           message: Output does not match file!
       - print::message:
-          when: "\"$!!\" !~ *does not match file!"
+          when: "\"@!!\" !~ *does not match file!"
           message: ""
 
   expect::check-output:
@@ -76,17 +76,17 @@ private:
       escapeQuotes: all
     pipe:
       - print::message:
-          when: "'$!!' != '@{expectedOutput}'"
-          message: "failed\nActual output:\n$!!\nExpected output:\n@{expectedOutput}\n"
+          when: "'@!!' != '@{expectedOutput}'"
+          message: "failed\nActual output:\n@!!\nExpected output:\n@{expectedOutput}\n"
       - print::message:
-          when: "'$!!' == '@{expectedOutput}'"
+          when: "'@!!' == '@{expectedOutput}'"
           message: "passed"
 
   expect::check-output-pattern:
     pipe:
       - print::message:
-          when: "'$!!' !~ '@{expectedOutputPattern}'"
-          message: "failed\nActual output:\n$!!\nExpected pattern:\n@{expectedOutputPattern}\n"
+          when: "'@!!' !~ '@{expectedOutputPattern}'"
+          message: "failed\nActual output:\n@!!\nExpected pattern:\n@{expectedOutputPattern}\n"
       - print::message:
-          when: "'$!!' =~ '@{expectedOutputPattern}'"
+          when: "'@!!' =~ '@{expectedOutputPattern}'"
           message: "passed"

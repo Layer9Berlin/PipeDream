@@ -3,5 +3,7 @@ version: 0.0.1
 
 public:
   shell::which:
+    interpolate:
+      quote: none
     shell:
       run: "which @{binary}"

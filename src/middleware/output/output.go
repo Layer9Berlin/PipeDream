@@ -2,11 +2,11 @@
 package _output
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
 	"io/ioutil"
-	"regexp"
 	"sync"
 )
 
@@ -25,19 +25,14 @@ func NewMiddleware() Middleware {
 }
 
 type middlewareArguments struct {
-	Else   *string
-	Switch []struct {
-		Pattern *string
-		Text    *string
-	}
-	Text *string
+	Process pipeline.Reference
+	Text    *string
 }
 
 func newMiddlewareArguments() middlewareArguments {
 	return middlewareArguments{
-		Else:   nil,
-		Switch: nil,
-		Text:   nil,
+		Process: nil,
+		Text:    nil,
 	}
 }
 
@@ -49,7 +44,7 @@ func newMiddlewareArguments() middlewareArguments {
 func (outputMiddleware Middleware) Apply(
 	run *pipeline.Run,
 	next func(pipelineRun *pipeline.Run),
-	_ *middleware.ExecutionContext,
+	executionContext *middleware.ExecutionContext,
 ) {
 	arguments := newMiddlewareArguments()
 	pipeline.ParseArguments(&arguments, "output", run)
@@ -80,58 +75,58 @@ func (outputMiddleware Middleware) Apply(
 
 	// switch is provided a list of regex patterns
 	// it will use the first match to replace the output
-	if arguments.Switch != nil {
+	if len(arguments.Process) > 0 {
 		run.Log.Debug(
-			fields.Symbol("↗️️"),
-			fields.Message("switch"),
+			fields.Symbol("⍈"),
+			fields.Message("process"),
 			fields.Middleware(outputMiddleware),
 		)
 
-		// using the stdout intercept to be able to read and write stdout asynchronously
+		run.Log.Trace(
+			fields.DataStream(outputMiddleware, "intercepting stdout")...,
+		)
 		stdoutIntercept := run.Stdout.Intercept()
-		// do not close log yet, we may still want to write errors to it...
-		run.LogClosingWaitGroup.Add(1)
-		go func() {
-			defer run.LogClosingWaitGroup.Done()
-			// read the entire output data
-			outputData, _ := ioutil.ReadAll(stdoutIntercept)
+		run.Log.Trace(
+			fields.DataStream(outputMiddleware, "creating stderr writer")...,
+		)
+		stderrAppender := run.Stderr.WriteCloser()
+		parentLogWriter := run.Log.AddWriteCloserEntry()
 
-			foundMatch := false
-			for _, switchStatement := range arguments.Switch {
-				if switchStatement.Pattern == nil || switchStatement.Text == nil {
-					continue
-				}
-				regex, err := regexp.Compile(*switchStatement.Pattern)
-				run.Log.PossibleError(err)
-				if err == nil && regex.Match(outputData) {
-					run.Log.Debug(
-						fields.Symbol("🔢"),
-						fields.Message("match"),
-						fields.Info(*switchStatement.Pattern),
-						fields.Middleware(outputMiddleware),
-					)
-					foundMatch = true
-					_, err = stdoutIntercept.Write([]byte(*switchStatement.Text))
-					run.Log.PossibleError(err)
-					break
-				} else {
-					run.Log.Debug(
-						fields.Symbol("🔢"),
-						fields.Message("mismatch"),
-						fields.Info(*switchStatement.Pattern),
-						fields.Middleware(outputMiddleware),
-					)
-				}
-			}
-
-			if !foundMatch {
-				if arguments.Else != nil {
-					_, err := stdoutIntercept.Write([]byte(*arguments.Else))
-					run.Log.PossibleError(err)
-				}
-			}
-
-			run.Log.PossibleError(stdoutIntercept.Close())
-		}()
+		var childIdentifier *string
+		childArguments := make(stringmap.StringMap, 10)
+		for elseIdentifier, elseArguments := range arguments.Process {
+			childIdentifier = elseIdentifier
+			childArguments = elseArguments
+			break
+		}
+		executionContext.FullRun(
+			middleware.WithIdentifier(childIdentifier),
+			middleware.WithParentRun(run),
+			middleware.WithLogWriter(parentLogWriter),
+			middleware.WithArguments(childArguments),
+			middleware.WithSetupFunc(func(childRun *pipeline.Run) {
+				childRun.Log.Trace(
+					fields.DataStream(outputMiddleware, "merging parent's previous stdout into child stdin")...,
+				)
+				childRun.Stdin.MergeWith(stdoutIntercept)
+			}),
+			middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
+				childRun.Log.Trace(
+					fields.DataStream(outputMiddleware, "merging child stdout into parent's new stdout")...,
+				)
+				childRun.Stdout.StartCopyingInto(stdoutIntercept)
+				childRun.Log.Trace(
+					fields.DataStream(outputMiddleware, "merging child stderr into parent stderr")...,
+				)
+				childRun.Stderr.StartCopyingInto(stderrAppender)
+				executionContext.Connections = append(executionContext.Connections,
+					pipeline.NewDataConnection(run, childRun, "output processing"))
+				go func() {
+					childRun.Wait()
+					// need to clean up by closing the writers we created
+					childRun.Log.PossibleError(stdoutIntercept.Close())
+					childRun.Log.PossibleError(stderrAppender.Close())
+				}()
+			}))
 	}
 }

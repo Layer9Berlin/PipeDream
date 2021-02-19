@@ -4,6 +4,7 @@ package interpolate
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
@@ -20,6 +21,7 @@ type interpolateMiddlewareArguments struct {
 	Enable         bool
 	EscapeQuotes   string
 	IgnoreWarnings bool
+	Pipes          []string
 	Quote          string
 }
 
@@ -50,17 +52,29 @@ func (interpolateMiddleware Middleware) Apply(
 		Enable:         true,
 		EscapeQuotes:   "none",
 		IgnoreWarnings: false,
+		Pipes:          nil,
 		Quote:          "single",
 	}
 	pipeline.ParseArguments(&arguments, "interpolate", run)
 
 	if arguments.Enable {
+		// we may need to wait for the output of any pipes passed as arguments
+		// and/or the previous pipe (if input interpolation is used)
+		if len(arguments.Pipes) > 0 {
+			run.Log.Debug(
+				fields.Symbol("💤"),
+				fields.Message("waiting for pipes to complete"),
+				fields.Info(arguments.Pipes),
+				fields.Middleware(interpolateMiddleware),
+			)
+		}
+
 		preliminaryInterpolator := newInterpolator(run.ArgumentsCopy(), arguments)
 
 		interpolatedArguments := run.ArgumentsCopy()
 		structparse.Strings(preliminaryInterpolator, interpolatedArguments)
 
-		if preliminaryInterpolator.NeedCompleteInput {
+		if len(arguments.Pipes) > 0 || preliminaryInterpolator.NeedCompleteInput {
 			// we log any errors only as warnings
 			// this is because we might have other middleware (like `when`)
 			// that renders certain errors moot
@@ -91,14 +105,36 @@ func (interpolateMiddleware Middleware) Apply(
 			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "creating stderr writer")...,
 			)
-			stderrAppender := run.Stdout.WriteCloser()
+			stderrAppender := run.Stderr.WriteCloser()
 			// we return immediately and wait for the previous input to be available
 			// then we execute a full run
 			parentLogWriter := run.Log.AddWriteCloserEntry()
 			go func() {
-				input, inputErr := ioutil.ReadAll(stdinCopy)
-				fullInterpolator := newInterpolatorWithInput(interpolatedArguments, arguments, input)
+				waitGroup := &sync.WaitGroup{}
+				waitGroup.Add(1)
+				var inputData []byte
+				var inputErr error
+				// start reading the input data
+				go func() {
+					inputData, inputErr = ioutil.ReadAll(stdinCopy)
+					waitGroup.Done()
+				}()
+				// wait for all previous runs
+				var previousRunResults [][]byte
+				if len(arguments.Pipes) > 0 {
+					for _, runIdentifier := range arguments.Pipes {
+						runToWaitFor := executionContext.WaitForRun(runIdentifier)
+						previousRunResults = append(previousRunResults, runToWaitFor.Stdout.Bytes())
+					}
+				}
+				// and for the input data to be set
+				waitGroup.Wait()
+				fullInterpolator := newInterpolatorWithInput(interpolatedArguments, arguments, inputData, previousRunResults)
 				structparse.Strings(fullInterpolator, interpolatedArguments)
+				// need to remove the "pipes" key to prevent infinite recursion
+				if arguments.Pipes != nil {
+					run.Log.PossibleError(stringmap.RemoveValueInMap(interpolatedArguments, "interpolate", "pipes"))
+				}
 				executionContext.FullRun(
 					middleware.WithIdentifier(run.Identifier),
 					middleware.WithParentRun(run),
@@ -110,7 +146,7 @@ func (interpolateMiddleware Middleware) Apply(
 						childRun.Log.Trace(
 							fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 						)
-						childRun.Stdin.MergeWith(bytes.NewReader(input))
+						childRun.Stdin.MergeWith(bytes.NewReader(inputData))
 					}),
 					middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 						childRun.Log.Trace(
@@ -121,6 +157,8 @@ func (interpolateMiddleware Middleware) Apply(
 							fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr")...,
 						)
 						childRun.Stderr.StartCopyingInto(stderrAppender)
+						executionContext.Connections = append(executionContext.Connections,
+							pipeline.NewDataConnection(run, childRun, "interpolate"))
 						go func() {
 							childRun.Wait()
 							// need to clean up by closing the writers we created
@@ -161,6 +199,8 @@ func (interpolateMiddleware Middleware) Apply(
 						fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr writer")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrAppender)
+					executionContext.Connections = append(executionContext.Connections,
+						pipeline.NewDataConnection(run, childRun, "interpolate"))
 					go func() {
 						childRun.Wait()
 						// need to clean up by closing the writers we created
@@ -181,6 +221,7 @@ type interpolator struct {
 	Errors               *multierror.Error
 	MiddlewareArguments  interpolateMiddlewareArguments
 	NeedCompleteInput    bool
+	PreviousRunResults   [][]byte
 	Substitutions        map[string]interface{}
 	WaitGroup            *sync.WaitGroup
 }
@@ -189,6 +230,7 @@ func newInterpolatorWithInput(
 	availableReplacements map[string]interface{},
 	middlewareArguments interpolateMiddlewareArguments,
 	completeInput []byte,
+	previousRunResults [][]byte,
 ) *interpolator {
 	interpolator := interpolator{
 		ArgumentReplacements: availableReplacements,
@@ -196,6 +238,7 @@ func newInterpolatorWithInput(
 		Errors:               nil,
 		MiddlewareArguments:  middlewareArguments,
 		NeedCompleteInput:    false,
+		PreviousRunResults:   previousRunResults,
 		Substitutions:        make(map[string]interface{}, 10),
 		WaitGroup:            &sync.WaitGroup{},
 	}
@@ -206,13 +249,16 @@ func newInterpolator(
 	availableReplacements map[string]interface{},
 	middlewareArguments interpolateMiddlewareArguments,
 ) *interpolator {
-	return newInterpolatorWithInput(availableReplacements, middlewareArguments, nil)
+	return newInterpolatorWithInput(availableReplacements, middlewareArguments, nil, nil)
 }
 
 func (interpolator *interpolator) ParseString(value string) interface{} {
-	// we allow defining keys in terms of arguments and vice versa, within reason
 	result := interpolator.interpolateInput(value)
+	if interpolator.PreviousRunResults != nil {
+		result = interpolator.interpolatePreviousRuns(result, interpolator.PreviousRunResults)
+	}
 
+	// we allow defining keys in terms of arguments and vice versa, within reason
 	substitutionCount := len(interpolator.Substitutions)
 	// keep replacing arguments while all three conditions are fulfilled:
 	// - the total number of iterations is at most 5
@@ -235,13 +281,34 @@ func (interpolator *interpolator) ParseString(value string) interface{} {
 }
 
 func (interpolator *interpolator) interpolateInput(value string) string {
-	if strings.Contains(value, "$!!") {
+	if strings.Contains(value, "@!!") {
 		interpolator.NeedCompleteInput = true
 		if interpolator.completeInput != nil {
 			replacement := handleQuotes(string(interpolator.completeInput), interpolator.MiddlewareArguments)
-			interpolator.Substitutions["$!!"] = replacement
-			return strings.Replace(value, "$!!", replacement, -1)
+			interpolator.Substitutions["@!!"] = replacement
+			return strings.Replace(value, "@!!", replacement, -1)
 		}
+	}
+	return value
+}
+
+func (interpolator *interpolator) interpolatePreviousRuns(value string, previousResults [][]byte) string {
+	regex := regexp.MustCompile("@\\|(\\d+|{\\d+})")
+	matches := regex.FindAllStringSubmatch(value, -1)
+	for _, match := range matches {
+		valueAsInt, err := strconv.Atoi(match[1])
+		if err != nil {
+			interpolator.Errors = multierror.Append(interpolator.Errors, err)
+			return ""
+		}
+		if valueAsInt < 0 || valueAsInt >= len(previousResults) {
+			interpolator.Errors = multierror.Append(interpolator.Errors,
+				fmt.Errorf("trying to interpolate result at index %v, but only %v `pipes` arguments were provided", valueAsInt, len(previousResults)))
+			return ""
+		}
+		replacement := handleQuotes(string(previousResults[valueAsInt]), interpolator.MiddlewareArguments)
+		interpolator.Substitutions[match[0]] = replacement
+		return strings.Replace(value, match[0], replacement, -1)
 	}
 	return value
 }

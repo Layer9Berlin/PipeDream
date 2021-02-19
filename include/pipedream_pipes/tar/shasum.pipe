@@ -3,6 +3,9 @@ version: 0.0.1
 
 public:
   tar::shasum:
+    interpolate:
+      # don't quote `dirs` argument
+      quote: none
     pipe:
       - tar::shasum::tar:
           shell:

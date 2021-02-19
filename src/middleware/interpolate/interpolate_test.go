@@ -130,7 +130,7 @@ func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 			"quote": "none",
 		},
 		"arg":  "value",
-		"arg2": "@{arg} $!!",
+		"arg2": "@{arg} @!!",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("TestInput @{arg}"))
 
@@ -172,7 +172,7 @@ func TestInterpolate_Disabled(t *testing.T) {
 		"arg":  "value",
 		"arg2": "test-@{arg}",
 		"arg3": "@arg",
-		"arg4": "$!!",
+		"arg4": "@!!",
 		"arg5": "@{missing|default}",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("TestInput @{arg}"))
@@ -194,7 +194,7 @@ func TestInterpolate_Disabled(t *testing.T) {
 		"arg":  "value",
 		"arg2": "test-@{arg}",
 		"arg3": "@arg",
-		"arg4": "$!!",
+		"arg4": "@!!",
 		"arg5": "@{missing|default}",
 	}, run.ArgumentsCopy())
 	require.NotContains(t, run.Log.String(), "interpolate")
@@ -223,7 +223,7 @@ func TestInterpolate_NoSubstitution(t *testing.T) {
 func TestInterpolate_InputReadError(t *testing.T) {
 	identifier := "child identifier with @{arg} (not interpolated)"
 	run, _ := pipeline.NewRun(&identifier, map[string]interface{}{
-		"arg": "$!!",
+		"arg": "@!!",
 	}, nil, nil)
 	run.Stdin.Replace(NewErrorReader(1))
 
@@ -284,7 +284,7 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 		"arg2": map[string]interface{}{
 			"test": "not a valid substitution",
 		},
-		"arg3": "$!!",
+		"arg3": "@!!",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("input"))
 
@@ -366,7 +366,7 @@ func TestInterpolate_EscapeAllQuotes(t *testing.T) {
 			"escapeQuotes": "all",
 			"quote":        "none",
 		},
-		"arg": "test $!!",
+		"arg": "test @!!",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("' \" ` \\\" '"))
 
@@ -403,7 +403,7 @@ func TestInterpolate_EscapeSingleQuotes(t *testing.T) {
 			"escapeQuotes": "single",
 			"quote":        "none",
 		},
-		"arg": "test $!!",
+		"arg": "test @!!",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("' \" ` \\\" '"))
 
@@ -440,7 +440,7 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 			"escapeQuotes": "double",
 			"quote":        "none",
 		},
-		"arg": "test $!!",
+		"arg": "test @!!",
 	}, nil, nil)
 	run.Stdin.Replace(strings.NewReader("' \" ` \\\" '"))
 

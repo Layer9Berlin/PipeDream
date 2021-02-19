@@ -2,6 +2,7 @@
 package run
 
 import (
+	"github.com/Layer9Berlin/pipedream/src/graph"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/middleware/stack"
 	"github.com/sirupsen/logrus"
@@ -23,6 +24,9 @@ var Verbosity string
 
 // PipelineFlag sets the pipeline to be executed, skipping the user selection prompt
 var PipelineFlag string
+
+// ShowGraphFlag is a toggle indicating whether a graph should be opened in the browser after execution
+var ShowGraphFlag bool
 
 // FileFlag sets the file to be executed, skipping the user selection prompt
 var FileFlag string
@@ -56,4 +60,8 @@ func Cmd(_ *cobra.Command, args []string) {
 	executionContext.RootFileName = fileName
 
 	executionContext.Execute(pipelineIdentifier, osStdout, osStderr)
+
+	if ShowGraphFlag {
+		graph.OutputGraph(executionContext)
+	}
 }

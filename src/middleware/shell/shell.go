@@ -180,6 +180,8 @@ func (shellMiddleware Middleware) Apply(
 			run.Stdout.Wait()
 			run.Stderr.Wait()
 			err := executor.Wait()
+			// reset so that later cancellation will not result in error
+			executor.Clear()
 			if err != nil {
 				if exitErr, ok := err.(*exec.ExitError); ok {
 					exitCode := exitErr.ExitCode()

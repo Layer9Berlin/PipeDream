@@ -7,6 +7,7 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/datastream"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/hashicorp/go-multierror"
+	"github.com/hashicorp/go-uuid"
 	"github.com/logrusorgru/aurora/v3"
 	"strings"
 	"sync"
@@ -31,6 +32,7 @@ type Run struct {
 	//
 	// Note that anonymous pipes without an identifier can have invocation arguments, but no definition
 	Identifier *string
+	Id         string
 	// Definition references the definition matching the pipeline identifier, if any
 	Definition *Definition
 	// InvocationArguments are passed to the pipe at the time of invocation / run creation
@@ -98,10 +100,12 @@ func NewRun(
 		}
 	}
 
+	randomUUID, _ := uuid.GenerateUUID()
 	run := &Run{
 		arguments:  arguments,
 		Definition: definition,
 		Identifier: identifier,
+		Id:         randomUUID,
 
 		ExitCode: nil,
 
@@ -204,22 +208,8 @@ func (run *Run) Completed() bool {
 // The value will keep changing until the run has completed
 func (run *Run) String() string {
 	components := make([]string, 0, 10)
-	var name *string = nil
-	nameArg, err := run.ArgumentAtPath("description")
-	if err == nil {
-		if nameAsString, nameIsString := nameArg.(string); nameIsString && len(nameAsString) > 0 {
-			name = &nameAsString
-		}
-	}
-	if (name == nil || *name == "") && run.Identifier != nil {
-		prettyName := customstrings.IdentifierToDisplayName(*run.Identifier)
-		name = &prettyName
-	}
-	if name == nil || *name == "" {
-		anonymousName := "anonymous"
-		name = &anonymousName
-	}
-	components = append(components, fmt.Sprint(aurora.Bold(customstrings.Shorten(*name, 128))))
+	name := run.DisplayString()
+	components = append(components, fmt.Sprint(aurora.Bold(customstrings.Shorten(name, 128))))
 	if run.completed {
 		if run.Stdin.Len() > 0 {
 			components = append(components, fmt.Sprint(aurora.Gray(12, fmt.Sprint("↘️", customstrings.PrettyPrintedByteCount(run.Stdin.Len())))))
@@ -238,6 +228,56 @@ func (run *Run) String() string {
 	return strings.Join(components, "  ")
 }
 
+func (run *Run) GraphLabel() string {
+	if run.Log != nil && run.Log.errors != nil && run.Log.errors.Len() > 0 {
+		return fmt.Sprintf("✘ %v", run.DisplayString())
+	}
+	if run.completed {
+		return fmt.Sprintf("✔ %v", run.DisplayString())
+	}
+	if run.closed {
+		return fmt.Sprintf("↺ %v", run.DisplayString())
+	}
+	if run.cancelled {
+		return fmt.Sprintf("⎋ %v", run.DisplayString())
+	}
+	return fmt.Sprintf("🔜 %v", run.DisplayString())
+}
+
+func (run *Run) GraphGroup() string {
+	if run.Log != nil && run.Log.errors != nil && run.Log.errors.Len() > 0 {
+		return "error"
+	}
+	if run.completed {
+		return "success"
+	}
+	if run.closed {
+		return "active"
+	}
+	if run.cancelled {
+		return "cancelled"
+	}
+	return "waiting"
+}
+
+func (run *Run) DisplayString() string {
+	var name *string = nil
+	nameArg, err := run.ArgumentAtPath("description")
+	if err == nil && nameArg != nil {
+		if nameAsString, nameIsString := nameArg.(string); nameIsString && len(nameAsString) > 0 {
+			name = &nameAsString
+		}
+	}
+	if (name == nil || *name == "") && run.Identifier != nil {
+		prettyName := customstrings.IdentifierToDisplayName(*run.Identifier)
+		name = &prettyName
+	}
+	if name == nil || *name == "" {
+		return "anonymous"
+	}
+	return *name
+}
+
 // ArgumentsCopy is a deep copy of the run's arguments that can be safely mutated
 func (run *Run) ArgumentsCopy() map[string]interface{} {
 	run.argumentsMutex.RLock()
@@ -250,6 +290,13 @@ func (run *Run) ArgumentAtPath(path ...string) (interface{}, error) {
 	run.argumentsMutex.RLock()
 	defer run.argumentsMutex.RUnlock()
 	return stringmap.GetValueInMap(run.arguments, path...)
+}
+
+// HaveArgumentAtPath indicates whether the run's arguments contain a value at the specified path
+func (run *Run) HaveArgumentAtPath(path ...string) bool {
+	run.argumentsMutex.RLock()
+	defer run.argumentsMutex.RUnlock()
+	return stringmap.HaveValueInMap(run.arguments, path...)
 }
 
 // ArgumentAtPathIncludingParents looks up the argument path within the run's arguments or, failing that, its parents

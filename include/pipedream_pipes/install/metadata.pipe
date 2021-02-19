@@ -2,101 +2,93 @@
 version: 0.0.1
 
 public:
-  install::metadata::collect-current:
+  install::metadata::current::collect:
     pipe:
-      - install::pipedream-version:
+      - install::metadata::current::version:
           shell:
             run: "svu c"
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_CURRENT_METADATA_version
-      - install::pipedream-commit:
+          output:
+            process: strings::remove-new-lines
+      - install::metadata::current::commit:
           shell:
             run: "git rev-parse HEAD"
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_CURRENT_METADATA_commit
-      - tar::shasum:
-          dirs: "cmd include src install.pipe"
-          env:
-            save: PIPEDREAM_CURRENT_METADATA_PIPEDREAM_checksum
-      - tar::shasum:
-          dirs: "util/semver-compare"
-          env:
-            save: PIPEDREAM_CURRENT_METADATA_SEMVER_COMPARE_checksum
-      - tar::shasum:
-          dirs: "util/traffic-light"
-          env:
-            save: PIPEDREAM_CURRENT_METADATA_TRAFFIC_LIGHT_checksum
-      - install::current-date:
+          output:
+            process: strings::remove-new-lines
+      - install::metadata::current::pipedream::checksum:
+          pipe:
+            - tar::shasum:
+                dirs: "cmd include src install.pipe"
+      - install::metadata::current::semver-compare::checksum:
+          pipe:
+            - tar::shasum:
+                dirs: "util/semver-compare"
+      - install::metadata::current::traffic-light::checksum:
+          pipe:
+            - tar::shasum:
+                dirs: "util/traffic-light"
+      - install::metadata::current::date:
           shell:
             run: "date"
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_CURRENT_METADATA_date
+          output:
+            process: strings::remove-new-lines
       - noop
 
-  install::metadata::collect-installed:
+  install::metadata::installed::collect:
     pipe:
-      - install::metadata::extract-installed:
-          binary: pipedream
-          uppercase_identifier: PIPEDREAM
-      - install::metadata::extract-installed:
-          binary: semver-compare
-          uppercase_identifier: SEMVER_COMPARE
-      - install::metadata::extract-installed:
-          binary: traffic-light
-          uppercase_identifier: TRAFFIC_LIGHT
+      - install::metadata::pipedream::version:
+          shell:
+            run: "pipedream version"
+          catch: install::metadata::command-not-found-handler
+      - install::metadata::semver-compare::version:
+          shell:
+            run: "semver-compare version"
+          catch: install::metadata::command-not-found-handler
+      - install::metadata::traffic-light::version:
+          shell:
+            run: "traffic-light version"
+          catch: install::metadata::command-not-found-handler
+      - install::metadata::extract:
+          each:
+            - install::metadata::extract-installed:
+                binary: pipedream
+            - install::metadata::extract-installed:
+                binary: semver-compare
+            - install::metadata::extract-installed:
+                binary: traffic-light
+      - noop
 
 private:
   install::metadata::extract-installed:
-    pipe:
-      - install::metadata::version-command:
-          shell:
-            run: "@{binary} version"
-          catch: install::metadata::command-not-found-handler
-      - install::metadata::extract-values:
-          inherit:
-            - uppercase_identifier
-          each:
-            - install::metadata::extract-value:
-                inherit:
-                  - uppercase_identifier
-                key: "version"
-                uppercase_key: "VERSION"
-            - install::metadata::extract-value:
-                inherit:
-                  - uppercase_identifier
-                key: "commit"
-                uppercase_key: "COMMIT"
-            - install::metadata::extract-value:
-                inherit:
-                  - uppercase_identifier
-                key: "checksum"
-            - install::metadata::extract-value:
-                inherit:
-                  - uppercase_identifier
-                key: "location"
+    interpolate:
+      quote: none
+    inherit:
+      - binary
+    each:
+      - install::metadata::extract-value:
+          key: "version"
+      - install::metadata::extract-value:
+          key: "commit"
+      - install::metadata::extract-value:
+          key: "checksum"
+      - install::metadata::extract-value:
+          key: "location"
 
   install::metadata::command-not-found-handler:
-    when: "'$!!' =~ 'command not found'"
+    when: "@!! =~ 'command not found'"
 
   install::metadata::extract-value:
+    interpolate:
+      quote: none
+    inherit:
+      - key
+      - binary
     pipe:
       - install::metadata::extract-value::find-value:
-          inherit:
-            - key
           shell:
             run: "grep '@{key}: '"
-      - install::metadata::extract-value::filter-value:
-          inherit:
-            - key
+      - install::metadata::installed::@{binary}::@{key}:
+          description: Extract metadata for key @{key} from installed binary @{binary}
           shell:
             run: "sed 's/^.*@{key}: //'"
-      - strings::remove-new-lines:
-          inherit:
-            - key
-            - uppercase_identifier
-          env:
-            save: PIPEDREAM_INSTALLED_METADATA_@{uppercase_identifier}_@{key}
-      - noop
+          output:
+            process: strings::remove-new-lines
