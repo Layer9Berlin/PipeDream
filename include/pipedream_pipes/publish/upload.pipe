@@ -35,11 +35,10 @@ private:
   publish::handle-git-push-error:
     interpolate:
       escapeQuotes: all
-    input:
-      switch:
-        - pattern: "Permission denied"
-          text: "permission denied"
-        - pattern: "^Everything up-to-date|^To github"
-          text: "successful"
-        - pattern: ".*"
-          text: "uncaught error ('@!!')"
+    switch:
+      - pattern: "Permission denied"
+        text: "permission denied"
+      - pattern: "^Everything up-to-date|^To github"
+        text: "successful"
+      - pattern: ".*"
+        text: "uncaught error (@!!)"

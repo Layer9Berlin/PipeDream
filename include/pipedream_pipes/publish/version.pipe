@@ -3,18 +3,22 @@ version: 0.0.1
 
 public:
   publish::version::bump:
-    waitFor:
-      envVars:
-        - PIPEDREAM_GIT_STATUS
     pipe:
+      # increment the version if the git status is clean
       - publish::version::increment:
-          when: "'$PIPEDREAM_GIT_STATUS' =~ 'clean'"
+          interpolate:
+            pipes:
+              - git::status::process
+          when: "@|0 =~ 'clean'"
+      # otherwise output 'skipped'
       - publish::version::bump-skip:
+          interpolate:
+            pipes:
+              - git::status::process
           output:
             text: "skipped"
-          when: "'$PIPEDREAM_GIT_STATUS' !~ 'clean'"
-          env:
-            save: PIPEDREAM_PUBLISH_VERSION
+          when: "@|0 !~ 'clean'"
+      # report the result
       - publish::version::report:
           shell:
             args:
@@ -26,31 +30,37 @@ public:
 private:
   publish::version::increment:
     pipe:
+      # get the current version in order to compare it with the next version
+      # (we always want to increase the version, even if the git log has no changes)
       - publish::version::get-current-version:
           shell:
             run: "svu c"
-      - strings::remove-new-lines:
-          env:
-            save: "PIPEDREAM_CURRENT_VERSION"
+          output:
+            process: strings::remove-new-lines
+      # get the next version, according to the git log
       - publish::version::create-new-version-string:
           shell:
             run: "svu n"
-      - strings::remove-new-lines
-      - publish::version::enforce-version-increase
-      - strings::remove-new-lines
-      - publish::version::increment-npm-version
-      - strings::remove-new-lines:
-          env:
-            save: PIPEDREAM_PUBLISH_VERSION
+          output:
+            process: strings::remove-new-lines
+      # if current and next versions are identical,
+      # force a version increase by creating a patch version
+      - publish::version::enforce-version-increase:
+          output:
+            process: strings::remove-new-lines
+      # now tell npm about the new version, so that the package.json is updated
+      - publish::version::increment-npm-version:
+          output:
+            process: strings::remove-new-lines
 
   publish::version::increment-npm-version:
     shell:
       run: "npm version @!!"
 
   publish::version::enforce-version-increase:
-    when: "'@!!' == '$PIPEDREAM_CURRENT_VERSION'"
+    interpolate:
+      pipes:
+        - publish::version::get-current-version
+    when: "@!! == @|0"
     shell:
       run: "svu p"
-    waitFor:
-      envVars:
-        - PIPEDREAM_CURRENT_VERSION

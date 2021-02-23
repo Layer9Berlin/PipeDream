@@ -4,16 +4,17 @@ version: 0.0.1
 public:
   publish::git::status:
     pipe:
+      # first check the current git status
+      # we should not proceed with the version increase and uplaod
+      # if the repo is dirty or git status returns any other kind of error
       - git::status:
+          # the catching pipe - defined below - in effect redirects stderr to stdout
           catch: publish::git::catch-status-error
       - git::status::process:
-          input:
-            switch:
-              - pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
-                text: clean
-              - text: dirty
-          env:
-            save: PIPEDREAM_GIT_STATUS
+          switch:
+            - pattern: (?m)^Everything up-to-date$|^nothing to commit, working tree clean$
+              text: clean
+            - text: dirty
       - publish::git::status-indicator
 
 private:
@@ -25,11 +26,7 @@ private:
         - green: "clean"
       run: "traffic-light"
 
+  # just echo the input to stdout
   publish::git::catch-status-error:
-    pipe:
-      - print::message:
-          when: "'@!!' == 'Everything up-to-date\n'"
-          message: "clean"
-      - print::message:
-          when: "'@!!' != 'Everything up-to-date\n'"
-          message: "dirty"
+    shell:
+      run: "@!!"

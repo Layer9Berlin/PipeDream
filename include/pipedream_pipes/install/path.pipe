@@ -17,7 +17,8 @@ public:
     pipe:
       - install::path::verify-directory-in-path:
           interpolate:
-            - install::path::find
+            pipes:
+              - install::path::find
           directory: "@|0"
 
   # check that the passed `dir` is in the path
