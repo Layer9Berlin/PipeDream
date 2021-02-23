@@ -4,7 +4,6 @@ package interpolate
 import (
 	"bytes"
 	"fmt"
-	"github.com/Layer9Berlin/pipedream/src/custom/stringmap"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
@@ -131,16 +130,20 @@ func (interpolateMiddleware Middleware) Apply(
 				waitGroup.Wait()
 				fullInterpolator := newInterpolatorWithInput(interpolatedArguments, arguments, inputData, previousRunResults)
 				structparse.Strings(fullInterpolator, interpolatedArguments)
-				// need to remove the "pipes" key to prevent infinite recursion
-				if arguments.Pipes != nil {
-					run.Log.PossibleError(stringmap.RemoveValueInMap(interpolatedArguments, "interpolate", "pipes"))
-				}
 				executionContext.FullRun(
 					middleware.WithIdentifier(run.Identifier),
 					middleware.WithParentRun(run),
 					middleware.WithLogWriter(parentLogWriter),
 					middleware.WithArguments(interpolatedArguments),
 					middleware.WithSetupFunc(func(childRun *pipeline.Run) {
+						// need to remove the "pipes" key to prevent infinite recursion
+						// we can only do this within the full run, as opposed to the WithArguments option
+						// as there might be a an `interpolate` argument in the definition,
+						// which would be picked up again
+						if arguments.Pipes != nil {
+							childRun.Log.PossibleError(childRun.RemoveArgumentAtPath("interpolate"))
+						}
+
 						fullInterpolator.log(childRun.Log, interpolateMiddleware)
 						childRun.Log.PossibleErrorWithExplanation(inputErr, "unable to find value for previous output")
 						childRun.Log.Trace(
@@ -185,6 +188,14 @@ func (interpolateMiddleware Middleware) Apply(
 				middleware.WithParentRun(run),
 				middleware.WithArguments(interpolatedArguments),
 				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
+					// need to remove the "pipes" key to prevent infinite recursion
+					// we can only do this within the full run, as opposed to the WithArguments option
+					// as there might be a an `interpolate` argument in the definition,
+					// which would be picked up again
+					if arguments.Pipes != nil {
+						childRun.Log.PossibleError(childRun.RemoveArgumentAtPath("interpolate"))
+					}
+
 					childRun.Log.Trace(
 						fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,
 					)
