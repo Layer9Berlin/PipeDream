@@ -23,7 +23,7 @@ import (
 // - be nestable in the sense that the output of another logger can be slotted in
 // - preserve the order of log entries, including those slotted in
 type Logger struct {
-	logEntries list.List
+	logEntries *list.List
 
 	baseLogger  *logrus.Logger
 	run         *Run
@@ -61,6 +61,7 @@ func NewLogger(run *Run, indentation int) *Logger {
 		Indentation: indentation,
 		errors:      nil,
 
+		logEntries:      list.New(),
 		logCountTrace:   numTraceLogs,
 		logCountDebug:   numDebugLogs,
 		logCountInfo:    numInfoLogs,
