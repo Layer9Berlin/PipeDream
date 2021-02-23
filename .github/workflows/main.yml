@@ -15,9 +15,13 @@ jobs:
         with:
           fetch-depth: 0
       -
-        uses: codecov/codecov-action@v1
+        name: Go test
+        run: go test ./src/... -coverprofile=test/coverage.out
+      -
+        name: Upload coverage
+        uses: codecov/codecov-action@v1.2.1
         with:
-          files: ./test/coverage.out
+          file: ./test/coverage.out
           token: ${{ secrets.CODECOV_TOKEN }}
       -
         name: Set up Go
