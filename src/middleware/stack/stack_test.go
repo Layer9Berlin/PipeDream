@@ -16,7 +16,6 @@ func TestRun_MiddlewareStack_setUpMiddleware(t *testing.T) {
 	require.Contains(t, middlewareStrings, "docker")
 	require.Contains(t, middlewareStrings, "each")
 	require.Contains(t, middlewareStrings, "env")
-	require.Contains(t, middlewareStrings, "else")
 	require.Contains(t, middlewareStrings, "inherit")
 	require.Contains(t, middlewareStrings, "input")
 	require.Contains(t, middlewareStrings, "interpolate")

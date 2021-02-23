@@ -36,6 +36,8 @@ var osStdin io.ReadCloser = os.Stdin
 var osStdout io.WriteCloser = os.Stdout
 var osStderr io.WriteCloser = os.Stderr
 
+var graphWriter = graph.NewWriter()
+
 // Cmd executes the main command, selecting and running a pipeline within an execution context
 func Cmd(_ *cobra.Command, args []string) {
 	executableLocation, _ := os.Executable()
@@ -62,6 +64,9 @@ func Cmd(_ *cobra.Command, args []string) {
 	executionContext.Execute(pipelineIdentifier, osStdout, osStderr)
 
 	if ShowGraphFlag {
-		graph.OutputGraph(executionContext)
+		err := graphWriter.Write(executionContext)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

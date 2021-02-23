@@ -74,7 +74,7 @@ func (switchMiddleware Middleware) Apply(
 					run.Log.PossibleError(err)
 					break
 				}
-				regex, err := regexp.Compile(*switchStatement.Pattern)
+				regex, err := regexp.Compile("(?m)" + *switchStatement.Pattern)
 				run.Log.PossibleError(err)
 				if err == nil && regex.Match(inputData) {
 					run.Log.Debug(

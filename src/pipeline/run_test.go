@@ -76,6 +76,24 @@ func TestPipelineRun_SetArgumentAtPath(t *testing.T) {
 	}, run.ArgumentsCopy())
 }
 
+func TestPipelineRun_HaveArgumentAtPath(t *testing.T) {
+	run, _ := NewRun(nil, map[string]interface{}{
+		"test": map[string]interface{}{
+			"key": "value",
+		},
+		"test2": []string{
+			"test3",
+			"test4",
+		},
+	}, nil, nil)
+	require.False(t, run.HaveArgumentAtPath("missing"))
+	require.False(t, run.HaveArgumentAtPath("missing", "as", "well"))
+	require.False(t, run.HaveArgumentAtPath("test", "missing"))
+	require.False(t, run.HaveArgumentAtPath("test2", "test3"))
+	require.True(t, run.HaveArgumentAtPath("test2"))
+	require.True(t, run.HaveArgumentAtPath("test", "key"))
+}
+
 func TestPipelineRun_Lengths(t *testing.T) {
 	run, _ := NewRun(nil, nil, nil, nil)
 	run.Stdin.MergeWith(strings.NewReader("test"))
@@ -239,4 +257,36 @@ func TestPipelineRun_Cancel(t *testing.T) {
 	require.Contains(t, err.Error(), "test error")
 
 	require.True(t, run.Cancelled())
+}
+
+func TestPipelineRun_GraphLabel(t *testing.T) {
+	runIdentifier := "test"
+	run, _ := NewRun(&runIdentifier, nil, nil, nil)
+	run.completionWaitGroup.Add(1)
+	require.Equal(t, "🔜 Test", run.GraphLabel())
+	run.Close()
+	require.Equal(t, "↺ Test", run.GraphLabel())
+	run.completionWaitGroup.Done()
+	run.Wait()
+	require.Equal(t, "✔ Test", run.GraphLabel())
+	_ = run.Cancel()
+	require.Equal(t, "⎋ Test", run.GraphLabel())
+	run.Log.Error(fmt.Errorf("test error"))
+	require.Equal(t, "✘ Test", run.GraphLabel())
+}
+
+func TestPipelineRun_GraphGroup(t *testing.T) {
+	runIdentifier := "test"
+	run, _ := NewRun(&runIdentifier, nil, nil, nil)
+	run.completionWaitGroup.Add(1)
+	require.Equal(t, "waiting", run.GraphGroup())
+	run.Close()
+	require.Equal(t, "active", run.GraphGroup())
+	run.completionWaitGroup.Done()
+	run.Wait()
+	require.Equal(t, "success", run.GraphGroup())
+	_ = run.Cancel()
+	require.Equal(t, "cancelled", run.GraphGroup())
+	run.Log.Error(fmt.Errorf("test error"))
+	require.Equal(t, "error", run.GraphGroup())
 }

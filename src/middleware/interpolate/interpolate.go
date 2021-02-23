@@ -136,13 +136,11 @@ func (interpolateMiddleware Middleware) Apply(
 					middleware.WithLogWriter(parentLogWriter),
 					middleware.WithArguments(interpolatedArguments),
 					middleware.WithSetupFunc(func(childRun *pipeline.Run) {
-						// need to remove the "pipes" key to prevent infinite recursion
+						// need to disable further interpolation to prevent infinite recursion
 						// we can only do this within the full run, as opposed to the WithArguments option
 						// as there might be a an `interpolate` argument in the definition,
 						// which would be picked up again
-						if arguments.Pipes != nil {
-							childRun.Log.PossibleError(childRun.RemoveArgumentAtPath("interpolate"))
-						}
+						childRun.Log.PossibleError(childRun.SetArgumentAtPath(map[string]interface{}{"enable": false}, "interpolate"))
 
 						fullInterpolator.log(childRun.Log, interpolateMiddleware)
 						childRun.Log.PossibleErrorWithExplanation(inputErr, "unable to find value for previous output")
@@ -188,13 +186,11 @@ func (interpolateMiddleware Middleware) Apply(
 				middleware.WithParentRun(run),
 				middleware.WithArguments(interpolatedArguments),
 				middleware.WithSetupFunc(func(childRun *pipeline.Run) {
-					// need to remove the "pipes" key to prevent infinite recursion
+					// need to disable further interpolation to prevent infinite recursion
 					// we can only do this within the full run, as opposed to the WithArguments option
 					// as there might be a an `interpolate` argument in the definition,
 					// which would be picked up again
-					if arguments.Pipes != nil {
-						childRun.Log.PossibleError(childRun.RemoveArgumentAtPath("interpolate"))
-					}
+					childRun.Log.PossibleError(childRun.SetArgumentAtPath(map[string]interface{}{"enable": false}, "interpolate"))
 
 					childRun.Log.Trace(
 						fields.DataStream(interpolateMiddleware, "merging parent stdin into child stdin")...,

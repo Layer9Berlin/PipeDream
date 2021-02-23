@@ -232,14 +232,14 @@ func (run *Run) GraphLabel() string {
 	if run.Log != nil && run.Log.errors != nil && run.Log.errors.Len() > 0 {
 		return fmt.Sprintf("✘ %v", run.DisplayString())
 	}
+	if run.cancelled {
+		return fmt.Sprintf("⎋ %v", run.DisplayString())
+	}
 	if run.completed {
 		return fmt.Sprintf("✔ %v", run.DisplayString())
 	}
 	if run.closed {
 		return fmt.Sprintf("↺ %v", run.DisplayString())
-	}
-	if run.cancelled {
-		return fmt.Sprintf("⎋ %v", run.DisplayString())
 	}
 	return fmt.Sprintf("🔜 %v", run.DisplayString())
 }
@@ -248,14 +248,14 @@ func (run *Run) GraphGroup() string {
 	if run.Log != nil && run.Log.errors != nil && run.Log.errors.Len() > 0 {
 		return "error"
 	}
+	if run.cancelled {
+		return "cancelled"
+	}
 	if run.completed {
 		return "success"
 	}
 	if run.closed {
 		return "active"
-	}
-	if run.cancelled {
-		return "cancelled"
 	}
 	return "waiting"
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/Layer9Berlin/pipedream/src/middleware/dir"
 	"github.com/Layer9Berlin/pipedream/src/middleware/docker"
 	"github.com/Layer9Berlin/pipedream/src/middleware/each"
-	_else "github.com/Layer9Berlin/pipedream/src/middleware/else"
 	"github.com/Layer9Berlin/pipedream/src/middleware/env"
 	"github.com/Layer9Berlin/pipedream/src/middleware/inherit"
 	_input "github.com/Layer9Berlin/pipedream/src/middleware/input"
@@ -32,7 +31,6 @@ func SetUpMiddleware() []middleware.Middleware {
 		env.NewMiddleware(),
 		_switch.NewMiddleware(),
 		when.NewMiddleware(),
-		_else.NewMiddleware(),
 		_output.NewMiddleware(),
 		catch.NewMiddleware(),
 		pipe.NewMiddleware(),

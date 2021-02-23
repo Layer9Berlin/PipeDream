@@ -58,7 +58,7 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"quote": "none",
+			"enable": false,
 		},
 		"shell": map[string]interface{}{
 			"run": "test value",
@@ -112,7 +112,7 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"quote": "none",
+			"enable": false,
 		},
 		"arg":  "value",
 		"arg2": "value",
@@ -154,7 +154,7 @@ func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"quote": "none",
+			"enable": false,
 		},
 		"arg":  "value",
 		"arg2": "value TestInput value",
@@ -247,6 +247,9 @@ func TestInterpolate_InputReadError(t *testing.T) {
 	require.Equal(t, 1, run.Log.ErrorCount())
 	require.Contains(t, run.Log.LastError().Error(), "test error")
 	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"enable": false,
+		},
 		"arg": "''",
 	}, runArguments)
 }
@@ -309,7 +312,7 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 	require.Equal(t, 1, run.Log.WarnCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"quote": "none",
+			"enable": false,
 		},
 		"arg": "@{arg2}",
 		"arg2": map[string]interface{}{
@@ -352,7 +355,7 @@ func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 	require.Equal(t, 1, run.Log.WarnCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"quote": "none",
+			"enable": false,
 		},
 		"arg":  "test",
 		"arg2": "test",
@@ -390,8 +393,7 @@ func TestInterpolate_EscapeAllQuotes(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"escapeQuotes": "all",
-			"quote":        "none",
+			"enable": false,
 		},
 		"arg": "test \\' \\\" \\` \\\\\" \\'",
 	}, runArguments)
@@ -427,8 +429,7 @@ func TestInterpolate_EscapeSingleQuotes(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"escapeQuotes": "single",
-			"quote":        "none",
+			"enable": false,
 		},
 		"arg": "test \\' \" ` \\\" \\'",
 	}, runArguments)
@@ -464,8 +465,7 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
-			"escapeQuotes": "double",
-			"quote":        "none",
+			"enable": false,
 		},
 		"arg": "test ' \\\" ` \\\\\" '",
 	}, runArguments)
@@ -575,6 +575,109 @@ func TestInterpolate_QuotingCombinations(t *testing.T) {
 		require.Equal(t, 0, run.Log.ErrorCount())
 		require.Equal(t, results[index], runArguments["arg2"], testCase)
 	}
+}
+
+func TestInterpolate_PreventInfiniteRecursion_withPipesInterpolation(t *testing.T) {
+	runIdentifier := "test"
+	preconditionRunIdentifier := "test-precondition"
+	run, _ := pipeline.NewRun(&runIdentifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"pipes": []string{
+				preconditionRunIdentifier,
+			},
+		},
+		"arg": "test @!! @|0",
+	}, nil, nil)
+	run.Stdin.Replace(strings.NewReader("input"))
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(2)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	executionContext := middleware.NewExecutionContext(
+		middleware.WithDefinitionsLookup(pipeline.DefinitionsLookup{
+			runIdentifier: []pipeline.Definition{
+				{
+					DefinitionArguments: map[string]interface{}{
+						"interpolate": map[string]interface{}{
+							"pipes": []string{
+								preconditionRunIdentifier,
+							},
+						},
+					},
+				},
+			},
+		}),
+		middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+			defer waitGroup.Done()
+			if *childRun.Identifier == "test" {
+				runArguments = childRun.ArgumentsCopy()
+			}
+		}),
+	)
+	executionContext.FullRun(
+		middleware.WithIdentifier(&preconditionRunIdentifier),
+		middleware.WithTearDownFunc(func(preconditionRun *pipeline.Run) {
+			preconditionRun.Stdout.Replace(strings.NewReader("precondition output"))
+		}),
+	)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {
+
+		},
+		executionContext,
+	)
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"enable": false,
+		},
+		"arg": "test 'input' 'precondition output'",
+	}, runArguments)
+}
+
+func TestInterpolate_PreventInfiniteRecursion_withoutPipesInterpolation(t *testing.T) {
+	runIdentifier := "test"
+	run, _ := pipeline.NewRun(&runIdentifier, map[string]interface{}{
+		"arg": "test @!!",
+	}, nil, nil)
+	run.Stdin.Replace(strings.NewReader("input"))
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	executionContext := middleware.NewExecutionContext(
+		middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+			defer waitGroup.Done()
+			if *childRun.Identifier == "test" {
+				runArguments = childRun.ArgumentsCopy()
+			}
+		}),
+	)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {
+
+		},
+		executionContext,
+	)
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"enable": false,
+		},
+		"arg": "test 'input'",
+	}, runArguments)
 }
 
 type ErrorReader struct {

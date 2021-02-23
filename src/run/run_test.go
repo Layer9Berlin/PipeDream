@@ -3,6 +3,7 @@ package run
 import (
 	"bytes"
 	"fmt"
+	"github.com/Layer9Berlin/pipedream/src/graph"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/parsing"
 	"github.com/stretchr/testify/require"
@@ -120,4 +121,50 @@ public:
 	require.Contains(t, string(result), "===== RESULT =====")
 	require.NotContains(t, string(result), "====== LOGS ======")
 	require.Equal(t, "", buffer.String())
+}
+
+func TestRun_Cmd_withGraphFlag(t *testing.T) {
+	ShowGraphFlag = true
+	previousGraphWriter := graphWriter
+	defer func() {
+		ShowGraphFlag = false
+		graphWriter = previousGraphWriter
+		if recover() == nil {
+			t.Errorf("failed to encounter expected panic")
+		}
+	}()
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	graphWriter = graph.NewWriter()
+	graphWriter.OpenInBrowser = func(file string) error {
+		waitGroup.Done()
+		return fmt.Errorf("test error")
+	}
+
+	oldExecutionContextFactory := executionContextFactory
+	defer func() {
+		executionContextFactory = oldExecutionContextFactory
+	}()
+	executionContextFactory = func(options ...middleware.ExecutionContextOption) *middleware.ExecutionContext {
+		options = append(options, middleware.WithParser(
+			parsing.NewParser(
+				parsing.WithFindByGlobImplementation(func(_ string) ([]string, error) {
+					return []string{"test1.pipe"}, nil
+				}),
+				parsing.WithReadFileImplementation(func(_ string) ([]byte, error) {
+					return []byte(`
+public:
+  test:
+    arg: value
+`), nil
+				}),
+				parsing.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
+					return []string{"test1.pipe"}, nil
+				}),
+			)))
+		executionContext := middleware.NewExecutionContext(options...)
+		return executionContext
+	}
+
+	Cmd(nil, []string{"test1.pipe"})
 }
