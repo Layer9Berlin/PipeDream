@@ -8,6 +8,7 @@ public:
           interpolate:
             pipes:
               - git::status::process
+              - publish::version::increment
           when: "@|0 =~ 'clean'"
       - publish::upload-to-github::skip:
           interpolate:
@@ -21,7 +22,6 @@ public:
               - amber: "^skipped$"
               - green: "^successful"
             run: "traffic-light"
-
 
 private:
   publish::upload-to-github:
