@@ -79,6 +79,7 @@ func NewLogger(run *Run, indentation int) *Logger {
 func NewClosedLoggerWithResult(buffer *bytes.Buffer) *Logger {
 	return &Logger{
 		closed:       true,
+		logEntries:   list.New(),
 		unreadBuffer: buffer.Bytes(),
 	}
 }
