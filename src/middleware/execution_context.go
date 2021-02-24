@@ -343,6 +343,7 @@ func defaultUserPrompt(
 	return prompt.Run()
 }
 
+// SetUpCancelHandler registers a handler for interrupt signals
 func (executionContext *ExecutionContext) SetUpCancelHandler(handler func(), writer io.Writer) {
 	if executionContext.interruptChannel == nil {
 		signalChannel := make(chan os.Signal, 1)
@@ -358,6 +359,7 @@ func (executionContext *ExecutionContext) SetUpCancelHandler(handler func(), wri
 	}
 }
 
+// WaitForRun blocks until a run with the specified identifier is found and completes
 func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipeline.Run {
 	for {
 		for _, run := range executionContext.Runs {
@@ -368,4 +370,15 @@ func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipelin
 		}
 		time.Sleep(250)
 	}
+}
+
+// UserRuns lists all runs of pipes that are not built-in
+func (executionContext *ExecutionContext) UserRuns() []*pipeline.Run {
+	result := make([]*pipeline.Run, 0, len(executionContext.Runs))
+	for _, run := range executionContext.Runs {
+		if run.Definition == nil || !run.Definition.BuiltIn {
+			result = append(result, run)
+		}
+	}
+	return result
 }

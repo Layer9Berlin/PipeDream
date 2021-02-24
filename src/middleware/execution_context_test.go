@@ -497,6 +497,61 @@ func TestExecutionContext_WaitForRun(t *testing.T) {
 	require.Equal(t, run, waitedRun)
 }
 
+func TestExecutionContext_UserRuns(t *testing.T) {
+	executionContext := NewExecutionContext()
+	test0 := "test0"
+	test1 := "test1"
+	test2 := "test2"
+	executionContext.Runs = []*pipeline.Run{
+		{
+			Identifier: &test0,
+			Definition: &pipeline.Definition{
+				BuiltIn: true,
+			},
+		},
+		{
+			Identifier: nil,
+			Definition: &pipeline.Definition{
+				BuiltIn: true,
+			},
+		},
+		{
+			Identifier: &test1,
+			Definition: nil,
+		},
+		{
+			Identifier: &test2,
+			Definition: &pipeline.Definition{
+				BuiltIn: false,
+			},
+		},
+		{
+			Identifier: nil,
+			Definition: &pipeline.Definition{
+				BuiltIn: false,
+			},
+		},
+	}
+	require.Equal(t, []*pipeline.Run{
+		{
+			Identifier: &test1,
+			Definition: nil,
+		},
+		{
+			Identifier: &test2,
+			Definition: &pipeline.Definition{
+				BuiltIn: false,
+			},
+		},
+		{
+			Identifier: nil,
+			Definition: &pipeline.Definition{
+				BuiltIn: false,
+			},
+		},
+	}, executionContext.UserRuns())
+}
+
 type FakeMiddleware struct {
 	CallCount int
 }
