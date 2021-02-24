@@ -124,6 +124,8 @@ func (interpolateMiddleware Middleware) Apply(
 					for _, runIdentifier := range arguments.Pipes {
 						runToWaitFor := executionContext.WaitForRun(runIdentifier)
 						previousRunResults = append(previousRunResults, runToWaitFor.Stdout.Bytes())
+						executionContext.Connections = append(executionContext.Connections,
+							pipeline.NewDataConnection(runToWaitFor, run, "interpolate"))
 					}
 				}
 				// and for the input data to be set
