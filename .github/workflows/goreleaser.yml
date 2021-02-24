@@ -13,16 +13,7 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
-      -
-        name: Go test
-        run: go test ./src/... -coverprofile=test/coverage.out
-      -
-        name: Upload coverage
-        uses: codecov/codecov-action@v1.2.1
-        with:
-          file: ./test/coverage.out
-          token: ${{ secrets.CODECOV_TOKEN }}
+          fetch-depth: 0
       -
         name: Set up Go
         uses: actions/setup-go@v2
