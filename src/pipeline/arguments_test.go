@@ -215,3 +215,47 @@ func TestParsePipelineReferences_WithValidReference_StringPointerMap(t *testing.
 	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Equal(t, 1, len(reference))
 }
+
+func Test_CollectReferences(t *testing.T) {
+	test1 := "test1"
+	test2 := "test2"
+	childIdentifiers, childArguments, info := CollectReferences([]Reference{
+		{
+			nil: map[string]interface{}{
+				"test": "arg",
+			},
+		},
+		{
+			&test1: map[string]interface{}{
+				"test": "arg1",
+			},
+		},
+		{
+			&test2: map[string]interface{}{
+				"test": "arg2",
+			},
+		},
+	})
+
+	require.Equal(t, []*string{
+		nil,
+		&test1,
+		&test2,
+	}, childIdentifiers)
+	require.Equal(t, []map[string]interface{}{
+		{
+			"test": "arg",
+		},
+		{
+			"test": "arg1",
+		},
+		{
+			"test": "arg2",
+		},
+	}, childArguments)
+	require.Equal(t, []string{
+		"anonymous",
+		"test1",
+		"test2",
+	}, info)
+}

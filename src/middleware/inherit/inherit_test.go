@@ -126,3 +126,31 @@ func TestInherit_WithoutParent(t *testing.T) {
 		"\n",
 	), orphanRun.Log.String())
 }
+
+func TestInherit_NoValue(t *testing.T) {
+	parentRun, _ := pipeline.NewRun(nil, map[string]interface{}{}, nil, nil)
+
+	childIdentifier := "child"
+	childRun, _ := pipeline.NewRun(&childIdentifier, map[string]interface{}{
+		"inherit": []interface{}{
+			"arg",
+		},
+	}, nil, parentRun)
+
+	childRun.Log.SetLevel(logrus.TraceLevel)
+	NewMiddleware().Apply(
+		childRun,
+		func(invocation *pipeline.Run) {},
+		nil,
+	)
+	childRun.Close()
+	childRun.Wait()
+
+	require.Equal(t, 0, childRun.Log.ErrorCount())
+	require.Equal(t, fmt.Sprint(
+		aurora.Gray(18, fmt.Sprint("  ⏏️ closing | ", aurora.Bold("Child"))),
+		"\n",
+		aurora.Green(fmt.Sprint("  ✔ completed | ", aurora.Bold("Child"))),
+		"\n",
+	), childRun.Log.String())
+}

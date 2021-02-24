@@ -309,7 +309,7 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 	waitGroup.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
-	require.Equal(t, 1, run.Log.WarnCount())
+	require.Equal(t, 2, run.Log.WarnCount())
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{
 			"enable": false,
@@ -677,6 +677,62 @@ func TestInterpolate_PreventInfiniteRecursion_withoutPipesInterpolation(t *testi
 			"enable": false,
 		},
 		"arg": "test 'input'",
+	}, runArguments)
+}
+
+func TestInterpolate_InvalidPipesInterpolation(t *testing.T) {
+	runIdentifier := "test"
+	preconditionRunIdentifier := "test-precondition"
+	run, _ := pipeline.NewRun(&runIdentifier, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"pipes": []string{
+				preconditionRunIdentifier,
+			},
+		},
+		"arg": "test @!! @|0 @|2 @|{1} @|{0}",
+	}, nil, nil)
+	run.Stdin.Replace(strings.NewReader("input"))
+
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(2)
+	runArguments := make(map[string]interface{}, 0)
+	run.Log.SetLevel(logrus.DebugLevel)
+	executionContext := middleware.NewExecutionContext(
+		middleware.WithExecutionFunction(func(childRun *pipeline.Run) {
+			defer waitGroup.Done()
+			if *childRun.Identifier == "test" {
+				runArguments = childRun.ArgumentsCopy()
+			}
+		}),
+	)
+	executionContext.FullRun(
+		middleware.WithIdentifier(&preconditionRunIdentifier),
+		middleware.WithTearDownFunc(func(preconditionRun *pipeline.Run) {
+			preconditionRun.Stdout.Replace(strings.NewReader("precondition output"))
+		}),
+	)
+	NewMiddleware().Apply(
+		run,
+		func(run *pipeline.Run) {
+
+		},
+		executionContext,
+	)
+	run.Close()
+	run.Wait()
+	waitGroup.Wait()
+
+	require.Equal(t, 0, run.Log.ErrorCount())
+	// two errors are converted to warnings
+	require.Equal(t, 2, run.Log.WarnCount())
+	logString := run.Log.String()
+	require.Contains(t, logString, "trying to interpolate result at index 2, but only 1 `pipes` argument(s) provided")
+	require.Contains(t, logString, "trying to interpolate result at index 1, but only 1 `pipes` argument(s) provided")
+	require.Equal(t, map[string]interface{}{
+		"interpolate": map[string]interface{}{
+			"enable": false,
+		},
+		"arg": "test 'input' 'precondition output' '' '' 'precondition output'",
 	}, runArguments)
 }
 

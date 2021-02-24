@@ -1,11 +1,11 @@
 package graph
 
 import (
+	"github.com/skratchdot/open-golang/open"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
 )
 
 type Writer struct {
@@ -24,9 +24,7 @@ func NewWriter() *Writer {
 		Execute: func(template *template.Template, wr io.Writer, data interface{}) error {
 			return template.Execute(wr, data)
 		},
-		OpenInBrowser: func(file string) error {
-			return exec.Command("open", file).Run()
-		},
+		OpenInBrowser: open.Start,
 	}
 }
 
@@ -37,16 +35,14 @@ func (writer *Writer) Write(executionContext interface{}) error {
 	}
 
 	tmpFile, err := writer.TempFile(os.TempDir(), "*.html")
+	defer func() {
+		_ = tmpFile.Close()
+	}()
 	if err != nil {
 		return err
 	}
 
 	err = writer.Execute(ut, tmpFile, executionContext)
-	if err != nil {
-		return err
-	}
-
-	err = tmpFile.Close()
 	if err != nil {
 		return err
 	}

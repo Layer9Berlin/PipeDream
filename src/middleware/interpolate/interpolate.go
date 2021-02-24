@@ -79,20 +79,21 @@ func (interpolateMiddleware Middleware) Apply(
 			// that renders certain errors moot
 			if preliminaryInterpolator.Errors != nil && preliminaryInterpolator.Errors.Len() > 0 {
 				if !arguments.IgnoreWarnings {
-					run.Log.Warn(
-						fields.Symbol("⚠️"),
-						fields.Message("warning"),
-						fields.Info(preliminaryInterpolator.Errors.Errors),
-						fields.Middleware(interpolateMiddleware),
-					)
+					for _, err := range preliminaryInterpolator.Errors.Errors {
+						run.Log.Warn(
+							fields.Symbol("⚠️"),
+							fields.Message("warning"),
+							fields.Info(err),
+							fields.Middleware(interpolateMiddleware),
+						)
+					}
 				}
-			} else {
-				run.Log.Debug(
-					fields.Symbol("💤"),
-					fields.Message("input interpolation used, need to wait for input to complete..."),
-					fields.Middleware(interpolateMiddleware),
-				)
 			}
+			run.Log.Debug(
+				fields.Symbol("💤"),
+				fields.Message("input interpolation used, need to wait for input to complete..."),
+				fields.Middleware(interpolateMiddleware),
+			)
 			run.Log.Trace(
 				fields.DataStream(interpolateMiddleware, "copying stdin")...,
 			)
@@ -132,6 +133,18 @@ func (interpolateMiddleware Middleware) Apply(
 				waitGroup.Wait()
 				fullInterpolator := newInterpolatorWithInput(interpolatedArguments, arguments, inputData, previousRunResults)
 				structparse.Strings(fullInterpolator, interpolatedArguments)
+				if fullInterpolator.Errors != nil && fullInterpolator.Errors.Len() > 0 {
+					if !arguments.IgnoreWarnings {
+						for _, err := range fullInterpolator.Errors.Errors {
+							run.Log.Warn(
+								fields.Symbol("⚠️"),
+								fields.Message("warning"),
+								fields.Info(err),
+								fields.Middleware(interpolateMiddleware),
+							)
+						}
+					}
+				}
 				executionContext.FullRun(
 					middleware.WithIdentifier(run.Identifier),
 					middleware.WithParentRun(run),
@@ -304,22 +317,22 @@ func (interpolator *interpolator) interpolateInput(value string) string {
 func (interpolator *interpolator) interpolatePreviousRuns(value string, previousResults [][]byte) string {
 	regex := regexp.MustCompile("@\\|(\\d+|{\\d+})")
 	matches := regex.FindAllStringSubmatch(value, -1)
+	result := value
 	for _, match := range matches {
-		valueAsInt, err := strconv.Atoi(match[1])
-		if err != nil {
-			interpolator.Errors = multierror.Append(interpolator.Errors, err)
-			return ""
-		}
-		if valueAsInt < 0 || valueAsInt >= len(previousResults) {
+		index := strings.Trim(match[1], "{}")
+		valueAsInt, _ := strconv.Atoi(index)
+		rawReplacement := ""
+		if valueAsInt < len(previousResults) {
+			rawReplacement = string(previousResults[valueAsInt])
+		} else {
 			interpolator.Errors = multierror.Append(interpolator.Errors,
-				fmt.Errorf("trying to interpolate result at index %v, but only %v `pipes` arguments were provided", valueAsInt, len(previousResults)))
-			return ""
+				fmt.Errorf("trying to interpolate result at index %v, but only %v `pipes` argument(s) provided", valueAsInt, len(previousResults)))
 		}
-		replacement := handleQuotes(string(previousResults[valueAsInt]), interpolator.MiddlewareArguments)
+		replacement := handleQuotes(rawReplacement, interpolator.MiddlewareArguments)
 		interpolator.Substitutions[match[0]] = replacement
-		return strings.Replace(value, match[0], replacement, -1)
+		result = strings.Replace(result, match[0], replacement, 1)
 	}
-	return value
+	return result
 }
 
 func (interpolator *interpolator) interpolateArguments(value string) (string, error) {
