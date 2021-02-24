@@ -49,6 +49,11 @@ type Run struct {
 	// ExitCode is the exit code of the run's shell command, if any
 	ExitCode *int
 
+	//Interactive indicates whether the run accepts user input from the OS
+
+	//Interactive runs must
+	//Interactive bool
+
 	// Log is the dedicated logger for this run
 	//
 	// We need to organize our logs by run, so that the order of entries remains consistent
@@ -68,19 +73,15 @@ type Run struct {
 	// when everything has been processed, the run will complete
 	completed           bool
 	completionWaitGroup *sync.WaitGroup
-	// LogClosingWaitGroup will keep the Log available to be written to, even if the run's shell command has completed
+	// WaitGroup will block as long as the run is still in progress
 	//
-	// This is needed if further log entries might have to be added after shell command execution.
-	LogClosingWaitGroup *sync.WaitGroup
+	// It will only unblock when the shell command has completed and all additional tasks have completed
+	// For example, a middleware might use the WaitGroup to ensure that the run's Log is still available
+	// to be written to even after possible shell command completion
+	WaitGroup *sync.WaitGroup
 
 	cancelled   bool
 	cancelHooks []func() error
-
-	// StartWaitGroup defers the start of the run's shell command execution
-	//
-	// Middleware might use this to ensure that the shell command is only started
-	// when all required data (e.g. environment variables set by another run) is available.
-	StartWaitGroup *sync.WaitGroup
 }
 
 // NewRun creates a new Run with the specified identifier, invocation arguments, definition and parent
@@ -117,12 +118,10 @@ func NewRun(
 		closed:              false,
 		completed:           false,
 		completionWaitGroup: &sync.WaitGroup{},
-		LogClosingWaitGroup: &sync.WaitGroup{},
+		WaitGroup:           &sync.WaitGroup{},
 
 		cancelled:   false,
 		cancelHooks: make([]func() error, 0, 10),
-
-		StartWaitGroup: &sync.WaitGroup{},
 	}
 
 	if parent == nil {
@@ -161,17 +160,12 @@ func (run *Run) Close() {
 	run.Stdout.Close()
 	run.Stderr.Close()
 
-	run.completionWaitGroup.Add(1)
+	run.WaitGroup.Add(1)
 	go func() {
-		defer run.completionWaitGroup.Done()
-
-		run.StartWaitGroup.Wait()
+		defer run.WaitGroup.Done()
 
 		run.Stdout.Wait()
 		run.Stderr.Wait()
-		run.Stdin.Wait()
-
-		run.LogClosingWaitGroup.Wait()
 
 		run.completed = true
 
@@ -191,11 +185,13 @@ func (run *Run) Close() {
 
 // Wait halts execution until the run has completed
 func (run *Run) Wait() {
+	//if !run.Interactive {
+	//
+	//}
 	run.Stdout.Wait()
 	run.Stderr.Wait()
-	run.Stdin.Wait()
 	// ensure that run.Completed() returns true after the call to run.Wait()
-	run.completionWaitGroup.Wait()
+	run.WaitGroup.Wait()
 }
 
 // Completed indicates whether the run has finished executing, logging etc.

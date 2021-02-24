@@ -2,7 +2,6 @@
 package run
 
 import (
-	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/graph"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/middleware/stack"
@@ -40,7 +39,7 @@ var osStderr io.WriteCloser = os.Stderr
 var graphWriter = graph.NewWriter()
 
 // Cmd executes the main command, selecting and running a pipeline within an execution context
-func Cmd(_ *cobra.Command, args []string) {
+func Cmd(_ *cobra.Command, _ []string) {
 	executableLocation, _ := os.Executable()
 	executableDir := path.Dir(executableLocation)
 	projectPath, _ := filepath.EvalSymlinks(executableDir)
@@ -62,12 +61,6 @@ func Cmd(_ *cobra.Command, args []string) {
 	}
 	executionContext.RootFileName = fileName
 
-	executionContext.SetUpCancelHandler(func() {
-		err := executionContext.CancelAll()
-		if err != nil {
-			_, _ = io.WriteString(osStdout, fmt.Sprintf("Failed to cancel: %v", err))
-		}
-	}, osStdout)
 	executionContext.Execute(pipelineIdentifier, osStdout, osStderr)
 
 	if ShowGraphFlag {

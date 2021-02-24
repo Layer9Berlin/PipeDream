@@ -173,19 +173,19 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 	// copy the stderr output after all other middleware has processed it
 	stderrCopy := pipelineRun.Stderr.Copy()
 	// don't close the run's log until we are done writing to it
-	pipelineRun.LogClosingWaitGroup.Add(1)
+	pipelineRun.WaitGroup.Add(1)
 	go func() {
+		defer pipelineRun.WaitGroup.Done()
 		// read the entire remaining stderr
 		stderr, _ := ioutil.ReadAll(stderrCopy)
 		// if there is any output, log it!
 		if len(stderr) > 0 {
 			pipelineRun.Log.StderrOutput(string(stderr))
 		}
-		// now the run can complete
-		pipelineRun.LogClosingWaitGroup.Done()
 	}()
-	pipelineRun.LogClosingWaitGroup.Add(1)
+	pipelineRun.WaitGroup.Add(1)
 	go func() {
+		defer pipelineRun.WaitGroup.Done()
 		pipelineRun.Stdin.Wait()
 		stdin := pipelineRun.Stdin.String()
 		if len(stdin) > 0 {
@@ -196,10 +196,10 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 				fields.Color("gray"),
 			)
 		}
-		pipelineRun.LogClosingWaitGroup.Done()
 	}()
-	pipelineRun.LogClosingWaitGroup.Add(1)
+	pipelineRun.WaitGroup.Add(1)
 	go func() {
+		defer pipelineRun.WaitGroup.Done()
 		pipelineRun.Stdout.Wait()
 		stdout := pipelineRun.Stdout.String()
 		if len(stdout) > 0 {
@@ -210,7 +210,6 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 				fields.Color("gray"),
 			)
 		}
-		pipelineRun.LogClosingWaitGroup.Done()
 	}()
 	pipelineRun.Close()
 	return pipelineRun
@@ -270,6 +269,7 @@ func (executionContext *ExecutionContext) unwindStack(
 
 // Execute runs a pipeline and outputs the result
 func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, stdoutWriter io.Writer, stderrWriter io.Writer) {
+	executionContext.SetUpCancelHandler(stdoutWriter, stderrWriter, nil)
 
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
@@ -344,14 +344,20 @@ func defaultUserPrompt(
 }
 
 // SetUpCancelHandler registers a handler for interrupt signals
-func (executionContext *ExecutionContext) SetUpCancelHandler(handler func(), writer io.Writer) {
+func (executionContext *ExecutionContext) SetUpCancelHandler(stdoutWriter io.Writer, stderrWriter io.Writer, handler func()) {
 	if executionContext.interruptChannel == nil {
 		signalChannel := make(chan os.Signal, 1)
 		signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
 		go func() {
 			<-signalChannel
-			_, _ = io.WriteString(writer, "\nExecution cancelled...\n")
-			handler()
+			_, _ = io.WriteString(stdoutWriter, "\nExecution cancelled...\n")
+			err := executionContext.CancelAll()
+			if err != nil {
+				_, _ = io.WriteString(stderrWriter, fmt.Sprintf("Failed to cancel: %v\n", err))
+			}
+			if handler != nil {
+				handler()
+			}
 			close(signalChannel)
 			signal.Reset(os.Interrupt, syscall.SIGTERM)
 		}()

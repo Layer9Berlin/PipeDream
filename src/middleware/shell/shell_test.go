@@ -9,8 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"io"
 	"os/exec"
+	"strings"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestShell_NonRunnable(t *testing.T) {
@@ -226,95 +228,93 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 	require.Equal(t, -1, *run.ExitCode)
 }
 
-//func TestShell_Interactive(t *testing.T) {
-//	run, _ := models.NewRun(nil, map[string]interface{}{
-//		"shell": map[string]interface{}{
-//			"interactive": true,
-//			"run":         "something",
-//		},
-//	}, nil, nil)
-//
-//	nextExecuted := false
-//	run.Log.SetLevel(logrus.DebugLevel)
-//	executor := NewTestCommandExecutor()
-//	osStdin := new(bytes.Buffer)
-//	osStdout := new(bytes.Buffer)
-//	osStderr := new(bytes.Buffer)
-//	shellMiddleware := ShellMiddleware{
-//		osStdin:         osStdin,
-//		osStdout:        osStdout,
-//		osStderr:        osStderr,
-//		ExecutorCreator: func() commandExecutor { return executor },
-//	}
-//	shellCommandInput := ""
-//	go func() {
-//		// simulate user input to OS stdin
-//		_, err := io.WriteString(osStdin, "y\n")
-//		require.Nil(t, err)
-//	}()
-//	executor.WaitGroup.Add(1)
-//	go func() {
-//		// simulate shell command consuming its input and finishing after two lines of input
-//		reader := bufio.NewReader(executor.StdinReader)
-//		// the first line is available immediately
-//		chunk, err := reader.ReadString('\n')
-//		require.Nil(t, err)
-//		shellCommandInput += chunk
-//		for {
-//			// the second may be entered by the simulated user at any time
-//			chunk, err := reader.ReadString('\n')
-//			shellCommandInput += chunk
-//			if err != io.EOF {
-//				break
-//			}
-//			time.Sleep(100 * time.Millisecond)
-//		}
-//		require.Nil(t, err)
-//		executor.WaitGroup.Done()
-//	}()
-//	executor.WaitGroup.Add(1)
-//	go func() {
-//		defer executor.WaitGroup.Done()
-//		// simulate shell command giving some output
-//		_, _ = io.WriteString(executor.StdoutWriteCloser, "(Additional prompt):\n")
-//	}()
-//	executor.WaitGroup.Add(1)
-//	go func() {
-//		defer executor.WaitGroup.Done()
-//		// simulate shell command giving some stderr output
-//		_, _ = io.WriteString(executor.StderrWriteCloser, "(Additional stderr):\n")
-//	}()
-//	shellMiddleware.Apply(
-//		run,
-//		func(nextRun *models.Run) {
-//			// the input might come from a previous pipe
-//			nextRun.Stdin.Replace(strings.NewReader("Please confirm (Y/n):\n"))
-//			//this could be set by other middleware
-//			nextRun.Stdout.Replace(strings.NewReader("Middleware-defined output to be shown to user\n"))
-//			nextRun.Stderr.Replace(strings.NewReader("Middleware-defined stderr to be shown to user\n"))
-//			nextExecuted = true
-//		},
-//		nil,
-//	)
-//	run.Close()
-//	run.Wait()
-//
-//	require.True(t, nextExecuted)
-//	require.Equal(t, 0, run.Log.ErrorCount())
-//	require.Contains(t, run.Log.String(), "shell (Shell Command Runner)")
-//	// the pipe's input
-//	require.Equal(t, "y\n", run.Stdin.String())
-//	// the shell command's input is the pipe's input plus the OS stdin
-//	require.Equal(t, "Please confirm (Y/n):\ny\n", shellCommandInput)
-//	//the pipe's output
-//	require.Equal(t, "Middleware-defined output to be shown to user\n(Additional prompt):\n", run.Stdout.String())
-//	//the (simulated) OS stdout output
-//	require.Equal(t, "Middleware-defined output to be shown to user\n(Additional prompt):\n", osStdout.String())
-//	//the pipe's stderr
-//	require.Equal(t, "Middleware-defined stderr to be shown to user\n(Additional stderr):\n", run.Stderr.String())
-//	//the (simulated) OS stderr output
-//	require.Equal(t, "Middleware-defined stderr to be shown to user\n(Additional stderr):\n", osStderr.String())
-//}
+func TestShell_Interactive(t *testing.T) {
+	run, _ := pipeline.NewRun(nil, map[string]interface{}{
+		"shell": map[string]interface{}{
+			"interactive": true,
+			"run":         "something",
+		},
+	}, nil, nil)
+
+	nextExecuted := false
+	run.Log.SetLevel(logrus.DebugLevel)
+	executor := NewTestCommandExecutor()
+	osStdin := new(bytes.Buffer)
+	osStdout := new(bytes.Buffer)
+	osStderr := new(bytes.Buffer)
+	shellMiddleware := Middleware{
+		osStdin:         osStdin,
+		osStdout:        osStdout,
+		osStderr:        osStderr,
+		ExecutorCreator: func() commandExecutor { return executor },
+	}
+	shellCommandInput := ""
+	go func() {
+		// simulate user input to OS stdin
+		_, err := io.WriteString(osStdin, "y\n")
+		require.Nil(t, err)
+	}()
+	executor.WaitGroup.Add(1)
+	go func() {
+		defer executor.WaitGroup.Done()
+		// simulate shell command consuming its input
+		reader := bufio.NewReader(executor.StdinReader)
+		// the first line is available immediately
+		chunk, err := reader.ReadString('\n')
+		require.Nil(t, err)
+		shellCommandInput += chunk
+		for {
+			// the second may be entered by the simulated user at any time
+			chunk, err := reader.ReadString('\n')
+			shellCommandInput += chunk
+			if err != io.EOF {
+				break
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+		require.Nil(t, err)
+	}()
+	executor.WaitGroup.Add(1)
+	go func() {
+		defer executor.WaitGroup.Done()
+		// simulate shell command giving some output
+		_, _ = io.WriteString(executor.StdoutWriteCloser, "(Additional prompt):\n")
+	}()
+	executor.WaitGroup.Add(1)
+	go func() {
+		defer executor.WaitGroup.Done()
+		// simulate shell command giving some stderr output
+		_, _ = io.WriteString(executor.StderrWriteCloser, "(Additional stderr):\n")
+	}()
+	shellMiddleware.Apply(
+		run,
+		func(nextRun *pipeline.Run) {
+			// the input might come from a previous pipe
+			nextRun.Stdin.Replace(strings.NewReader("Please confirm (Y/n):\n"))
+			//this could be set by other middleware
+			nextRun.Stdout.Replace(strings.NewReader("Middleware-defined output to be shown to user\n"))
+			nextRun.Stderr.Replace(strings.NewReader("Middleware-defined stderr to be shown to user\n"))
+			nextExecuted = true
+		},
+		nil,
+	)
+	run.Close()
+	run.Wait()
+
+	require.True(t, nextExecuted)
+	require.Equal(t, 0, run.Log.ErrorCount())
+	require.Contains(t, run.Log.String(), "shell")
+	// the shell command's input is the pipe's input plus the OS stdin
+	require.Equal(t, "Please confirm (Y/n):\ny\n", shellCommandInput)
+	//the pipe's output
+	require.Equal(t, "Middleware-defined output to be shown to user\n(Additional prompt):\n", run.Stdout.String())
+	//the (simulated) OS stdout output
+	require.Equal(t, "Middleware-defined output to be shown to user\n(Additional prompt):\n", osStdout.String())
+	//the pipe's stderr
+	require.Equal(t, "Middleware-defined stderr to be shown to user\n(Additional stderr):\n", run.Stderr.String())
+	//the (simulated) OS stderr output
+	require.Equal(t, "Middleware-defined stderr to be shown to user\n(Additional stderr):\n", osStderr.String())
+}
 
 func TestShell_WaitError(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{

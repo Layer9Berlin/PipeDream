@@ -154,7 +154,6 @@ func (shellMiddleware Middleware) Apply(
 		)
 
 		go func() {
-			run.StartWaitGroup.Wait()
 			run.Log.PossibleError(executor.Start())
 		}()
 
@@ -174,9 +173,12 @@ func (shellMiddleware Middleware) Apply(
 			}()
 		}
 
-		run.LogClosingWaitGroup.Add(1)
+		run.WaitGroup.Add(1)
 		go func() {
-			run.Stdin.Wait()
+			defer run.WaitGroup.Done()
+			if !arguments.Indefinite && !arguments.Interactive {
+				run.Stdin.Wait()
+			}
 			run.Stdout.Wait()
 			run.Stderr.Wait()
 			err := executor.Wait()
@@ -194,7 +196,9 @@ func (shellMiddleware Middleware) Apply(
 				exitCode := 0
 				run.ExitCode = &exitCode
 			}
-			run.LogClosingWaitGroup.Done()
+			if arguments.Indefinite || arguments.Interactive {
+				run.Stdin.Close()
+			}
 		}()
 	}
 }

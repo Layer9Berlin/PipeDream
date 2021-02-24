@@ -449,15 +449,22 @@ func TestExecutionContext_defaultUserPrompt(t *testing.T) {
 	require.Equal(t, "option2", resultString)
 }
 
-func TestExecutionContext_SetUpCancelHandler(t *testing.T) {
+func TestExecutionContext_CancelError(t *testing.T) {
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(1)
 	executionContext := NewExecutionContext()
+	run, _ := pipeline.NewRun(nil, nil, nil, nil)
+	run.AddCancelHook(func() error {
+		return fmt.Errorf("test error")
+	})
+	executionContext.Runs = []*pipeline.Run{
+		run,
+	}
 	stdoutWriter := customio.NewPipedWriteCloser()
 	stderrWriter := customio.NewPipedWriteCloser()
-	executionContext.SetUpCancelHandler(func() {
+	executionContext.SetUpCancelHandler(stdoutWriter, stderrWriter, func() {
 		waitGroup.Done()
-	}, stdoutWriter)
+	})
 	executionContext.interruptChannel <- syscall.SIGINT
 	waitGroup.Wait()
 	_ = stdoutWriter.Close()
@@ -465,7 +472,7 @@ func TestExecutionContext_SetUpCancelHandler(t *testing.T) {
 	stdoutWriter.Wait()
 	stderrWriter.Wait()
 	require.Equal(t, "\nExecution cancelled...\n", stdoutWriter.String())
-	require.Equal(t, "", stderrWriter.String())
+	require.Equal(t, "Failed to cancel: 1 error occurred:\n\t* test error\n\n\n", stderrWriter.String())
 }
 
 func TestExecutionContext_CollectErrors(t *testing.T) {
