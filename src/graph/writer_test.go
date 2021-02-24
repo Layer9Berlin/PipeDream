@@ -13,6 +13,9 @@ import (
 
 func TestGraph_OutputGraph(t *testing.T) {
 	graphWriter := NewWriter()
+	graphWriter.Execute = func(template *template.Template, wr io.Writer, data interface{}) error {
+		return nil
+	}
 	graphWriter.OpenInBrowser = func(file string) error {
 		return nil
 	}

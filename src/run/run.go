@@ -2,6 +2,7 @@
 package run
 
 import (
+	"fmt"
 	"github.com/Layer9Berlin/pipedream/src/graph"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
 	"github.com/Layer9Berlin/pipedream/src/middleware/stack"
@@ -48,7 +49,7 @@ func Cmd(_ *cobra.Command, args []string) {
 		middleware.WithProjectPath(projectPath),
 		middleware.WithLogger(Log),
 	)
-	err := executionContext.SetUpPipelines(FileFlag, args...)
+	err := executionContext.SetUpPipelines(FileFlag)
 	if err != nil {
 		executionContext.Log.Error(err)
 		return
@@ -61,6 +62,12 @@ func Cmd(_ *cobra.Command, args []string) {
 	}
 	executionContext.RootFileName = fileName
 
+	executionContext.SetUpCancelHandler(func() {
+		err := executionContext.CancelAll()
+		if err != nil {
+			_, _ = io.WriteString(osStdout, fmt.Sprintf("Failed to cancel: %v", err))
+		}
+	}, osStdout)
 	executionContext.Execute(pipelineIdentifier, osStdout, osStderr)
 
 	if ShowGraphFlag {

@@ -55,6 +55,8 @@ type ExecutionContext struct {
 
 	errors *multierror.Error
 
+	interruptChannel chan os.Signal
+
 	preCallback       func(*pipeline.Run)
 	postCallback      func(*pipeline.Run)
 	executionFunction func(*pipeline.Run)
@@ -271,12 +273,6 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
 	fullRun.Close()
-	setUpCancelHandler(func() {
-		err := executionContext.CancelAll()
-		if err != nil {
-			fmt.Printf("Failed to cancel: %v", err)
-		}
-	})
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(1)
 	go func() {
@@ -291,7 +287,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 }
 
 // SetUpPipelines collects and parses all relevant pipeline files
-func (executionContext *ExecutionContext) SetUpPipelines(fileFlag string, args ...string) error {
+func (executionContext *ExecutionContext) SetUpPipelines(fileFlag string) error {
 	executionContext.Log.Tracef("Setting up pipelines...")
 
 	filePaths, err := executionContext.parser.BuiltInPipelineFilePaths(executionContext.ProjectPath)
@@ -347,16 +343,19 @@ func defaultUserPrompt(
 	return prompt.Run()
 }
 
-func setUpCancelHandler(handler func()) {
-	signalChannel := make(chan os.Signal, 1)
-	signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-signalChannel
-		fmt.Println("\nExecution cancelled...")
-		handler()
-		close(signalChannel)
-		signal.Reset(os.Interrupt, syscall.SIGTERM)
-	}()
+func (executionContext *ExecutionContext) SetUpCancelHandler(handler func(), writer io.Writer) {
+	if executionContext.interruptChannel == nil {
+		signalChannel := make(chan os.Signal, 1)
+		signal.Notify(signalChannel, os.Interrupt, syscall.SIGTERM)
+		go func() {
+			<-signalChannel
+			_, _ = io.WriteString(writer, "\nExecution cancelled...\n")
+			handler()
+			close(signalChannel)
+			signal.Reset(os.Interrupt, syscall.SIGTERM)
+		}()
+		executionContext.interruptChannel = signalChannel
+	}
 }
 
 func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipeline.Run {
@@ -369,14 +368,4 @@ func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipelin
 		}
 		time.Sleep(250)
 	}
-}
-
-func (executionContext *ExecutionContext) UserRuns() []*pipeline.Run {
-	result := make([]*pipeline.Run, 0, len(executionContext.Runs))
-	for _, run := range executionContext.Runs {
-		//if run.Definition != nil && !run.Definition.BuiltIn {
-		result = append(result, run)
-		//}
-	}
-	return result
 }

@@ -3,6 +3,8 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	customio "github.com/Layer9Berlin/pipedream/src/custom/io"
+	"github.com/Layer9Berlin/pipedream/src/logging"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/parsing"
 	"github.com/Layer9Berlin/pipedream/src/pipeline"
@@ -12,7 +14,9 @@ import (
 	"io/ioutil"
 	"strings"
 	"sync"
+	"syscall"
 	"testing"
+	"time"
 )
 
 func TestExecutionContext_CancelAll(t *testing.T) {
@@ -365,51 +369,133 @@ func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
 	require.Nil(t, executionContext.PipelineFiles)
 }
 
-//
-//func TestExecutionContext_SetUpPipelines_ParsePipelineFilesError(t *testing.T) {
-//	executionContext := NewExecutionContext(
-//		WithParser(
-//			parsers.NewParser(
-//				parsers.WithFindByGlobImplementation(func(pattern string) ([]string, error) {
-//					if pattern == "pipes/**/*.pipe" {
-//						return []string{"test2.pipe"}, nil
-//					}
-//					return []string{"test1.pipe"}, nil
-//				}),
-//				parsers.WithReadFileImplementation(func(filename string) ([]byte, error) {
-//					if filename == "test.file" {
-//						return nil, fmt.Errorf("test error")
-//					}
-//					return []byte{}, nil
-//				}),
-//				parsers.WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
-//					return []string{"test.file"}, nil
-//				}))),
-//		WithDefinitionsLookup(models.DefinitionsLookup{}),
-//	)
-//	err := executionContext.SetUpPipelines([]string{"test1"})
-//	require.NotNil(t, err)
-//	require.Contains(t, err.Error(), "test error")
-//	require.Equal(t, []models.File{}, executionContext.PipelineFiles)
-//}
+func TestExecutionContext_LogFullRun(t *testing.T) {
+	previousLogLevel := logging.UserPipeLogLevel
+	logging.UserPipeLogLevel = logrus.TraceLevel
+	defer func() {
+		logging.UserPipeLogLevel = previousLogLevel
+	}()
+	pipedWriteCloser := customio.NewPipedWriteCloser()
+	executionContext := NewExecutionContext()
+	run := executionContext.FullRun(WithLogWriter(pipedWriteCloser))
 
-//func TestRun_PipelineSetupHelper_setUpPipelines(t *testing.T) {
-//	executionContext := middleware.NewExecutionContext(
-//		middleware.WithDefinitionsLookup(models.DefinitionsLookup{}),
-//		WithFindByGlobImplementation(func(pattern string) ([]string, error) {
-//			return []string{"test1.pipe"}, nil
-//		}),
-//		WithRecursivelyAddImportsImplementation(func(paths []string) ([]string, error) {
-//			return []string{"test2.pipe", "test3.pipe"}, nil
-//		}),
-//		WithParsePipelinesImplementation(func(allPipelineFilePaths []string, builtIn bool, executionContext *middleware.ExecutionContext) error {
-//			return nil
-//		}),
-//	)
-//	err := executionContext.SetUpPipelines([]string{"test1"})
-//	require.Nil(t, err)
-//	require.Equal(t, []models.File{}, executionContext.PipelineFiles)
-//}
+	run.Wait()
+	pipedWriteCloser.Wait()
+	require.Contains(t, pipedWriteCloser.String(), "full run")
+}
+
+func TestExecutionContext_FullRun_LogStderr(t *testing.T) {
+	previousLogLevel := logging.UserPipeLogLevel
+	logging.UserPipeLogLevel = logrus.TraceLevel
+	defer func() {
+		logging.UserPipeLogLevel = previousLogLevel
+	}()
+	pipedWriteCloser := customio.NewPipedWriteCloser()
+	executionContext := NewExecutionContext()
+	run := executionContext.FullRun(
+		WithLogWriter(pipedWriteCloser),
+		WithTearDownFunc(func(run *pipeline.Run) {
+			run.Stderr.Replace(strings.NewReader("test output"))
+		}),
+	)
+	run.Wait()
+	pipedWriteCloser.Wait()
+	require.Contains(t, pipedWriteCloser.String(), "test output")
+}
+
+func TestExecutionContext_FullRun_LogStdin(t *testing.T) {
+	previousLogLevel := logging.UserPipeLogLevel
+	logging.UserPipeLogLevel = logrus.TraceLevel
+	defer func() {
+		logging.UserPipeLogLevel = previousLogLevel
+	}()
+	pipedWriteCloser := customio.NewPipedWriteCloser()
+	executionContext := NewExecutionContext()
+	run := executionContext.FullRun(
+		WithLogWriter(pipedWriteCloser),
+		WithSetupFunc(func(run *pipeline.Run) {
+			run.Stdin.Replace(strings.NewReader("test input"))
+		}),
+	)
+	run.Wait()
+	pipedWriteCloser.Wait()
+	require.Contains(t, pipedWriteCloser.String(), "test input")
+}
+
+func TestExecutionContext_FullRun_LogStdout(t *testing.T) {
+	previousLogLevel := logging.UserPipeLogLevel
+	logging.UserPipeLogLevel = logrus.TraceLevel
+	defer func() {
+		logging.UserPipeLogLevel = previousLogLevel
+	}()
+	pipedWriteCloser := customio.NewPipedWriteCloser()
+	executionContext := NewExecutionContext()
+	run := executionContext.FullRun(
+		WithLogWriter(pipedWriteCloser),
+		WithTearDownFunc(func(run *pipeline.Run) {
+			run.Stdout.Replace(strings.NewReader("test output"))
+		}),
+	)
+	run.Wait()
+	pipedWriteCloser.Wait()
+	require.Contains(t, pipedWriteCloser.String(), "test output")
+}
+
+func TestExecutionContext_defaultUserPrompt(t *testing.T) {
+	pipedWriteCloser := customio.NewPipedWriteCloser()
+	resultIndex, resultString, err := defaultUserPrompt("test", []string{"option1", "option2"}, 1, 5, ioutil.NopCloser(strings.NewReader("\n")), pipedWriteCloser)
+	require.Nil(t, err)
+	require.Equal(t, 1, resultIndex)
+	require.Equal(t, "option2", resultString)
+}
+
+func TestExecutionContext_SetUpCancelHandler(t *testing.T) {
+	waitGroup := &sync.WaitGroup{}
+	waitGroup.Add(1)
+	executionContext := NewExecutionContext()
+	stdoutWriter := customio.NewPipedWriteCloser()
+	stderrWriter := customio.NewPipedWriteCloser()
+	executionContext.SetUpCancelHandler(func() {
+		waitGroup.Done()
+	}, stdoutWriter)
+	executionContext.interruptChannel <- syscall.SIGINT
+	waitGroup.Wait()
+	_ = stdoutWriter.Close()
+	_ = stderrWriter.Close()
+	stdoutWriter.Wait()
+	stderrWriter.Wait()
+	require.Equal(t, "\nExecution cancelled...\n", stdoutWriter.String())
+	require.Equal(t, "", stderrWriter.String())
+}
+
+func TestExecutionContext_CollectErrors(t *testing.T) {
+	pipedWriteCloser := customio.NewPipedWriteCloser()
+	executionContext := NewExecutionContext()
+	run := executionContext.FullRun(
+		WithLogWriter(pipedWriteCloser),
+		WithTearDownFunc(func(run *pipeline.Run) {
+			run.Log.Error(fmt.Errorf("test error"))
+		}),
+	)
+	run.Wait()
+	pipedWriteCloser.Wait()
+	require.Equal(t, 1, executionContext.errors.Len())
+	require.Equal(t, "anonymous:\ntest error", executionContext.errors.Errors[0].Error())
+}
+
+func TestExecutionContext_WaitForRun(t *testing.T) {
+	executionContext := NewExecutionContext()
+	runIdentifier := "test"
+	var run *pipeline.Run
+	go func() {
+		time.Sleep(500)
+		run = executionContext.FullRun(
+			WithIdentifier(&runIdentifier),
+		)
+	}()
+	waitedRun := executionContext.WaitForRun("test")
+	require.Equal(t, run, waitedRun)
+}
 
 type FakeMiddleware struct {
 	CallCount int
