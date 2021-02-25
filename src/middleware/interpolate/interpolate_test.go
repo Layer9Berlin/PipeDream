@@ -244,7 +244,7 @@ func TestInterpolate_InputReadError(t *testing.T) {
 	run.Wait()
 	waitGroup.Wait()
 
-	require.Equal(t, 1, run.Log.ErrorCount())
+	require.Equal(t, 2, run.Log.ErrorCount())
 	require.Contains(t, run.Log.LastError().Error(), "test error")
 	require.Equal(t, map[string]interface{}{
 		"interpolate": map[string]interface{}{

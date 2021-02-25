@@ -4,14 +4,19 @@ import (
 	"io"
 )
 
+type WriteCloserWithError = interface {
+	io.WriteCloser
+	CloseWithError(err error) error
+}
+
 // ComposableDataStreamIntercept is a structure for intercepting and manipulating data passed through a data stream
 type ComposableDataStreamIntercept struct {
 	reader       io.Reader
-	writer       io.WriteCloser
+	writer       WriteCloserWithError
 	errorHandler func(error)
 }
 
-func newComposableDataStreamIntercept(reader io.Reader, writer io.WriteCloser, errorHandler func(error)) *ComposableDataStreamIntercept {
+func newComposableDataStreamIntercept(reader io.Reader, writer WriteCloserWithError, errorHandler func(error)) *ComposableDataStreamIntercept {
 	return &ComposableDataStreamIntercept{
 		reader:       reader,
 		writer:       writer,
@@ -30,4 +35,8 @@ func (intercept *ComposableDataStreamIntercept) Write(p []byte) (int, error) {
 // Close closes the data stream intercept to indicate that all data has been written
 func (intercept *ComposableDataStreamIntercept) Close() error {
 	return intercept.writer.Close()
+}
+
+func (intercept *ComposableDataStreamIntercept) CloseWithError(err error) error {
+	return intercept.writer.CloseWithError(err)
 }

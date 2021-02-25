@@ -28,7 +28,7 @@ func (stream *ComposableDataStream) Copy() io.Reader {
 // You should read all input data provided in this way (until io.EOF) to prevent deadlocks.
 // The intercepted data stream's output will be replaced completely by the data written to the io.Writer interface.
 // You must close the data stream when you have written all output data through the io.Writer.
-func (stream *ComposableDataStream) Intercept() io.ReadWriteCloser {
+func (stream *ComposableDataStream) Intercept() *ComposableDataStreamIntercept {
 	if stream.closed {
 		stream.errorHandler(fmt.Errorf("attempt to modify closed data stream %q", stream.Name))
 		return nil
@@ -73,8 +73,10 @@ func (stream *ComposableDataStream) Replace(reader io.Reader) {
 			_, err := io.Copy(intercept, reader)
 			if err != nil {
 				stream.errorHandler(err)
+				_ = intercept.CloseWithError(err)
+			} else {
+				_ = intercept.Close()
 			}
-			_ = intercept.Close()
 		}()
 	}
 }
