@@ -32,8 +32,8 @@ func Cmd(writer io.Writer) {
 		`version: %v
 via: %v
 date: %v
-commit: %v
-checksum: %v
+commit: %-8v
+checksum: %-8v
 location: %v
 `, Version, Via, Date, CommitHash, RepoChecksum, executableLocation)))
 }
