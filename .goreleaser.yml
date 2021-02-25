@@ -18,7 +18,7 @@ builds:
     ldflags:
       - -s -w
       - -X pipedream/src/version.Via=brew
-      - -X pipedream/src/version.Version={{.Version}}
+      - -X pipedream/src/version.Version={{ .Version }}
       - -X pipedream/src/version.CommitHash={{ .Commit }}
       - -X pipedream/src/version.Date={{ .Date }}
       - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
@@ -118,8 +118,6 @@ brews:
       bin.install "pipedream"
       include.install Dir["include/*"]
       ln_s("#{include}/pipedream_pipes", "#{bin}", force: true)
-      system "#{bin}/pipedream"
-      ln_s("#{bin}/pipedream", "#{bin}/p", force: true)
 
     test: |
       system "#{bin}/pipedream --version"
