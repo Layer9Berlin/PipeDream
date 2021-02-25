@@ -20,7 +20,7 @@ var CommitHash = "-"
 var RepoChecksum = "-"
 
 // Date is the date and time at which the build was created
-var Date = time.Now().String()
+var Date = time.Now().Format(time.RFC822)
 
 // Via is the installation method ("npm"/"brew"/"compiled from source"/...)
 var Via = "compiled from source"

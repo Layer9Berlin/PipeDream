@@ -17,11 +17,11 @@ builds:
       - darwin
     ldflags:
       - -s -w
-      - -X pipedream/src/version.Via=brew
-      - -X pipedream/src/version.Version={{ .Version }}
-      - -X pipedream/src/version.CommitHash={{ .Commit }}
-      - -X pipedream/src/version.Date={{ .Date }}
-      - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.Via=brew
+      - -X github.com/Layer9Berlin/pipedream/src/version.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: pipedream_npm
     env:
       - CGO_ENABLED=0
@@ -31,11 +31,11 @@ builds:
       - darwin
     ldflags:
       - -s -w
-      - -X pipedream/src/version.Via=npm
-      - -X pipedream/src/version.Version={{ .Version }}
-      - -X pipedream/src/version.CommitHash={{ .Commit }}
-      - -X pipedream/src/version.Date={{ .Date }}
-      - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.Via=npm
+      - -X github.com/Layer9Berlin/pipedream/src/version.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: pipedream_apt
     env:
       - CGO_ENABLED=0
@@ -45,11 +45,11 @@ builds:
       - darwin
     ldflags:
       - -s -w
-      - -X pipedream/src/version.Via=apt
-      - -X pipedream/src/version.Version={{ .Version }}
-      - -X pipedream/src/version.CommitHash={{ .Commit }}
-      - -X pipedream/src/version.Date={{ .Date }}
-      - -X pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.Via=apt
+      - -X github.com/Layer9Berlin/pipedream/src/version.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: semver-compare
     env:
       - CGO_ENABLED=0
@@ -120,7 +120,7 @@ brews:
       ln_s("#{include}/pipedream_pipes", "#{bin}", force: true)
 
     test: |
-      system "#{bin}/pipedream --version"
+      system "#{bin}/pipedream version"
 nfpms:
   - id: pipedream
     builds:

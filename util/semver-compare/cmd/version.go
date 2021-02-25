@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	"os"
+	"time"
 )
 
 // Version is the current semantic version (all utils and pipedream itself share the same version)
@@ -19,7 +20,7 @@ var CommitHash = "-"
 var RepoChecksum = "-"
 
 // Date is the date and time at which the build was created
-var Date = "-"
+var Date = time.Now().Format(time.RFC822)
 
 // Via is the installation method ("npm"/"brew"/"compiled from source"/...)
 var Via = "compiled from source"
