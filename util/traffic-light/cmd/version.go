@@ -39,8 +39,8 @@ func versionCmd(writer io.Writer) {
 	_, _ = writer.Write([]byte(fmt.Sprintf(
 		`version: %v
 date: %v
-commit: %v
-checksum: %v
+commit: %-8v
+checksum: %-8v
 location: %v
 `, Version, Date, CommitHash, RepoChecksum, executableLocation)))
 }
