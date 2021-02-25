@@ -49,10 +49,11 @@ type Run struct {
 	// ExitCode is the exit code of the run's shell command, if any
 	ExitCode *int
 
-	//Interactive indicates whether the run accepts user input from the OS
-
-	//Interactive runs must
-	//Interactive bool
+	// IndefiniteInput indicates whether the run accepts user input from the OS
+	//
+	// Runs with indefinite input cannot wait for the stdin to complete, for obvious reasons...
+	// However, they do close their input once the shell command has finished.
+	IndefiniteInput bool
 
 	// Log is the dedicated logger for this run
 	//
@@ -166,6 +167,9 @@ func (run *Run) Close() {
 
 		run.Stdout.Wait()
 		run.Stderr.Wait()
+		if !run.IndefiniteInput {
+			run.Stdin.Wait()
+		}
 
 		run.completed = true
 
@@ -174,7 +178,10 @@ func (run *Run) Close() {
 			fields.Message("completed | "+run.String()),
 			fields.Color("green"),
 		)
+	}()
 
+	go func() {
+		run.WaitGroup.Wait()
 		// the log needed to be kept open
 		// while new entries might be coming in
 		// now that all the data has been processed,
@@ -185,11 +192,11 @@ func (run *Run) Close() {
 
 // Wait halts execution until the run has completed
 func (run *Run) Wait() {
-	//if !run.Interactive {
-	//
-	//}
 	run.Stdout.Wait()
 	run.Stderr.Wait()
+	if !run.IndefiniteInput {
+		run.Stdin.Wait()
+	}
 	// ensure that run.Completed() returns true after the call to run.Wait()
 	run.WaitGroup.Wait()
 }

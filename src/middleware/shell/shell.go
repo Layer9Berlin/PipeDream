@@ -4,7 +4,6 @@ package shell
 import (
 	"errors"
 	"fmt"
-	customio "github.com/Layer9Berlin/pipedream/src/custom/io"
 	customstrings "github.com/Layer9Berlin/pipedream/src/custom/strings"
 	"github.com/Layer9Berlin/pipedream/src/logging/fields"
 	"github.com/Layer9Berlin/pipedream/src/middleware"
@@ -14,6 +13,7 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+	"time"
 )
 
 // Middleware is a shell command runner
@@ -99,6 +99,10 @@ func (shellMiddleware Middleware) Apply(
 			*arguments.Run = fmt.Sprintf("cd %v && %v", *arguments.Dir, *arguments.Run)
 		}
 
+		if arguments.Indefinite || arguments.Interactive {
+			run.IndefiniteInput = true
+		}
+
 		// allow other middleware to make changes now that we have set the directory
 		// this is handy for things like the docker and the SSH middleware
 		// since we want to change directories on the remote service instead of locally
@@ -120,14 +124,24 @@ func (shellMiddleware Middleware) Apply(
 			// in interactive mode, we want to be ready to read user input
 			// and show all output in the console
 			stdinIntercept = run.Stdin.Intercept()
-
+			multiWriter := io.MultiWriter(cmdStdin, stdinIntercept)
 			go func() {
-				_, _ = io.Copy(cmdStdin, stdinIntercept)
+				for {
+					_, err = io.Copy(multiWriter, stdinIntercept)
+					if err != nil {
+						break
+					}
+					time.Sleep(200)
+				}
 			}()
 			go func() {
-				// need to wrap the osStdin, as it may return EOF for some time until new user input arrives
-				_, _ = io.Copy(io.MultiWriter(stdinIntercept, cmdStdin), customio.NewContinuousReader(shellMiddleware.osStdin))
-				_ = stdinIntercept.Close()
+				for {
+					_, err = io.Copy(multiWriter, shellMiddleware.osStdin)
+					if err != nil {
+						break
+					}
+					time.Sleep(200)
+				}
 			}()
 
 			// the shell command's stdout should be added to the pipe's output
@@ -166,7 +180,7 @@ func (shellMiddleware Middleware) Apply(
 			return executor.Kill()
 		})
 
-		if !arguments.Indefinite && !arguments.Interactive {
+		if !run.IndefiniteInput {
 			go func() {
 				run.Stdin.Wait()
 				run.Log.PossibleError(cmdStdin.Close())
@@ -176,7 +190,7 @@ func (shellMiddleware Middleware) Apply(
 		run.WaitGroup.Add(1)
 		go func() {
 			defer run.WaitGroup.Done()
-			if !arguments.Indefinite && !arguments.Interactive {
+			if !run.IndefiniteInput {
 				run.Stdin.Wait()
 			}
 			run.Stdout.Wait()
@@ -196,8 +210,9 @@ func (shellMiddleware Middleware) Apply(
 				exitCode := 0
 				run.ExitCode = &exitCode
 			}
-			if arguments.Indefinite || arguments.Interactive {
-				run.Stdin.Close()
+			if stdinIntercept != nil {
+				err = stdinIntercept.Close()
+				run.Log.PossibleError(err)
 			}
 		}()
 	}
