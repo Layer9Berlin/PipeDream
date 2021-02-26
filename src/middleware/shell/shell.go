@@ -168,6 +168,7 @@ func (shellMiddleware Middleware) Apply(
 		)
 
 		go func() {
+			run.StartWaitGroup.Wait()
 			run.Log.PossibleError(executor.Start())
 		}()
 

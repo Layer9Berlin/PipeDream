@@ -262,11 +262,11 @@ func TestPipelineRun_Cancel(t *testing.T) {
 func TestPipelineRun_GraphLabel(t *testing.T) {
 	runIdentifier := "test"
 	run, _ := NewRun(&runIdentifier, nil, nil, nil)
-	run.completionWaitGroup.Add(1)
+	run.WaitGroup.Add(1)
 	require.Equal(t, "🔜 Test", run.GraphLabel())
 	run.Close()
 	require.Equal(t, "↺ Test", run.GraphLabel())
-	run.completionWaitGroup.Done()
+	run.WaitGroup.Done()
 	run.Wait()
 	require.Equal(t, "✔ Test", run.GraphLabel())
 	_ = run.Cancel()
@@ -278,15 +278,23 @@ func TestPipelineRun_GraphLabel(t *testing.T) {
 func TestPipelineRun_GraphGroup(t *testing.T) {
 	runIdentifier := "test"
 	run, _ := NewRun(&runIdentifier, nil, nil, nil)
-	run.completionWaitGroup.Add(1)
+	run.WaitGroup.Add(1)
 	require.Equal(t, "waiting", run.GraphGroup())
 	run.Close()
 	require.Equal(t, "active", run.GraphGroup())
-	run.completionWaitGroup.Done()
+	run.WaitGroup.Done()
 	run.Wait()
 	require.Equal(t, "success", run.GraphGroup())
 	_ = run.Cancel()
 	require.Equal(t, "cancelled", run.GraphGroup())
 	run.Log.Error(fmt.Errorf("test error"))
 	require.Equal(t, "error", run.GraphGroup())
+}
+
+func TestPipelineRun_Name(t *testing.T) {
+	anonymousRun, _ := NewRun(nil, nil, nil, nil)
+	require.Equal(t, "anonymous", anonymousRun.Name())
+	runIdentifier := "test"
+	namedRun, _ := NewRun(&runIdentifier, nil, nil, nil)
+	require.Equal(t, "test", namedRun.Name())
 }

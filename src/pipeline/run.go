@@ -72,14 +72,15 @@ type Run struct {
 
 	// after closing, the run will keep executing for a while
 	// when everything has been processed, the run will complete
-	completed           bool
-	completionWaitGroup *sync.WaitGroup
+	completed bool
 	// WaitGroup will block as long as the run is still in progress
 	//
 	// It will only unblock when the shell command has completed and all additional tasks have completed
 	// For example, a middleware might use the WaitGroup to ensure that the run's Log is still available
 	// to be written to even after possible shell command completion
 	WaitGroup *sync.WaitGroup
+
+	StartWaitGroup *sync.WaitGroup
 
 	cancelled   bool
 	cancelHooks []func() error
@@ -115,11 +116,12 @@ func NewRun(
 
 		Parent: parent,
 
-		closeMutex:          &sync.Mutex{},
-		closed:              false,
-		completed:           false,
-		completionWaitGroup: &sync.WaitGroup{},
-		WaitGroup:           &sync.WaitGroup{},
+		closeMutex: &sync.Mutex{},
+		closed:     false,
+		completed:  false,
+		WaitGroup:  &sync.WaitGroup{},
+
+		StartWaitGroup: &sync.WaitGroup{},
 
 		cancelled:   false,
 		cancelHooks: make([]func() error, 0, 10),
@@ -204,6 +206,14 @@ func (run *Run) Wait() {
 // Completed indicates whether the run has finished executing, logging etc.
 func (run *Run) Completed() bool {
 	return run.completed
+}
+
+// Name returns the run's identifier or "anonymous", if the identifier is nil
+func (run *Run) Name() string {
+	if run.Identifier == nil {
+		return "anonymous"
+	}
+	return *run.Identifier
 }
 
 // String returns a string description of the run suitable for logging
