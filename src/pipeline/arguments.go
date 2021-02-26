@@ -91,19 +91,16 @@ func ParseArgumentsIncludingParents(
 func CollectReferences(references []Reference) ([]*string, []map[string]interface{}, []string) {
 	childIdentifiers := make([]*string, 0, len(references))
 	childArguments := make([]map[string]interface{}, 0, len(references))
+	info := make([]string, 0, len(references))
 	for _, childReference := range references {
 		for pipelineIdentifier, pipelineArguments := range childReference {
 			childIdentifiers = append(childIdentifiers, pipelineIdentifier)
 			childArguments = append(childArguments, stringmap.CopyMap(pipelineArguments))
-		}
-	}
-
-	info := make([]string, 0, len(childIdentifiers))
-	for _, childIdentifier := range childIdentifiers {
-		if childIdentifier == nil {
-			info = append(info, "anonymous")
-		} else {
-			info = append(info, *childIdentifier)
+			if pipelineIdentifier == nil {
+				info = append(info, "anonymous")
+			} else {
+				info = append(info, *pipelineIdentifier)
+			}
 		}
 	}
 	return childIdentifiers, childArguments, info
