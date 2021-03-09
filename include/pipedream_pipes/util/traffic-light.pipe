@@ -22,18 +22,21 @@ public:
 private:
   util::traffic-light::command-not-found:
     interpolate:
-      quote: false
+      quote: none
     when: "'@!!' =~ 'command not found'"
     pipe:
-      - print::message:
+      - util::traffic-light::fallback::red:
           description: "Show red traffic light"
           when: "@{redMatch|false} || (!@{amberMatch|false} && @{greenMismatch|false})"
-          message: "[✘] @{message}\n"
-      - print::message:
+          output:
+            text: "[✘] @{message}\n"
+      - util::traffic-light::fallback::amber:
           description: "Show amber traffic light"
           when: "!@{redMatch|false} && @{amberMatch|false}"
-          message: "[-] @{message}\n"
-      - print::message:
+          output:
+            text: "[-] @{message}\n"
+      - util::traffic-light::fallback::green:
           description: "Show green traffic light"
           when: "!@{redMatch|false} && !@{amberMatch|false} && !@{greenMismatch|false}"
-          message: "[✔] @{message}\n"
+          output:
+            text: "[✔] @{message}\n"
