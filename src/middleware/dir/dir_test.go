@@ -32,7 +32,7 @@ func TestDir_ChangeDir(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, "working-dir", currentDir)
@@ -60,7 +60,7 @@ func TestDir_DontChangeDir(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, "working-dir", currentDir)
@@ -90,7 +90,7 @@ func TestDir_ErrorChangingDir(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, "pre-test", currentDir)

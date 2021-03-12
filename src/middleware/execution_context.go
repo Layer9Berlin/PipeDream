@@ -162,10 +162,10 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 		}
 	}
 	pipelineRun.Log.Debug(
-		fields.Message("starting"),
+		fields.Message("setup"),
 		fields.Info(pipelineRun.String()),
-		fields.Symbol("▶️"),
-		fields.Color("green"),
+		fields.Symbol("🛠️"),
+		fields.Color("lightgray"),
 	)
 	if runOptions.parentRun == nil && executionContext.rootRun == nil {
 		executionContext.rootRun = pipelineRun
@@ -213,7 +213,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 			)
 		}
 	})
-	pipelineRun.Close()
+	pipelineRun.Start()
 	return pipelineRun
 }
 
@@ -274,7 +274,7 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 	executionContext.SetUpCancelHandler(stdoutWriter, stderrWriter, nil)
 
 	fullRun := executionContext.FullRun(WithIdentifier(&pipelineIdentifier))
-	fullRun.Close()
+	fullRun.Start()
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(1)
 	go func() {

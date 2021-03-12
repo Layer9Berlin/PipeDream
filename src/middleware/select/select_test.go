@@ -62,7 +62,7 @@ func TestSelect_Apply(t *testing.T) {
 		func(run *pipeline.Run) {},
 		executionContext,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -114,7 +114,7 @@ func TestSelect_StdinAndStdout(t *testing.T) {
 					childRun.Stdout.MergeWith(childRun.Stdin.Copy())
 					go func() {
 						childRun.Wait()
-						runStdOut.Close()
+						_ = runStdOut.Close()
 					}()
 				}
 			},
@@ -132,7 +132,7 @@ func TestSelect_StdinAndStdout(t *testing.T) {
 		output, _ = ioutil.ReadAll(runStdoutReader)
 		waitGroup.Done()
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 

@@ -41,7 +41,7 @@ func TestCatch_Error(t *testing.T) {
 			require.Equal(t, "test-handler", *errorRun.Identifier)
 			errorRun.Stdout.Replace(strings.NewReader("handled"))
 		})))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -79,7 +79,7 @@ func TestCatch_MultipleLinesOfErrorOutput(t *testing.T) {
 			require.Equal(t, "test-handler", *errorRun.Identifier)
 			errorRun.Stdout.Replace(strings.NewReader("handled"))
 		})))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -104,7 +104,7 @@ func TestCatch_HandlerNotInvoked(t *testing.T) {
 			require.Nil(t, stdoutIntercept.Close())
 		}()
 	}, nil)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -126,7 +126,7 @@ func TestCatch_WithoutHandler(t *testing.T) {
 			require.Nil(t, stdoutIntercept.Close())
 		}()
 	}, nil)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -167,7 +167,7 @@ func TestCatch_HandlerThrowingError(t *testing.T) {
 			errorRun.Stdout.Replace(strings.NewReader("not properly handled"))
 			errorRun.Stderr.Replace(strings.NewReader("handler error"))
 		})))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())

@@ -44,7 +44,7 @@ func TestTimer_WithValidArguments_RecordsExecutionTime(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -71,7 +71,7 @@ func TestTimer_WithInvalidArguments_ThrowsError(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -95,7 +95,7 @@ func TestTimer_NoArguments_DeactivateTimer(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -115,7 +115,7 @@ func TestDefaultTimeProvider(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())

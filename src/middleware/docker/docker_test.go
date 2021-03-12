@@ -23,7 +23,7 @@ func TestDocker_RunInDockerContainer(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -47,7 +47,7 @@ func TestDocker_MalformedArgument(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -75,7 +75,7 @@ func TestDocker_InheritArgument(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	childRun.Close()
+	childRun.Start()
 	childRun.Wait()
 
 	require.Equal(t, 0, childRun.Log.ErrorCount())
@@ -98,7 +98,7 @@ func TestDocker_NonRunnable(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	childRun.Close()
+	childRun.Start()
 	childRun.Wait()
 
 	require.Equal(t, 0, childRun.Log.ErrorCount())

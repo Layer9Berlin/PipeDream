@@ -57,7 +57,7 @@ func TestEach_Apply(t *testing.T) {
 					childRun.Stdout.Replace(strings.NewReader(fmt.Sprintf("output of pipeline `%v`\n", identifier)))
 				}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -87,7 +87,7 @@ func TestEach_ApplyWithInvalidArguments(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -108,7 +108,7 @@ func TestEach_Inactive(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())

@@ -25,13 +25,9 @@ func TestSequence_Apply(t *testing.T) {
 		middleware.WithExecutionFunction(
 			func(childRun *pipeline.Run) {
 				childRun.Stdout.Replace(strings.NewReader("ok\n"))
-				// use WriteCloser to ensure the parent will wait for the final child's completion
-				childRun.DontCompleteBefore(func() {
-					childRun.StartWaitGroup.Wait()
-					executionSequence = append(executionSequence, "start "+childRun.Name())
-					time.Sleep(100 * time.Millisecond)
-					executionSequence = append(executionSequence, "stop "+childRun.Name())
-				})
+				executionSequence = append(executionSequence, "start "+childRun.Name())
+				time.Sleep(100 * time.Millisecond)
+				executionSequence = append(executionSequence, "stop "+childRun.Name())
 			},
 		))
 	NewMiddleware().Apply(
@@ -39,7 +35,7 @@ func TestSequence_Apply(t *testing.T) {
 		func(childRun *pipeline.Run) {},
 		executionContext,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())

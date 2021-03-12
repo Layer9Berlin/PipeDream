@@ -49,7 +49,7 @@ func TestInherit_ArgumentsFromParent(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	childRun.Close()
+	childRun.Start()
 	childRun.Wait()
 
 	require.Equal(t, map[string]interface{}{
@@ -103,7 +103,7 @@ func TestInherit_WithoutParent(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	orphanRun.Close()
+	orphanRun.Start()
 	orphanRun.Wait()
 
 	require.Equal(t, map[string]interface{}{
@@ -120,7 +120,7 @@ func TestInherit_WithoutParent(t *testing.T) {
 	}, orphanRun.ArgumentsCopy())
 	require.Equal(t, 0, orphanRun.Log.ErrorCount())
 	require.Equal(t, fmt.Sprint(
-		aurora.Gray(18, fmt.Sprint("⏏️ closing | ", aurora.Bold("Orphan"))),
+		aurora.Green(fmt.Sprint("▶️ starting | ", aurora.Bold("Orphan"))),
 		"\n",
 		aurora.Green(fmt.Sprint("✔ completed | ", aurora.Bold("Orphan"))),
 		"\n",
@@ -143,12 +143,12 @@ func TestInherit_NoValue(t *testing.T) {
 		func(invocation *pipeline.Run) {},
 		nil,
 	)
-	childRun.Close()
+	childRun.Start()
 	childRun.Wait()
 
 	require.Equal(t, 0, childRun.Log.ErrorCount())
 	require.Equal(t, fmt.Sprint(
-		aurora.Gray(18, fmt.Sprint("  ⏏️ closing | ", aurora.Bold("Child"))),
+		aurora.Green(fmt.Sprint("  ▶️ starting | ", aurora.Bold("Child"))),
 		"\n",
 		aurora.Green(fmt.Sprint("  ✔ completed | ", aurora.Bold("Child"))),
 		"\n",

@@ -44,7 +44,7 @@ func TestWith_Pattern(t *testing.T) {
 			}),
 		))
 	waitGroup.Wait()
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -63,7 +63,7 @@ func TestWith_NoPattern(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -86,7 +86,7 @@ func TestWith_NoMatch(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -108,7 +108,7 @@ func TestWith_PatternDoesNotCompile(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())

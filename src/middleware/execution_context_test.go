@@ -23,11 +23,19 @@ func TestExecutionContext_CancelAll(t *testing.T) {
 	executionContext := NewExecutionContext()
 	run1, _ := pipeline.NewRun(nil, nil, nil, nil)
 	run2, _ := pipeline.NewRun(nil, nil, nil, nil)
-	executionContext.runs = []*pipeline.Run{run1, run2}
+	run3, _ := pipeline.NewRun(nil, nil, nil, nil)
+	run1.DontCompleteBefore(func() {
+		time.Sleep(1 * time.Second)
+	})
+	run1.Start()
+	run2.Start()
+	executionContext.runs = []*pipeline.Run{run1, run2, run3}
 	err := executionContext.CancelAll()
-	require.Nil(t, err)
+	require.NotNil(t, err)
+	require.Contains(t, err.Error(), "cancelling a run that has not yet started")
 	require.True(t, executionContext.runs[0].Cancelled())
 	require.True(t, executionContext.runs[1].Cancelled())
+	require.True(t, executionContext.runs[2].Cancelled())
 }
 
 func TestExecutionContext_FullRun_WithoutOptions(t *testing.T) {
@@ -144,7 +152,7 @@ func TestExecutionContext_FullRun_WithLogWriter(t *testing.T) {
 		logData, _ := ioutil.ReadAll(logReader)
 		log = string(logData)
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -474,7 +482,7 @@ func TestExecutionContext_CancelError(t *testing.T) {
 	stdoutWriter.Wait()
 	stderrWriter.Wait()
 	require.Equal(t, "\nExecution cancelled...\n", stdoutWriter.String())
-	require.Equal(t, "Failed to cancel: 1 error occurred:\n\t* test error\n\n\n", stderrWriter.String())
+	require.Equal(t, "Failed to cancel: 2 errors occurred:\n\t* cancelling a run that has not yet started\n\t* test error\n\n\n", stderrWriter.String())
 }
 
 func TestExecutionContext_CollectErrors(t *testing.T) {

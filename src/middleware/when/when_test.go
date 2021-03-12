@@ -21,7 +21,7 @@ func TestWhen_TrueCondition(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -39,7 +39,7 @@ func TestWhen_FalseCondition(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -57,7 +57,7 @@ func TestWhen_UnparseableCondition(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -74,7 +74,7 @@ func TestWhen_WithoutCondition(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -101,7 +101,7 @@ func TestWhen_else_withStringReference(t *testing.T) {
 			}),
 		),
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -134,7 +134,7 @@ func TestWhen_else_withMapReference(t *testing.T) {
 			}),
 		),
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())

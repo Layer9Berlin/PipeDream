@@ -14,7 +14,7 @@ func TestPipelineRun_AppendToStdout(t *testing.T) {
 	require.Nil(t, setupErr)
 
 	run.Stdout.MergeWith(strings.NewReader("this is a test"))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, "this is a test", run.Stdout.String())
@@ -98,7 +98,7 @@ func TestPipelineRun_Lengths(t *testing.T) {
 	run, _ := NewRun(nil, nil, nil, nil)
 	run.Stdin.MergeWith(strings.NewReader("test"))
 	run.Stdout.MergeWith(strings.NewReader("another test"))
-	run.Close()
+	run.Start()
 	run.Wait()
 	require.Equal(t, 4, run.Stdin.Len())
 	require.Equal(t, 12, run.Stdout.Len())
@@ -132,7 +132,7 @@ func TestPipelineRun_WaitForCompletion(t *testing.T) {
 		_, _ = appender.Write([]byte("test"))
 		_ = appender.Close()
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 	require.Equal(t, "test", run.Stderr.String())
 }
@@ -145,7 +145,7 @@ func TestPipelineRun_String(t *testing.T) {
 	run.Stderr.MergeWith(strings.NewReader("test err"))
 	run.Log.Error(fmt.Errorf("test error"))
 	run.Log.Warn(fields.Message("test warning"))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, fmt.Sprint(
@@ -168,7 +168,7 @@ func TestPipelineRun_String_WithDescription(t *testing.T) {
 	run.Stderr.MergeWith(strings.NewReader("test err"))
 	run.Log.Error(fmt.Errorf("test error"))
 	run.Log.Warn(fields.Message("test warning"))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, fmt.Sprint(
@@ -214,9 +214,9 @@ func TestPipelineRun_Close(t *testing.T) {
 	require.False(t, run.Completed())
 
 	// closing several times is allowed
-	run.Close()
-	run.Close()
-	run.Close()
+	run.Start()
+	run.Start()
+	run.Start()
 
 	run.Wait()
 
@@ -262,11 +262,11 @@ func TestPipelineRun_Cancel(t *testing.T) {
 func TestPipelineRun_GraphLabel(t *testing.T) {
 	runIdentifier := "test"
 	run, _ := NewRun(&runIdentifier, nil, nil, nil)
-	run.waitGroup.Add(1)
+	run.executionWaitGroup.Add(1)
 	require.Equal(t, "🔜 Test", run.GraphLabel())
-	run.Close()
+	run.Start()
 	require.Equal(t, "↺ Test", run.GraphLabel())
-	run.waitGroup.Done()
+	run.executionWaitGroup.Done()
 	run.Wait()
 	require.Equal(t, "✔ Test", run.GraphLabel())
 	_ = run.Cancel()
@@ -278,11 +278,11 @@ func TestPipelineRun_GraphLabel(t *testing.T) {
 func TestPipelineRun_GraphGroup(t *testing.T) {
 	runIdentifier := "test"
 	run, _ := NewRun(&runIdentifier, nil, nil, nil)
-	run.waitGroup.Add(1)
+	run.executionWaitGroup.Add(1)
 	require.Equal(t, "waiting", run.GraphGroup())
-	run.Close()
+	run.Start()
 	require.Equal(t, "active", run.GraphGroup())
-	run.waitGroup.Done()
+	run.executionWaitGroup.Done()
 	run.Wait()
 	require.Equal(t, "success", run.GraphGroup())
 	_ = run.Cancel()

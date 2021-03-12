@@ -52,7 +52,7 @@ func TestInterpolate_ArgumentSubstitution(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -106,7 +106,7 @@ func TestInterpolate_SingleSubstitution(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -147,7 +147,7 @@ func TestInterpolate_InputAndArgumentSubstitution(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -183,7 +183,7 @@ func TestInterpolate_Disabled(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -240,7 +240,7 @@ func TestInterpolate_InputReadError(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -267,7 +267,7 @@ func TestInterpolate_ValueMissing(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -304,7 +304,7 @@ func TestInterpolate_ValueNotSubstitutable(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -347,7 +347,7 @@ func TestInterpolate_SubstitutionPlusError(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -386,7 +386,7 @@ func TestInterpolate_EscapeAllQuotes(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -422,7 +422,7 @@ func TestInterpolate_EscapeSingleQuotes(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -458,7 +458,7 @@ func TestInterpolate_EscapeDoubleQuotes(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -498,7 +498,7 @@ func TestInterpolate_Nesting(t *testing.T) {
 				runArguments = childRun.ArgumentsCopy()
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -568,7 +568,7 @@ func TestInterpolate_QuotingCombinations(t *testing.T) {
 					runArguments = childRun.ArgumentsCopy()
 				}),
 			))
-		run.Close()
+		run.Start()
 		run.Wait()
 		waitGroup.Wait()
 
@@ -628,7 +628,7 @@ func TestInterpolate_PreventInfiniteRecursion_withPipesInterpolation(t *testing.
 		},
 		executionContext,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -667,7 +667,7 @@ func TestInterpolate_PreventInfiniteRecursion_withoutPipesInterpolation(t *testi
 		},
 		executionContext,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -718,7 +718,7 @@ func TestInterpolate_InvalidPipesInterpolation(t *testing.T) {
 		},
 		executionContext,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 

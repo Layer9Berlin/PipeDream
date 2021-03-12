@@ -87,18 +87,16 @@ func (stream *ComposableDataStream) Close() {
 	// we don't expect any more inputs
 	go func() {
 		// close the writer asynchronously, so that the reader knows we're done
-		stream.mutex.Lock()
-		defer stream.mutex.Unlock()
 		_ = stream.inputWriter.Close()
 	}()
 	go func() {
-		defer stream.completionWaitGroup.Done()
-		_, _ = io.Copy(stream.result, stream.outputReader)
-		stream.mutex.Lock()
-		defer stream.mutex.Unlock()
-		stream.completed = true
 		// the counter is initialized to 1,
 		// so that the stream does not complete before it has been closed
+		defer stream.completionWaitGroup.Done()
+		stream.mutex.Lock()
+		defer stream.mutex.Unlock()
+		_, _ = io.Copy(stream.result, stream.outputReader)
+		stream.completed = true
 	}()
 }
 

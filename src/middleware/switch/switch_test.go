@@ -32,7 +32,7 @@ func TestSwitch_Apply(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -66,7 +66,7 @@ func TestSwitch_Apply_matchSecondPattern(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -100,7 +100,7 @@ func TestSwitch_Apply_matchDefault(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -130,7 +130,7 @@ func TestSwitch_Apply_missingText(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())

@@ -48,7 +48,7 @@ func TestEnv_InterpolateShallow(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.NotNil(t, calledRun)
@@ -112,7 +112,7 @@ func TestEnv_InterpolateDeep(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.NotNil(t, calledRun)
@@ -179,7 +179,7 @@ func TestEnv_NoSubstitutions(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.NotNil(t, calledRun)
@@ -246,7 +246,7 @@ func TestEnv_InterpolateNone(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.NotNil(t, calledRun)
@@ -302,7 +302,7 @@ func TestEnv_Save(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.NotNil(t, calledRun)

@@ -23,7 +23,7 @@ func TestOutput_Apply(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -56,7 +56,7 @@ func TestOutput_Process_stringReference(t *testing.T) {
 				run.Stdout.Replace(strings.NewReader("processor output"))
 			})),
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 

@@ -59,7 +59,7 @@ func TestPipe_Apply(t *testing.T) {
 				}
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 	waitGroup.Wait()
 
@@ -82,7 +82,7 @@ func TestPipe_InvalidArguments(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -100,7 +100,7 @@ func TestPipe_NotInvoked(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -128,7 +128,7 @@ func TestPipe_InvalidReference(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -159,7 +159,7 @@ func TestPipe_AnonymousReference(t *testing.T) {
 				fullRunCalled = true
 			}),
 		))
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.True(t, fullRunCalled)

@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -125,21 +126,28 @@ func (shellMiddleware Middleware) Apply(
 			// and show all output in the console
 			stdinIntercept = run.Stdin.Intercept()
 			multiWriter := io.MultiWriter(cmdStdin, stdinIntercept)
+			multiWriterMutex := &sync.Mutex{}
 			go func() {
 				for {
+					multiWriterMutex.Lock()
 					_, err = io.Copy(multiWriter, stdinIntercept)
 					if err != nil {
+						multiWriterMutex.Unlock()
 						break
 					}
+					multiWriterMutex.Unlock()
 					time.Sleep(200)
 				}
 			}()
 			go func() {
 				for {
+					multiWriterMutex.Lock()
 					_, err = io.Copy(multiWriter, shellMiddleware.osStdin)
 					if err != nil {
+						multiWriterMutex.Unlock()
 						break
 					}
+					multiWriterMutex.Unlock()
 					time.Sleep(200)
 				}
 			}()
@@ -167,11 +175,6 @@ func (shellMiddleware Middleware) Apply(
 			fields.Middleware(shellMiddleware),
 		)
 
-		go func() {
-			run.StartWaitGroup.Wait()
-			run.Log.PossibleError(executor.Start())
-		}()
-
 		run.AddCancelHook(func() error {
 			run.Log.Warn(
 				fields.Symbol("⎋"),
@@ -189,6 +192,8 @@ func (shellMiddleware Middleware) Apply(
 		}
 
 		run.DontCompleteBefore(func() {
+			run.Log.PossibleError(executor.Start())
+
 			if !run.IndefiniteInput {
 				run.Stdin.Wait()
 			}

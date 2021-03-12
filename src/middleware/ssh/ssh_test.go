@@ -23,7 +23,7 @@ func TestRunningViaSsh(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -50,7 +50,7 @@ func TestNestedPipelines(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	childRun.Close()
+	childRun.Start()
 	childRun.Wait()
 
 	require.Equal(t, 0, childRun.Log.ErrorCount())
@@ -74,7 +74,7 @@ func TestMissingHostArgument(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -96,7 +96,7 @@ func TestNilArgument(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 0, run.Log.ErrorCount())
@@ -122,7 +122,7 @@ func TestMalformedArgument(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())

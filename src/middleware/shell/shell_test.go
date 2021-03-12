@@ -30,7 +30,7 @@ func TestShell_NonRunnable(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	testWaitGroup.Wait()
 
@@ -61,7 +61,7 @@ func TestShell_ChangeDir(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	testWaitGroup.Wait()
 
@@ -122,7 +122,7 @@ func TestShell_RunWithArguments(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	testWaitGroup.Wait()
 
@@ -154,7 +154,7 @@ func TestShell_InvalidArguments(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -184,7 +184,7 @@ func TestShell_Login(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	testWaitGroup.Wait()
 
@@ -216,7 +216,7 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	testWaitGroup.Wait()
 
@@ -239,8 +239,6 @@ func TestShell_Interactive_userInput(t *testing.T) {
 	nextExecuted := false
 	run.Log.SetLevel(logrus.DebugLevel)
 	executor := NewTestCommandExecutor()
-	// need to do this before Wait() is called in Start()
-	executor.WaitGroup.Add(1)
 
 	osStdin := customio.NewSynchronizedBuffer()
 	osStdout := customio.NewSynchronizedBuffer()
@@ -270,6 +268,7 @@ func TestShell_Interactive_userInput(t *testing.T) {
 		_, err := io.WriteString(osStdin, "y\n")
 		require.Nil(t, err)
 	}()
+	executor.WaitGroup.Add(1)
 	go func() {
 		defer executor.WaitGroup.Done()
 		// simulate shell command consuming its input
@@ -280,9 +279,10 @@ func TestShell_Interactive_userInput(t *testing.T) {
 			// now pretend the command has finished
 			// it will indicate this through closing CmdStdin()
 			_ = executor.CmdStdin().Close()
+			break
 		}
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.True(t, nextExecuted)
@@ -337,7 +337,7 @@ func TestShell_Interactive_userInputError(t *testing.T) {
 		defer executor.WaitGroup.Done()
 		_ = executor.CmdStdin().Close()
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.True(t, nextExecuted)
@@ -401,7 +401,7 @@ func TestShell_Interactive_pipeInput(t *testing.T) {
 			_ = executor.CmdStdin().Close()
 		}
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.True(t, nextExecuted)
@@ -457,7 +457,7 @@ func TestShell_Interactive_pipeInputError(t *testing.T) {
 		defer executor.WaitGroup.Done()
 		_ = executor.CmdStdin().Close()
 	}()
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.True(t, nextExecuted)
@@ -494,7 +494,7 @@ func TestShell_WaitError(t *testing.T) {
 		func(nextRun *pipeline.Run) {},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, 1, run.Log.ErrorCount())
@@ -520,7 +520,7 @@ func TestShell_UnmockedCommand(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 	testWaitGroup.Wait()
 
@@ -530,7 +530,7 @@ func TestShell_UnmockedCommand(t *testing.T) {
 	require.Equal(t, "Test\n", run.Stdout.String())
 }
 
-func TestShell_CancelHook(t *testing.T) {
+func TestShell_Cancel(t *testing.T) {
 	run, _ := pipeline.NewRun(nil, map[string]interface{}{
 		"shell": map[string]interface{}{
 			"run": "read",
@@ -543,13 +543,11 @@ func TestShell_CancelHook(t *testing.T) {
 		func(run *pipeline.Run) {},
 		nil,
 	)
+	run.Start()
 	err := run.Cancel()
 	require.Nil(t, err)
-	run.Close()
 	run.Wait()
 
-	require.Equal(t, 1, run.Log.ErrorCount())
-	require.Contains(t, run.Log.LastError().Error(), "command exited with non-zero exit code")
 	require.Contains(t, run.Log.String(), "shell")
 }
 
@@ -573,7 +571,7 @@ func TestShell_PrintfRun(t *testing.T) {
 		},
 		nil,
 	)
-	run.Close()
+	run.Start()
 	run.Wait()
 
 	require.Equal(t, "test", run.Stdout.String())
@@ -603,9 +601,9 @@ func (executor *TestCommandExecutor) Init(name string, arg ...string) {
 
 func (executor *TestCommandExecutor) Start() error {
 	go func() {
+		executor.WaitGroup.Wait()
 		executor.Mutex.RLock()
 		defer executor.Mutex.RUnlock()
-		executor.WaitGroup.Wait()
 		_ = executor.StdinWriteCloser.Close()
 		_ = executor.StdoutWriteCloser.Close()
 		_ = executor.StderrWriteCloser.Close()

@@ -119,6 +119,17 @@ func (logger *Logger) Summary() string {
 	return strings.Join(components, "  ")
 }
 
+func (logger *Logger) summary() string {
+	components := make([]string, 0, 2)
+	if logger.logCountWarning > 0 {
+		components = append(components, fmt.Sprint(aurora.Yellow(fmt.Sprint("⚠️", logger.logCountWarning))))
+	}
+	if logger.logCountError > 0 {
+		components = append(components, fmt.Sprint(aurora.Red(fmt.Sprint("🛑", logger.logCountError))))
+	}
+	return strings.Join(components, "  ")
+}
+
 // SetLevel sets the logger's log level
 func (logger *Logger) SetLevel(level logrus.Level) {
 	logger.logMutex.Lock()

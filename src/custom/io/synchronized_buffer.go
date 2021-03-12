@@ -17,26 +17,26 @@ func NewSynchronizedBuffer() *SynchronizedBuffer {
 	}
 }
 
-func (buffer *SynchronizedBuffer) Read(p []byte) (int, error) {
-	buffer.mutex.RLock()
-	defer buffer.mutex.RUnlock()
-	return buffer.Read(p)
+func (syncBuffer *SynchronizedBuffer) Read(p []byte) (int, error) {
+	syncBuffer.mutex.RLock()
+	defer syncBuffer.mutex.RUnlock()
+	return syncBuffer.buffer.Read(p)
 }
 
-func (buffer *SynchronizedBuffer) Write(p []byte) (int, error) {
-	buffer.mutex.Lock()
-	defer buffer.mutex.Unlock()
-	return buffer.Write(p)
+func (syncBuffer *SynchronizedBuffer) Write(p []byte) (int, error) {
+	syncBuffer.mutex.Lock()
+	defer syncBuffer.mutex.Unlock()
+	return syncBuffer.buffer.Write(p)
 }
 
-func (buffer *SynchronizedBuffer) String() string {
-	buffer.mutex.RLock()
-	defer buffer.mutex.RUnlock()
-	return buffer.String()
+func (syncBuffer *SynchronizedBuffer) String() string {
+	syncBuffer.mutex.RLock()
+	defer syncBuffer.mutex.RUnlock()
+	return syncBuffer.buffer.String()
 }
 
-func (buffer *SynchronizedBuffer) Bytes() []byte {
-	buffer.mutex.RLock()
-	defer buffer.mutex.RUnlock()
-	return buffer.Bytes()
+func (syncBuffer *SynchronizedBuffer) Bytes() []byte {
+	syncBuffer.mutex.RLock()
+	defer syncBuffer.mutex.RUnlock()
+	return syncBuffer.buffer.Bytes()
 }

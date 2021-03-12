@@ -62,11 +62,9 @@ func (sequenceMiddleware Middleware) Apply(
 							fields.Info(previousRun.Name()),
 							fields.Middleware(sequenceMiddleware),
 						)
-						childRun.StartWaitGroup.Add(1)
-						go func() {
+						childRun.DontCompleteBefore(func() {
 							childPredecessor.Wait()
-							childRun.StartWaitGroup.Done()
-						}()
+						})
 					}
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
