@@ -188,9 +188,7 @@ func (shellMiddleware Middleware) Apply(
 			}()
 		}
 
-		run.WaitGroup.Add(1)
-		go func() {
-			defer run.WaitGroup.Done()
+		run.DontCompleteBefore(func() {
 			if !run.IndefiniteInput {
 				run.Stdin.Wait()
 			}
@@ -215,7 +213,7 @@ func (shellMiddleware Middleware) Apply(
 				err = stdinIntercept.Close()
 				run.Log.PossibleError(err)
 			}
-		}()
+		})
 	}
 }
 

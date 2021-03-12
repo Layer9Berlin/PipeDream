@@ -3,6 +3,8 @@ version: 0.0.1
 
 pipelines:
   packman::apt:
+    interpolate:
+      quote: none
     steps:
       - ~:
           when: "'@{subcommand}' =~ 'update|upgrade'"

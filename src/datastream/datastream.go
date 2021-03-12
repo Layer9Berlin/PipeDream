@@ -18,6 +18,8 @@ type ComposableDataStream struct {
 	Name         string
 	outputReader io.Reader
 
+	mutex *sync.RWMutex
+
 	completed           bool
 	completionMutex     *sync.Mutex
 	completionWaitGroup *sync.WaitGroup
@@ -42,6 +44,8 @@ func NewComposableDataStream(name string, errorHandler func(error)) *ComposableD
 		Name:         name,
 		outputReader: reader,
 
+		mutex: &sync.RWMutex{},
+
 		completed:           false,
 		completionMutex:     &sync.Mutex{},
 		completionWaitGroup: completionWaitGroup,
@@ -61,6 +65,7 @@ func NewClosedComposableDataStreamFromBuffer(buffer *bytes.Buffer) *ComposableDa
 		finalizationMutex:   &sync.Mutex{},
 		closed:              true,
 		result:              buffer,
+		mutex:               &sync.RWMutex{},
 	}
 }
 
@@ -72,6 +77,8 @@ func NewClosedComposableDataStreamFromBuffer(buffer *bytes.Buffer) *ComposableDa
 func (stream *ComposableDataStream) Close() {
 	stream.finalizationMutex.Lock()
 	defer stream.finalizationMutex.Unlock()
+	stream.mutex.Lock()
+	defer stream.mutex.Unlock()
 	if stream.closed {
 		return
 	}
@@ -80,11 +87,15 @@ func (stream *ComposableDataStream) Close() {
 	// we don't expect any more inputs
 	go func() {
 		// close the writer asynchronously, so that the reader knows we're done
+		stream.mutex.Lock()
+		defer stream.mutex.Unlock()
 		_ = stream.inputWriter.Close()
 	}()
 	go func() {
 		defer stream.completionWaitGroup.Done()
 		_, _ = io.Copy(stream.result, stream.outputReader)
+		stream.mutex.Lock()
+		defer stream.mutex.Unlock()
 		stream.completed = true
 		// the counter is initialized to 1,
 		// so that the stream does not complete before it has been closed
@@ -93,6 +104,8 @@ func (stream *ComposableDataStream) Close() {
 
 // Closed indicates whether the data stream has been closed
 func (stream *ComposableDataStream) Closed() bool {
+	stream.mutex.RLock()
+	defer stream.mutex.RUnlock()
 	return stream.closed
 }
 
@@ -103,6 +116,8 @@ func (stream *ComposableDataStream) Wait() {
 
 // Completed indicates whether the data stream has completed
 func (stream *ComposableDataStream) Completed() bool {
+	stream.mutex.RLock()
+	defer stream.mutex.RUnlock()
 	return stream.completed
 }
 
@@ -110,6 +125,8 @@ func (stream *ComposableDataStream) Completed() bool {
 //
 // If you call String before the data stream has completed, the result is undefined.
 func (stream *ComposableDataStream) String() string {
+	stream.mutex.RLock()
+	defer stream.mutex.RUnlock()
 	return stream.result.String()
 }
 
@@ -117,6 +134,8 @@ func (stream *ComposableDataStream) String() string {
 //
 // If you call Bytes before the data stream has completed, the result is undefined.
 func (stream *ComposableDataStream) Bytes() []byte {
+	stream.mutex.RLock()
+	defer stream.mutex.RUnlock()
 	return stream.result.Bytes()
 }
 
@@ -124,5 +143,7 @@ func (stream *ComposableDataStream) Bytes() []byte {
 //
 // If you call Len before the data stream has completed, the result is undefined.
 func (stream *ComposableDataStream) Len() int {
+	stream.mutex.RLock()
+	defer stream.mutex.RUnlock()
 	return stream.result.Len()
 }

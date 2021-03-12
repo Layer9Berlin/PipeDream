@@ -15,6 +15,7 @@ type PipedWriteCloser struct {
 	result    []byte
 	waitGroup *sync.WaitGroup
 	writer    io.WriteCloser
+	mutex     *sync.RWMutex
 }
 
 // NewPipedWriteCloser creates a new PipedWriteCloser
@@ -27,6 +28,7 @@ func NewPipedWriteCloser() *PipedWriteCloser {
 	waitGroup := &sync.WaitGroup{}
 	waitGroup.Add(1)
 	writeCloser := PipedWriteCloser{
+		mutex:     &sync.RWMutex{},
 		reader:    reader,
 		waitGroup: waitGroup,
 		writer:    writer,
@@ -40,11 +42,15 @@ func NewPipedWriteCloser() *PipedWriteCloser {
 
 // Writer is the interface that wraps the basic Write method.
 func (writeCloser *PipedWriteCloser) Write(p []byte) (int, error) {
+	writeCloser.mutex.Lock()
+	defer writeCloser.mutex.Unlock()
 	return writeCloser.writer.Write(p)
 }
 
 // Closer is the interface that wraps the basic Close method.
 func (writeCloser *PipedWriteCloser) Close() error {
+	writeCloser.mutex.Lock()
+	defer writeCloser.mutex.Unlock()
 	return writeCloser.writer.Close()
 }
 
@@ -57,6 +63,8 @@ func (writeCloser *PipedWriteCloser) Wait() {
 //
 // If called before Wait(), the result is undefined
 func (writeCloser *PipedWriteCloser) Bytes() []byte {
+	writeCloser.mutex.RLock()
+	defer writeCloser.mutex.RUnlock()
 	return writeCloser.result
 }
 
@@ -64,5 +72,7 @@ func (writeCloser *PipedWriteCloser) Bytes() []byte {
 //
 // If called before Wait(), the result is undefined
 func (writeCloser *PipedWriteCloser) String() string {
+	writeCloser.mutex.RLock()
+	defer writeCloser.mutex.RUnlock()
 	return string(writeCloser.result)
 }

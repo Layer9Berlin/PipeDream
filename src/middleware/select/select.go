@@ -134,8 +134,7 @@ func (selectMiddleware Middleware) Apply(
 						fields.DataStream(selectMiddleware, "copy child stderr into parent stderr")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrWriter)
-					executionContext.Connections = append(executionContext.Connections,
-						pipeline.NewDataConnection(run, childRun, "select"))
+					executionContext.AddConnection(run, childRun, "select")
 					go func() {
 						childRun.Wait()
 						_ = stdoutWriter.Close()

@@ -23,6 +23,7 @@ import (
 // - be nestable in the sense that the output of another logger can be slotted in
 // - preserve the order of log entries, including those slotted in
 type Logger struct {
+	logMutex   *sync.RWMutex
 	logEntries *list.List
 
 	baseLogger  *logrus.Logger
@@ -62,6 +63,7 @@ func NewLogger(run *Run, indentation int) *Logger {
 		errors:      nil,
 
 		logEntries:      list.New(),
+		logMutex:        &sync.RWMutex{},
 		logCountTrace:   numTraceLogs,
 		logCountDebug:   numDebugLogs,
 		logCountInfo:    numInfoLogs,
@@ -78,16 +80,18 @@ func NewLogger(run *Run, indentation int) *Logger {
 // NewClosedLoggerWithResult creates a new Logger that is already closed with the specified result
 func NewClosedLoggerWithResult(buffer *bytes.Buffer) *Logger {
 	return &Logger{
-		closed:       true,
-		logEntries:   list.New(),
+		closed:     true,
+		logEntries: list.New(),
+		logMutex:   &sync.RWMutex{},
+
 		unreadBuffer: buffer.Bytes(),
 	}
 }
 
 // Close finalizes the log, preventing further entries from being logged
 func (logger *Logger) Close() {
-	defer logger.closureMutex.Unlock()
-	logger.closureMutex.Lock()
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	if logger.closed {
 		return
 	}
@@ -96,11 +100,15 @@ func (logger *Logger) Close() {
 
 // Closed indicates whether the run has been closed
 func (logger *Logger) Closed() bool {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.closed
 }
 
 // Summary returns a human-readable short description of the logged warnings and errors
 func (logger *Logger) Summary() string {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	components := make([]string, 0, 2)
 	if logger.logCountWarning > 0 {
 		components = append(components, fmt.Sprint(aurora.Yellow(fmt.Sprint("⚠️", logger.logCountWarning))))
@@ -113,16 +121,22 @@ func (logger *Logger) Summary() string {
 
 // SetLevel sets the logger's log level
 func (logger *Logger) SetLevel(level logrus.Level) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.baseLogger.SetLevel(level)
 }
 
 // Level indicates the log level
 func (logger *Logger) Level() logrus.Level {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.baseLogger.Level
 }
 
 // AddReaderEntry adds an entry that will write the entire contents of the provided reader before proceeding to the next entry
 func (logger *Logger) AddReaderEntry(reader io.Reader) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logEntry := fields.EntryWithFields(
 		fields.Indentation(logger.Indentation+2),
 		fields.WithReader(reader),
@@ -158,6 +172,8 @@ func (logger *Logger) PossibleErrorWithExplanation(err error, explanation string
 
 // StderrOutput adds an appropriate entry for non-trivial stderr output to the logs
 func (logger *Logger) StderrOutput(message string, logFields ...fields.LogEntryField) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.logCountError++
 	logger.errors = multierror.Append(logger.errors, fmt.Errorf("stderr: %v", message))
 	logEntry := logrus.WithFields(logrus.Fields{
@@ -174,6 +190,8 @@ func (logger *Logger) StderrOutput(message string, logFields ...fields.LogEntryF
 
 // Error adds an appropriate entry for an encountered error
 func (logger *Logger) Error(err error, logFields ...fields.LogEntryField) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.logCountError++
 	logger.errors = multierror.Append(logger.errors, err)
 	logEntry := logrus.WithFields(logrus.Fields{
@@ -197,6 +215,8 @@ func (logger *Logger) Error(err error, logFields ...fields.LogEntryField) {
 
 // Warn adds an appropriate entry for an encountered warning
 func (logger *Logger) Warn(logFields ...fields.LogEntryField) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.logCountWarning++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
@@ -206,6 +226,8 @@ func (logger *Logger) Warn(logFields ...fields.LogEntryField) {
 
 // Info adds an appropriate entry for non-critical information
 func (logger *Logger) Info(logFields ...fields.LogEntryField) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.logCountInfo++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
@@ -215,6 +237,8 @@ func (logger *Logger) Info(logFields ...fields.LogEntryField) {
 
 // Debug adds an appropriate entry for a debug message
 func (logger *Logger) Debug(logFields ...fields.LogEntryField) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.logCountDebug++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
@@ -224,6 +248,8 @@ func (logger *Logger) Debug(logFields ...fields.LogEntryField) {
 
 // Trace adds an appropriate entry for a trace message
 func (logger *Logger) Trace(logFields ...fields.LogEntryField) {
+	logger.logMutex.Lock()
+	defer logger.logMutex.Unlock()
 	logger.logCountTrace++
 	logFields = append(logFields, fields.Run(logger.run))
 	entry := fields.EntryWithFields(logFields...)
@@ -233,26 +259,36 @@ func (logger *Logger) Trace(logFields ...fields.LogEntryField) {
 
 // TraceCount is the total number of trace logs encountered
 func (logger *Logger) TraceCount() int {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.logCountTrace
 }
 
 // DebugCount is the total number of debug logs encountered
 func (logger *Logger) DebugCount() int {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.logCountDebug
 }
 
 // InfoCount is the total number of info logs encountered
 func (logger *Logger) InfoCount() int {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.logCountInfo
 }
 
 // WarnCount is the total number of warning logs encountered
 func (logger *Logger) WarnCount() int {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.logCountWarning
 }
 
 // ErrorCount is the total number of error logs encountered
 func (logger *Logger) ErrorCount() int {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	return logger.logCountError
 }
 
@@ -267,6 +303,8 @@ func (logger *Logger) String() string {
 
 // LastError returns the most recent error level log entry
 func (logger *Logger) LastError() error {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	if logger.errors == nil || logger.errors.Len() == 0 {
 		return nil
 	}
@@ -275,6 +313,8 @@ func (logger *Logger) LastError() error {
 
 // AllErrorMessages returns all errors logged up to this point
 func (logger *Logger) AllErrorMessages() []string {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	result := make([]string, 0, logger.errors.Len())
 	for _, err := range logger.errors.WrappedErrors() {
 		result = append(result, err.Error())
@@ -286,21 +326,29 @@ func (logger *Logger) AllErrorMessages() []string {
 //
 // io.EOF indicates that the log is closed and all log entries have been read.
 func (logger *Logger) Read(p []byte) (int, error) {
+	logger.logMutex.RLock()
+	defer logger.logMutex.RUnlock()
 	if logger.unreadBuffer != nil && len(logger.unreadBuffer) > 0 {
 		return logger.readFromUnreadBuffer(p)
 	}
-	firstItem := logger.logEntries.Front()
-	if firstItem != nil {
-		if logEntry, ok := firstItem.Value.(*logrus.Entry); ok {
+	firstLogEntry := logger.logEntries.Front()
+	if firstLogEntry != nil {
+		if logEntry, ok := firstLogEntry.Value.(*logrus.Entry); ok {
 			readerDataEntry := logEntry.Data["reader"]
 			if readerDataEntry != nil {
-				return logger.readFromNestedReader(p, readerDataEntry)
+				n, err := logger.readFromNestedReader(p, readerDataEntry)
+				if err == io.EOF {
+					logger.logEntries.Remove(firstLogEntry)
+					return n, nil
+				}
+				return n, err
 			}
+			logger.logEntries.Remove(firstLogEntry)
 			return logger.readFromLogEntry(p, logEntry)
 		}
-		panic(fmt.Sprintf("unknown log entry type: %T", firstItem.Value))
+		panic(fmt.Sprintf("unknown log entry type: %T", firstLogEntry.Value))
 	}
-	if logger.Closed() {
+	if logger.closed {
 		return 0, io.EOF
 	}
 	return 0, nil
@@ -319,12 +367,7 @@ func (logger *Logger) readFromUnreadBuffer(p []byte) (int, error) {
 
 func (logger *Logger) readFromNestedReader(p []byte, readerDataEntry interface{}) (int, error) {
 	if reader, ok := readerDataEntry.(io.Reader); ok {
-		n, err := reader.Read(p)
-		if err == io.EOF {
-			logger.logEntries.Remove(logger.logEntries.Front())
-			err = nil
-		}
-		return n, err
+		return reader.Read(p)
 	}
 
 	return 0, fmt.Errorf("invalid type for `reader` data field")
@@ -332,8 +375,7 @@ func (logger *Logger) readFromNestedReader(p []byte, readerDataEntry interface{}
 
 func (logger *Logger) readFromLogEntry(p []byte, logEntry *logrus.Entry) (int, error) {
 	// discard entries whose log level is above (i.e. of lower severity) than the logger's level
-	if logEntry.Level > logger.Level() {
-		logger.logEntries.Remove(logger.logEntries.Front())
+	if logEntry.Level > logger.baseLogger.Level {
 		return 0, nil
 	}
 	logEntry.Logger = logger.baseLogger
@@ -349,6 +391,5 @@ func (logger *Logger) readFromLogEntry(p []byte, logEntry *logrus.Entry) (int, e
 		result, logger.unreadBuffer = result[:len(p)], result[len(p):]
 	}
 	copy(p, result)
-	logger.logEntries.Remove(logger.logEntries.Front())
 	return len(result), nil
 }

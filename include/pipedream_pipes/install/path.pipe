@@ -7,7 +7,7 @@ public:
       - install::path::determine-install-dir::print-dir:
           # TODO: do we need other options here?
           shell:
-            run: "printf \"$GOPATH/bin\""
+            run: "print \"$GOPATH/bin\""
       # don't need any output
       - noop
 

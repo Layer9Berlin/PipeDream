@@ -116,8 +116,7 @@ func (whenMiddleware Middleware) Apply(
 						fields.DataStream(whenMiddleware, "merging child stderr into parent stderr")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrAppender)
-					executionContext.Connections = append(executionContext.Connections,
-						pipeline.NewDataConnection(run, childRun, "else"))
+					executionContext.AddConnection(run, childRun, "else")
 					go func() {
 						childRun.Wait()
 						// need to clean up by closing the writers we created

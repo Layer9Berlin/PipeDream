@@ -4,4 +4,4 @@ version: 0.0.1
 public:
   exec::abort:
     shell:
-      run: "printf \"@{message|''}\" && exit 1"
+      run: "print \"@{message|''}\" && exit 1"

@@ -50,10 +50,13 @@ type ExecutionContext struct {
 
 	rootRun *pipeline.Run
 
-	Runs        []*pipeline.Run
-	Connections []*pipeline.DataConnection
+	runs             []*pipeline.Run
+	runsMutex        *sync.RWMutex
+	connections      []*pipeline.DataConnection
+	connectionsMutex *sync.RWMutex
 
-	errors *multierror.Error
+	errors      *multierror.Error
+	errorsMutex *sync.RWMutex
 
 	interruptChannel chan os.Signal
 
@@ -79,8 +82,11 @@ type ExecutionContext struct {
 // NewExecutionContext creates a new ExecutionContext with the specified options
 func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 	executionContext := &ExecutionContext{
-		parser:                   parsing.NewParser(),
+		connectionsMutex:         &sync.RWMutex{},
+		errorsMutex:              &sync.RWMutex{},
 		Log:                      logrus.New(),
+		parser:                   parsing.NewParser(),
+		runsMutex:                &sync.RWMutex{},
 		UserPromptImplementation: defaultUserPrompt,
 	}
 	executionContext.executionFunction = func(run *pipeline.Run) {
@@ -95,7 +101,7 @@ func NewExecutionContext(options ...ExecutionContextOption) *ExecutionContext {
 // CancelAll cancels all active runs
 func (executionContext *ExecutionContext) CancelAll() error {
 	err := &multierror.Error{}
-	for _, run := range executionContext.Runs {
+	for _, run := range executionContext.Runs() {
 		err = multierror.Append(err, run.Cancel())
 	}
 	return err.ErrorOrNil()
@@ -118,6 +124,8 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 		panic(fmt.Errorf("failed to create pipeline run: %w", err))
 	}
 	pipelineRun.Log.ErrorCallback = func(err error) {
+		executionContext.errorsMutex.Lock()
+		defer executionContext.errorsMutex.Unlock()
 		executionContext.errors = multierror.Append(executionContext.errors, err)
 	}
 	if runOptions.logWriter == nil {
@@ -162,7 +170,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 	if runOptions.parentRun == nil && executionContext.rootRun == nil {
 		executionContext.rootRun = pipelineRun
 	}
-	executionContext.Runs = append(executionContext.Runs, pipelineRun)
+	executionContext.addRun(pipelineRun)
 	if runOptions.preCallback != nil {
 		runOptions.preCallback(pipelineRun)
 	}
@@ -173,19 +181,15 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 	// copy the stderr output after all other middleware has processed it
 	stderrCopy := pipelineRun.Stderr.Copy()
 	// don't close the run's log until we are done writing to it
-	pipelineRun.WaitGroup.Add(1)
-	go func() {
-		defer pipelineRun.WaitGroup.Done()
+	pipelineRun.DontCompleteBefore(func() {
 		// read the entire remaining stderr
 		stderr, _ := ioutil.ReadAll(stderrCopy)
 		// if there is any output, log it!
 		if len(stderr) > 0 {
 			pipelineRun.Log.StderrOutput(string(stderr))
 		}
-	}()
-	pipelineRun.WaitGroup.Add(1)
-	go func() {
-		defer pipelineRun.WaitGroup.Done()
+	})
+	pipelineRun.DontCompleteBefore(func() {
 		pipelineRun.Stdin.Wait()
 		stdin := pipelineRun.Stdin.String()
 		if len(stdin) > 0 {
@@ -196,10 +200,8 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 				fields.Color("gray"),
 			)
 		}
-	}()
-	pipelineRun.WaitGroup.Add(1)
-	go func() {
-		defer pipelineRun.WaitGroup.Done()
+	})
+	pipelineRun.DontCompleteBefore(func() {
 		pipelineRun.Stdout.Wait()
 		stdout := pipelineRun.Stdout.String()
 		if len(stdout) > 0 {
@@ -210,7 +212,7 @@ func (executionContext *ExecutionContext) FullRun(options ...FullRunOption) *pip
 				fields.Color("gray"),
 			)
 		}
-	}()
+	})
 	pipelineRun.Close()
 	return pipelineRun
 }
@@ -283,6 +285,8 @@ func (executionContext *ExecutionContext) Execute(pipelineIdentifier string, std
 
 	waitGroup.Wait()
 	outputResult(fullRun, stdoutWriter)
+	executionContext.errorsMutex.Lock()
+	defer executionContext.errorsMutex.Unlock()
 	outputErrors(executionContext.errors, stderrWriter)
 }
 
@@ -368,7 +372,7 @@ func (executionContext *ExecutionContext) SetUpCancelHandler(stdoutWriter io.Wri
 // WaitForRun blocks until a run with the specified identifier is found and completes
 func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipeline.Run {
 	for {
-		for _, run := range executionContext.Runs {
+		for _, run := range executionContext.Runs() {
 			if run != nil && run.Identifier != nil && *run.Identifier == identifier {
 				run.Wait()
 				return run
@@ -380,11 +384,36 @@ func (executionContext *ExecutionContext) WaitForRun(identifier string) *pipelin
 
 // UserRuns lists all runs of pipes that are not built-in
 func (executionContext *ExecutionContext) UserRuns() []*pipeline.Run {
-	result := make([]*pipeline.Run, 0, len(executionContext.Runs))
-	for _, run := range executionContext.Runs {
+	runs := executionContext.Runs()
+	result := make([]*pipeline.Run, 0, len(runs))
+	for _, run := range runs {
 		if run.Definition == nil || !run.Definition.BuiltIn {
 			result = append(result, run)
 		}
 	}
 	return result
+}
+
+func (executionContext *ExecutionContext) AddConnection(sourceRun *pipeline.Run, targetRun *pipeline.Run, label string) {
+	executionContext.connectionsMutex.Lock()
+	defer executionContext.connectionsMutex.Unlock()
+	executionContext.connections = append(executionContext.connections, pipeline.NewDataConnection(sourceRun, targetRun, label))
+}
+
+func (executionContext *ExecutionContext) Connections() []*pipeline.DataConnection {
+	executionContext.connectionsMutex.RLock()
+	defer executionContext.connectionsMutex.RUnlock()
+	return executionContext.connections
+}
+
+func (executionContext *ExecutionContext) addRun(run *pipeline.Run) {
+	executionContext.runsMutex.Lock()
+	defer executionContext.runsMutex.Unlock()
+	executionContext.runs = append(executionContext.runs, run)
+}
+
+func (executionContext *ExecutionContext) Runs() []*pipeline.Run {
+	executionContext.runsMutex.RLock()
+	defer executionContext.runsMutex.RUnlock()
+	return executionContext.runs
 }

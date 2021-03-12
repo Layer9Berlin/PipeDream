@@ -125,8 +125,7 @@ func (interpolateMiddleware Middleware) Apply(
 					for _, runIdentifier := range arguments.Pipes {
 						runToWaitFor := executionContext.WaitForRun(runIdentifier)
 						previousRunResults = append(previousRunResults, runToWaitFor.Stdout.Bytes())
-						executionContext.Connections = append(executionContext.Connections,
-							pipeline.NewDataConnection(runToWaitFor, run, "interpolate"))
+						executionContext.AddConnection(runToWaitFor, run, "interpolate")
 					}
 				}
 				// and for the input data to be set
@@ -165,6 +164,7 @@ func (interpolateMiddleware Middleware) Apply(
 						childRun.Stdin.MergeWith(bytes.NewReader(inputData))
 					}),
 					middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
+						executionContext.AddConnection(run, childRun, "interpolate")
 						childRun.Log.Trace(
 							fields.DataStream(interpolateMiddleware, "merging child stdout into parent stdout")...,
 						)
@@ -173,8 +173,6 @@ func (interpolateMiddleware Middleware) Apply(
 							fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr")...,
 						)
 						childRun.Stderr.StartCopyingInto(stderrAppender)
-						executionContext.Connections = append(executionContext.Connections,
-							pipeline.NewDataConnection(run, childRun, "interpolate"))
 						go func() {
 							childRun.Wait()
 							// need to clean up by closing the writers we created
@@ -221,8 +219,7 @@ func (interpolateMiddleware Middleware) Apply(
 						fields.DataStream(interpolateMiddleware, "merging child stderr into parent stderr writer")...,
 					)
 					childRun.Stderr.StartCopyingInto(stderrAppender)
-					executionContext.Connections = append(executionContext.Connections,
-						pipeline.NewDataConnection(run, childRun, "interpolate"))
+					executionContext.AddConnection(run, childRun, "interpolate")
 					go func() {
 						childRun.Wait()
 						// need to clean up by closing the writers we created

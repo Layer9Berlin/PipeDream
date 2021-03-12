@@ -106,8 +106,7 @@ func (withMiddleware Middleware) Apply(
 							fields.Middleware(withMiddleware),
 						)
 						matchRun.Stderr.StartCopyingInto(stderrAppender)
-						executionContext.Connections = append(executionContext.Connections,
-							pipeline.NewDataConnection(run, matchRun, "with"))
+						executionContext.AddConnection(run, matchRun, "with")
 						go func() {
 							defer waitGroup.Done()
 							matchRun.Wait()

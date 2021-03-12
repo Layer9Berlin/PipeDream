@@ -73,6 +73,7 @@ func (eachMiddleware Middleware) Apply(
 						fields.DataStream(eachMiddleware, "copy parent stdin into child stdin")...,
 					)
 					childRun.Stdin.MergeWith(run.Stdin.Copy())
+					executionContext.AddConnection(run, childRun, "each")
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
 					run.Log.Trace(
@@ -83,8 +84,6 @@ func (eachMiddleware Middleware) Apply(
 						fields.DataStream(eachMiddleware, "copy child stderr into parent stderr")...,
 					)
 					run.Stderr.MergeWith(childRun.Stderr.Copy())
-					executionContext.Connections = append(executionContext.Connections,
-						pipeline.NewDataConnection(run, childRun, "each"))
 				}))
 		}
 	}

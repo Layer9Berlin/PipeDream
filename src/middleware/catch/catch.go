@@ -81,8 +81,7 @@ func (catchMiddleware Middleware) Apply(
 							fields.DataStream(catchMiddleware, "replacing parent stderr with child stderr")...,
 						)
 						errorRun.Stderr.StartCopyingInto(stderrIntercept)
-						executionContext.Connections = append(executionContext.Connections,
-							pipeline.NewDataConnection(run, errorRun, "catch"))
+						executionContext.AddConnection(run, errorRun, "catch")
 						go func() {
 							errorRun.Wait()
 							// need to clean up by closing the writers we created

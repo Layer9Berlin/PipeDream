@@ -20,6 +20,7 @@ func TestWith_Pattern(t *testing.T) {
 
 	waitGroup := &sync.WaitGroup{}
 	allInputs := make([]string, 0, 3)
+	allInputsMutex := &sync.Mutex{}
 	run.Log.SetLevel(logrus.DebugLevel)
 	NewMiddleware().Apply(
 		run,
@@ -34,6 +35,8 @@ func TestWith_Pattern(t *testing.T) {
 					defer waitGroup.Done()
 					completeInput, err := ioutil.ReadAll(stdinCopier)
 					require.Nil(t, err)
+					allInputsMutex.Lock()
+					defer allInputsMutex.Unlock()
 					allInputs = append(allInputs, string(completeInput))
 				}()
 				childRun.Stdout.Replace(strings.NewReader("child output"))

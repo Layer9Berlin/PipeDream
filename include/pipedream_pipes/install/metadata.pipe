@@ -34,28 +34,31 @@ public:
       - noop
 
   install::metadata::installed::collect:
-    pipe:
-      - install::metadata::pipedream::version:
-          shell:
-            run: "pipedream version"
-          catch: install::metadata::command-not-found-handler
-      - install::metadata::semver-compare::version:
-          shell:
-            run: "semver-compare version"
-          catch: install::metadata::command-not-found-handler
-      - install::metadata::traffic-light::version:
-          shell:
-            run: "traffic-light version"
-          catch: install::metadata::command-not-found-handler
-      - install::metadata::extract:
-          each:
+    each:
+      - install::metadata::installed::collect::pipedream:
+          pipe:
+            - install::metadata::pipedream::version:
+                shell:
+                  run: "pipedream version"
+                catch: install::metadata::command-not-found-handler
             - install::metadata::extract-installed:
                 binary: pipedream
-            - install::metadata::extract-installed:
-                binary: semver-compare
+      - install::metadata::installed::collect::traffic-light:
+          pipe:
+            - install::metadata::traffic-light::version:
+                shell:
+                  run: "traffic-light version"
+                catch: install::metadata::command-not-found-handler
             - install::metadata::extract-installed:
                 binary: traffic-light
-      - noop
+      - install::metadata::installed::collect::semver-compare:
+          pipe:
+            - install::metadata::semver-compare::version:
+                shell:
+                  run: "semver-compare version"
+                catch: install::metadata::command-not-found-handler
+            - install::metadata::extract-installed:
+                binary: semver-compare
 
 private:
   install::metadata::extract-installed:
@@ -92,3 +95,4 @@ private:
             run: "sed 's/^.*@{key}: //'"
           output:
             process: strings::remove-new-lines
+      - noop

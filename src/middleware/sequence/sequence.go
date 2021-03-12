@@ -79,11 +79,9 @@ func (sequenceMiddleware Middleware) Apply(
 					)
 					childRun.Stderr.StartCopyingInto(stderrWriter)
 					if previousRun != nil {
-						executionContext.Connections = append(executionContext.Connections,
-							pipeline.NewDataConnection(previousRun, childRun, "next"))
+						executionContext.AddConnection(previousRun, childRun, "next")
 					} else {
-						executionContext.Connections = append(executionContext.Connections,
-							pipeline.NewDataConnection(run, childRun, "sequence"))
+						executionContext.AddConnection(run, childRun, "sequence")
 					}
 				}))
 			previousRun = childRun

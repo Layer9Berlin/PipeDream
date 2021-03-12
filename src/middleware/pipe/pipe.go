@@ -83,11 +83,10 @@ func (pipeMiddleware Middleware) Apply(
 					}
 				}),
 				middleware.WithTearDownFunc(func(childRun *pipeline.Run) {
+					executionContext.AddConnection(previousRun, childRun, "pipe")
 					childRun.Log.Trace(
 						fields.DataStream(pipeMiddleware, "copying stdout")...,
 					)
-					executionContext.Connections = append(executionContext.Connections,
-						pipeline.NewDataConnection(previousRun, childRun, "pipe"))
 					// write to the next run's input
 					// or the parent's output, if this is the last child
 					previousOutput = childRun.Stdout.Copy()

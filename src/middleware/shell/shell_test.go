@@ -239,9 +239,12 @@ func TestShell_Interactive_userInput(t *testing.T) {
 	nextExecuted := false
 	run.Log.SetLevel(logrus.DebugLevel)
 	executor := NewTestCommandExecutor()
-	osStdin := new(bytes.Buffer)
-	osStdout := new(bytes.Buffer)
-	osStderr := new(bytes.Buffer)
+	// need to do this before Wait() is called in Start()
+	executor.WaitGroup.Add(1)
+
+	osStdin := customio.NewSynchronizedBuffer()
+	osStdout := customio.NewSynchronizedBuffer()
+	osStderr := customio.NewSynchronizedBuffer()
 	shellMiddleware := Middleware{
 		osStdin:         osStdin,
 		osStdout:        osStdout,
@@ -267,7 +270,6 @@ func TestShell_Interactive_userInput(t *testing.T) {
 		_, err := io.WriteString(osStdin, "y\n")
 		require.Nil(t, err)
 	}()
-	executor.WaitGroup.Add(1)
 	go func() {
 		defer executor.WaitGroup.Done()
 		// simulate shell command consuming its input
@@ -589,15 +591,20 @@ type TestCommandExecutor struct {
 	WaitGroup         *sync.WaitGroup
 	WaitError         error
 	KillError         error
+	Mutex             *sync.RWMutex
 }
 
 func (executor *TestCommandExecutor) Init(name string, arg ...string) {
+	executor.Mutex.Lock()
+	defer executor.Mutex.Unlock()
 	executor.StartCommand = name
 	executor.StartArgs = arg
 }
 
 func (executor *TestCommandExecutor) Start() error {
 	go func() {
+		executor.Mutex.RLock()
+		defer executor.Mutex.RUnlock()
 		executor.WaitGroup.Wait()
 		_ = executor.StdinWriteCloser.Close()
 		_ = executor.StdoutWriteCloser.Close()
@@ -607,27 +614,39 @@ func (executor *TestCommandExecutor) Start() error {
 }
 
 func (executor *TestCommandExecutor) CmdStdin() io.WriteCloser {
+	executor.Mutex.RLock()
+	defer executor.Mutex.RUnlock()
 	return executor.StdinWriteCloser
 }
 
 func (executor *TestCommandExecutor) CmdStdout() io.Reader {
+	executor.Mutex.RLock()
+	defer executor.Mutex.RUnlock()
 	return executor.StdoutReader
 }
 
 func (executor *TestCommandExecutor) CmdStderr() io.Reader {
+	executor.Mutex.RLock()
+	defer executor.Mutex.RUnlock()
 	return executor.StderrReader
 }
 
 func (executor *TestCommandExecutor) Wait() error {
+	executor.Mutex.Lock()
+	defer executor.Mutex.Unlock()
 	executor.WaitGroup.Wait()
 	return executor.WaitError
 }
 
 func (executor *TestCommandExecutor) Kill() error {
+	executor.Mutex.RLock()
+	defer executor.Mutex.RUnlock()
 	return executor.KillError
 }
 
 func (executor *TestCommandExecutor) String() string {
+	executor.Mutex.RLock()
+	defer executor.Mutex.RUnlock()
 	return fmt.Sprintf("%v %v", executor.StartCommand, executor.StartArgs)
 }
 
@@ -646,6 +665,7 @@ func NewTestCommandExecutor() *TestCommandExecutor {
 		StderrReader:      bufio.NewReader(stderrReader),
 		StderrWriteCloser: stderrWriter,
 		WaitGroup:         &sync.WaitGroup{},
+		Mutex:             &sync.RWMutex{},
 	}
 }
 

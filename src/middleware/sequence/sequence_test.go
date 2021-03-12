@@ -26,14 +26,12 @@ func TestSequence_Apply(t *testing.T) {
 			func(childRun *pipeline.Run) {
 				childRun.Stdout.Replace(strings.NewReader("ok\n"))
 				// use WriteCloser to ensure the parent will wait for the final child's completion
-				childRun.WaitGroup.Add(1)
-				go func() {
+				childRun.DontCompleteBefore(func() {
 					childRun.StartWaitGroup.Wait()
 					executionSequence = append(executionSequence, "start "+childRun.Name())
 					time.Sleep(100 * time.Millisecond)
 					executionSequence = append(executionSequence, "stop "+childRun.Name())
-					childRun.WaitGroup.Done()
-				}()
+				})
 			},
 		))
 	NewMiddleware().Apply(

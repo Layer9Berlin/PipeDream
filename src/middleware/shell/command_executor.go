@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"sync"
 )
 
 type commandExecutor interface {
@@ -23,21 +24,27 @@ type defaultCommandExecutor struct {
 	command *exec.Cmd
 	env     []string
 	stopped bool
+	mutex   *sync.RWMutex
 }
 
 func newDefaultCommandExecutor() *defaultCommandExecutor {
 	return &defaultCommandExecutor{
 		env:     os.Environ(),
 		stopped: false,
+		mutex:   &sync.RWMutex{},
 	}
 }
 
 func (executor *defaultCommandExecutor) Init(name string, arg ...string) {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	executor.command = exec.Command(name, arg...)
 	executor.command.Env = executor.env
 }
 
 func (executor *defaultCommandExecutor) Start() error {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil {
 		return fmt.Errorf("cannot start cleared command")
 	}
@@ -45,6 +52,8 @@ func (executor *defaultCommandExecutor) Start() error {
 }
 
 func (executor *defaultCommandExecutor) CmdStdin() io.WriteCloser {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil {
 		return nil
 	}
@@ -53,6 +62,8 @@ func (executor *defaultCommandExecutor) CmdStdin() io.WriteCloser {
 }
 
 func (executor *defaultCommandExecutor) CmdStdout() io.Reader {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil {
 		return nil
 	}
@@ -61,6 +72,8 @@ func (executor *defaultCommandExecutor) CmdStdout() io.Reader {
 }
 
 func (executor *defaultCommandExecutor) CmdStderr() io.Reader {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil {
 		return nil
 	}
@@ -69,6 +82,8 @@ func (executor *defaultCommandExecutor) CmdStderr() io.Reader {
 }
 
 func (executor *defaultCommandExecutor) Wait() error {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil {
 		return fmt.Errorf("cannot wait for cleared command")
 	}
@@ -76,6 +91,8 @@ func (executor *defaultCommandExecutor) Wait() error {
 }
 
 func (executor *defaultCommandExecutor) Kill() error {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil || executor.command.Process == nil {
 		return nil
 	}
@@ -85,10 +102,14 @@ func (executor *defaultCommandExecutor) Kill() error {
 }
 
 func (executor *defaultCommandExecutor) Clear() {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	executor.command = nil
 }
 
 func (executor *defaultCommandExecutor) String() string {
+	executor.mutex.Lock()
+	defer executor.mutex.Unlock()
 	if executor.command == nil {
 		return ""
 	}

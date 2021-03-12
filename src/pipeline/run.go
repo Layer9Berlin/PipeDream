@@ -16,15 +16,18 @@ import (
 // Run contains everything needed to actually execute the invocation of a pipe
 //
 // The middleware operates on these objects, triggering further runs or shell invocations
-// there are three steps to this process:
+// there are multiple steps to this process:
 // 	1. Setup
 //		In the setup phase the arguments, connections between inputs and outputs, etc. of each run are defined.
-//	2. Finalization
+//	2. Closing
 //		After the setup, Close() is called to prevent any further changes to input/output connections.
 //  3. Execution
 //		The shell command is executed and data is piped through the defined input/output connections. Note that some
 //		middleware might start additional runs in the execution phase. For example, the `when` middleware for
 //		conditional execution will trigger runs based on whether the result of previous runs satisfies a certain condition
+//  4. Completion
+//  5. Log
+
 type Run struct {
 	// arguments are a mix of definition arguments, invocation arguments and changes made by middleware
 	arguments map[string]interface{}
@@ -67,18 +70,22 @@ type Run struct {
 	// a run can must be closed exactly once
 	// this will close all the data streams
 	// and wait for the run to complete
-	closeMutex *sync.Mutex
-	closed     bool
+	closed bool
 
 	// after closing, the run will keep executing for a while
 	// when everything has been processed, the run will complete
-	completed bool
+	completed           bool
+	completionWaitGroup *sync.WaitGroup
+
 	// WaitGroup will block as long as the run is still in progress
 	//
 	// It will only unblock when the shell command has completed and all additional tasks have completed
 	// For example, a middleware might use the WaitGroup to ensure that the run's Log is still available
 	// to be written to even after possible shell command completion
-	WaitGroup *sync.WaitGroup
+	waitGroup           *sync.WaitGroup
+	processingWaitGroup *sync.WaitGroup
+
+	mutex *sync.RWMutex
 
 	StartWaitGroup *sync.WaitGroup
 
@@ -116,12 +123,15 @@ func NewRun(
 
 		Parent: parent,
 
-		closeMutex: &sync.Mutex{},
-		closed:     false,
-		completed:  false,
-		WaitGroup:  &sync.WaitGroup{},
+		closed:              false,
+		completed:           false,
+		completionWaitGroup: &sync.WaitGroup{},
+		waitGroup:           &sync.WaitGroup{},
+		processingWaitGroup: &sync.WaitGroup{},
 
 		StartWaitGroup: &sync.WaitGroup{},
+
+		mutex: &sync.RWMutex{},
 
 		cancelled:   false,
 		cancelHooks: make([]func() error, 0, 10),
@@ -133,6 +143,9 @@ func NewRun(
 		run.Log = NewLogger(run, parent.Log.Indentation+2)
 		run.Log.SetLevel(parent.Log.Level())
 	}
+
+	run.completionWaitGroup.Add(1)
+	run.processingWaitGroup.Add(1)
 
 	errorCallback := run.Log.PossibleError
 
@@ -147,43 +160,51 @@ func NewRun(
 //
 // It is fine to call Close multiple times. After the first, subsequent calls will have no effect.
 func (run *Run) Close() {
-	run.closeMutex.Lock()
-	defer run.closeMutex.Unlock()
+	run.mutex.Lock()
 	if run.closed {
+		run.mutex.Unlock()
 		return
 	}
 	run.closed = true
+	run.mutex.Unlock()
+	defer run.processingWaitGroup.Done()
 
 	run.Log.Trace(
 		fields.Message("closing | "+run.String()),
 		fields.Symbol("⏏️"),
 		fields.Color("lightgray"),
 	)
+
 	run.Stdin.Close()
 	run.Stdout.Close()
 	run.Stderr.Close()
 
-	run.WaitGroup.Add(1)
+	run.waitGroup.Add(1)
 	go func() {
-		defer run.WaitGroup.Done()
-
 		run.Stdout.Wait()
 		run.Stderr.Wait()
 		if !run.IndefiniteInput {
 			run.Stdin.Wait()
 		}
 
-		run.completed = true
-
 		run.Log.Info(
 			fields.Symbol("✔"),
 			fields.Message("completed | "+run.String()),
 			fields.Color("green"),
 		)
+
+		run.waitGroup.Done()
 	}()
 
 	go func() {
-		run.WaitGroup.Wait()
+		run.waitGroup.Wait()
+
+		run.mutex.Lock()
+		run.completed = true
+		run.mutex.Unlock()
+
+		run.completionWaitGroup.Done()
+
 		// the log needed to be kept open
 		// while new entries might be coming in
 		// now that all the data has been processed,
@@ -194,22 +215,27 @@ func (run *Run) Close() {
 
 // Wait halts execution until the run has completed
 func (run *Run) Wait() {
+	run.processingWaitGroup.Wait()
 	run.Stdout.Wait()
 	run.Stderr.Wait()
 	if !run.IndefiniteInput {
 		run.Stdin.Wait()
 	}
-	// ensure that run.Completed() returns true after the call to run.Wait()
-	run.WaitGroup.Wait()
+	run.waitGroup.Wait()
+	run.completionWaitGroup.Wait()
 }
 
 // Completed indicates whether the run has finished executing, logging etc.
 func (run *Run) Completed() bool {
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	return run.completed
 }
 
 // Name returns the run's identifier or "anonymous", if the identifier is nil
 func (run *Run) Name() string {
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	if run.Identifier == nil {
 		return "anonymous"
 	}
@@ -222,6 +248,9 @@ func (run *Run) Name() string {
 func (run *Run) String() string {
 	components := make([]string, 0, 10)
 	name := run.DisplayString()
+	logSummary := run.Log.Summary()
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	components = append(components, fmt.Sprint(aurora.Bold(customstrings.Shorten(name, 128))))
 	if run.completed {
 		if run.Stdin.Len() > 0 {
@@ -233,7 +262,6 @@ func (run *Run) String() string {
 		if run.Stderr.Len() > 0 {
 			components = append(components, fmt.Sprint(aurora.Red(fmt.Sprint("⛔️", customstrings.PrettyPrintedByteCount(run.Stderr.Len())))))
 		}
-		logSummary := run.Log.Summary()
 		if len(logSummary) > 0 {
 			components = append(components, logSummary)
 		}
@@ -242,22 +270,27 @@ func (run *Run) String() string {
 }
 
 func (run *Run) GraphLabel() string {
+	displayString := run.DisplayString()
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	if run.Log != nil && run.Log.errors != nil && run.Log.errors.Len() > 0 {
-		return fmt.Sprintf("✘ %v", run.DisplayString())
+		return fmt.Sprintf("✘ %v", displayString)
 	}
 	if run.cancelled {
-		return fmt.Sprintf("⎋ %v", run.DisplayString())
+		return fmt.Sprintf("⎋ %v", displayString)
 	}
 	if run.completed {
-		return fmt.Sprintf("✔ %v", run.DisplayString())
+		return fmt.Sprintf("✔ %v", displayString)
 	}
 	if run.closed {
-		return fmt.Sprintf("↺ %v", run.DisplayString())
+		return fmt.Sprintf("↺ %v", displayString)
 	}
-	return fmt.Sprintf("🔜 %v", run.DisplayString())
+	return fmt.Sprintf("🔜 %v", displayString)
 }
 
 func (run *Run) GraphGroup() string {
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	if run.Log != nil && run.Log.errors != nil && run.Log.errors.Len() > 0 {
 		return "error"
 	}
@@ -274,6 +307,8 @@ func (run *Run) GraphGroup() string {
 }
 
 func (run *Run) DisplayString() string {
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	var name *string = nil
 	nameArg, err := run.ArgumentAtPath("description")
 	if err == nil && nameArg != nil {
@@ -356,11 +391,15 @@ func (run *Run) RemoveArgumentAtPath(path ...string) error {
 //
 // Use this to implement cancel functionality in middleware.
 func (run *Run) AddCancelHook(cancelHook func() error) {
+	run.mutex.Lock()
+	defer run.mutex.Unlock()
 	run.cancelHooks = append(run.cancelHooks, cancelHook)
 }
 
 // Cancel cancels the run without waiting for execution to complete
 func (run *Run) Cancel() error {
+	run.mutex.Lock()
+	defer run.mutex.Unlock()
 	run.cancelled = true
 	var err = &multierror.Error{}
 	for _, cancelHook := range run.cancelHooks {
@@ -371,5 +410,23 @@ func (run *Run) Cancel() error {
 
 // Cancelled indicates whether the run has been cancelled
 func (run *Run) Cancelled() bool {
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
 	return run.cancelled
+}
+
+func (run *Run) DontCompleteBefore(executionFunction func()) {
+	run.mutex.RLock()
+	defer run.mutex.RUnlock()
+	if run.closed {
+		panic("trying to register a completion waiter on a run that has already been closed")
+	}
+
+	run.waitGroup.Add(1)
+	go func() {
+		defer func() {
+			run.waitGroup.Done()
+		}()
+		executionFunction()
+	}()
 }

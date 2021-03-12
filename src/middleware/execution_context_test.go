@@ -21,11 +21,13 @@ import (
 
 func TestExecutionContext_CancelAll(t *testing.T) {
 	executionContext := NewExecutionContext()
-	executionContext.Runs = []*pipeline.Run{{}, {}}
+	run1, _ := pipeline.NewRun(nil, nil, nil, nil)
+	run2, _ := pipeline.NewRun(nil, nil, nil, nil)
+	executionContext.runs = []*pipeline.Run{run1, run2}
 	err := executionContext.CancelAll()
 	require.Nil(t, err)
-	require.True(t, executionContext.Runs[0].Cancelled())
-	require.True(t, executionContext.Runs[1].Cancelled())
+	require.True(t, executionContext.runs[0].Cancelled())
+	require.True(t, executionContext.runs[1].Cancelled())
 }
 
 func TestExecutionContext_FullRun_WithoutOptions(t *testing.T) {
@@ -457,7 +459,7 @@ func TestExecutionContext_CancelError(t *testing.T) {
 	run.AddCancelHook(func() error {
 		return fmt.Errorf("test error")
 	})
-	executionContext.Runs = []*pipeline.Run{
+	executionContext.runs = []*pipeline.Run{
 		run,
 	}
 	stdoutWriter := customio.NewPipedWriteCloser()
@@ -496,8 +498,11 @@ func TestExecutionContext_WaitForRun(t *testing.T) {
 	var run *pipeline.Run
 	go func() {
 		time.Sleep(500)
-		run = executionContext.FullRun(
+		executionContext.FullRun(
 			WithIdentifier(&runIdentifier),
+			WithSetupFunc(func(calledRun *pipeline.Run) {
+				run = calledRun
+			}),
 		)
 	}()
 	waitedRun := executionContext.WaitForRun("test")
@@ -509,7 +514,7 @@ func TestExecutionContext_UserRuns(t *testing.T) {
 	test0 := "test0"
 	test1 := "test1"
 	test2 := "test2"
-	executionContext.Runs = []*pipeline.Run{
+	executionContext.runs = []*pipeline.Run{
 		{
 			Identifier: &test0,
 			Definition: &pipeline.Definition{

@@ -53,9 +53,7 @@ func (switchMiddleware Middleware) Apply(
 		stdinCopy := run.Stdin.Copy()
 		stdoutAppender := run.Stdout.WriteCloser()
 		// do not close log yet, we may still want to write errors to it...
-		run.WaitGroup.Add(1)
-		go func() {
-			defer run.WaitGroup.Done()
+		run.DontCompleteBefore(func() {
 			// read the entire input data
 			inputData, _ := ioutil.ReadAll(stdinCopy)
 
@@ -97,7 +95,7 @@ func (switchMiddleware Middleware) Apply(
 			}
 
 			run.Log.PossibleError(stdoutAppender.Close())
-		}()
+		})
 	}
 
 	next(run)

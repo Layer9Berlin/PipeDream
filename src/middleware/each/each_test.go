@@ -29,6 +29,7 @@ func TestEach_Apply(t *testing.T) {
 
 	waitGroup := &sync.WaitGroup{}
 	allInputs := make([]string, 0, 3)
+	allInputsMutex := &sync.Mutex{}
 	run.Log.SetLevel(logrus.DebugLevel)
 	run.Stdin.Replace(strings.NewReader("bla\nbla\nend\n"))
 	run.Stdout.Replace(strings.NewReader("output of parent pipe\n"))
@@ -45,6 +46,8 @@ func TestEach_Apply(t *testing.T) {
 						defer waitGroup.Done()
 						completeInput, err := ioutil.ReadAll(stdinCopy)
 						require.Nil(t, err)
+						allInputsMutex.Lock()
+						defer allInputsMutex.Unlock()
 						allInputs = append(allInputs, string(completeInput))
 					}()
 					identifier := "anonymous"

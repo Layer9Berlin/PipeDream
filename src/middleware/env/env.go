@@ -96,13 +96,11 @@ func (envMiddleware Middleware) Apply(
 	next(run)
 
 	if arguments.Save != nil {
-		run.WaitGroup.Add(1)
-		go func() {
+		run.DontCompleteBefore(func() {
 			run.Stdout.Wait()
 			err := envMiddleware.Setenv(*arguments.Save, run.Stdout.String())
 			run.Log.PossibleError(err)
-			run.WaitGroup.Done()
-		}()
+		})
 		run.Log.Debug(
 			fields.Symbol("💲"),
 			fields.Message(fmt.Sprintf("saving output")),
