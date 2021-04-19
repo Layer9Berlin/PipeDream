@@ -42,5 +42,6 @@ func TestRun_Output_outputErrors(t *testing.T) {
 			fmt.Errorf("test error 2"),
 		},
 	}, buffer)
-	require.Equal(t, fmt.Sprintln("test error 1")+fmt.Sprintln("test error 2"), buffer.String())
+	require.Contains(t, buffer.String(), "test error 1")
+	require.Contains(t, buffer.String(), "test error 2")
 }
