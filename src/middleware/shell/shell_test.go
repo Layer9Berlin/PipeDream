@@ -221,7 +221,11 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 	testWaitGroup.Wait()
 
 	require.True(t, nextExecuted)
-	require.Equal(t, 1, run.Log.ErrorCount())
+	// non-zero exit codes are now reported as warnings, not errors
+	// (until a more sophisticated implementation of the `catch` middleware
+	// allows us to actually deal with and clear exit codes)
+	require.Equal(t, 1, run.Log.WarnCount())
+	require.Equal(t, 0, run.Log.ErrorCount())
 	require.Contains(t, run.Log.LastError().Error(), "command exited with non-zero exit code")
 	require.Equal(t, []string{"-l", "-c", "something"}, executor.StartArgs)
 	require.Contains(t, run.Log.String(), "shell")
