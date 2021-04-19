@@ -37,7 +37,8 @@ func init() {
 func versionCmd(writer io.Writer) {
 	executableLocation, _ := os.Executable()
 	_, _ = writer.Write([]byte(fmt.Sprintf(
-		`version: %v
+		`name: semver-compare
+version: %v
 date: %v
 commit: %-8v
 checksum: %-8v

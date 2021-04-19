@@ -29,7 +29,8 @@ var Via = "compiled from source"
 func Cmd(writer io.Writer) {
 	executableLocation, _ := os.Executable()
 	_, _ = writer.Write([]byte(fmt.Sprintf(
-		`version: %v
+		`name: pipedream
+version: %v
 via: %v
 date: %v
 commit: %-8v

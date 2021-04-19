@@ -61,10 +61,10 @@ builds:
     binary: util/semver-compare
     ldflags:
       - -s -w
-      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.Version={{ .Version }}
-      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.CommitHash={{ .Commit }}
-      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.Date={{ .Date }}
-      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/cmd.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/cmd.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/cmd.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/cmd.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: traffic-light
     env:
       - CGO_ENABLED=0
@@ -76,10 +76,10 @@ builds:
     binary: util/traffic-light
     ldflags:
       - -s -w
-      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.Version={{ .Version }}
-      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.CommitHash={{ .Commit }}
-      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.Date={{ .Date }}
-      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/cmd.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/cmd.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/cmd.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/cmd.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
 archives:
   - id: npm_archive
     builds:
