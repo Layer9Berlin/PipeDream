@@ -226,7 +226,6 @@ func TestShell_NonZeroExitCode(t *testing.T) {
 	// allows us to actually deal with and clear exit codes)
 	require.Equal(t, 1, run.Log.WarnCount())
 	require.Equal(t, 0, run.Log.ErrorCount())
-	require.Contains(t, run.Log.LastError().Error(), "command exited with non-zero exit code")
 	require.Equal(t, []string{"-l", "-c", "something"}, executor.StartArgs)
 	require.Contains(t, run.Log.String(), "shell")
 	require.Equal(t, -1, *run.ExitCode)
