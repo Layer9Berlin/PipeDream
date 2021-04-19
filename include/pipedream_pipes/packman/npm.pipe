@@ -3,44 +3,44 @@ version: 0.0.1
 
 pipelines:
   packman::npm:
-    steps:
-      - ~:
+    pipe:
+      - packman::npm::list-outdated:
           when: "'@{subcommand}' =~ 'outdated|upgrade'"
           shell:
             run: "npm outdated --parseable"
           save: NPM_OUTDATED
           ignore-exit-code: true
-      - ~:
+      - packman::npm::parse-outdated:
           when: "'@{subcommand}' =~ 'outdated'"
           shell:
             run: "echo \"#{NPM_OUTDATED}\" | sed -E \"s|([^:]*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*)|- pm: npm\\\\\n  path: '\\1'\\\\\n  package: '\\2'\\\\\n  current: '\\3'\\\\\n  wanted: '\\5'\\\\\n  latest: '\\7'\\\\\n|g\""
           save: NPM_OUTDATED_DEPENDENCIES
-      - ~:
+      - packman::npm::filter-upgradeable:
           when: "'@{subcommand}' == 'upgrade'"
           shell:
             run: "echo \"#{NPM_OUTDATED}\" | sed -E \"s|([^:]*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*):([^:]*)@([0-9v].*)|'\\2'@latest|g\""
           save: NPM_OUTDATED_PACKAGES
-      - ~:
+      - packman::npm::remove-ignores:
           when: "'@{subcommand}' == 'upgrade'"
           shell:
             run: "echo \"@{ignore | }\" | sed \"s@,@|@g\""
           save: NPM_IGNORE_PATTERN
-      - ~:
+      - packman::npm::make-install-list:
           when: "'@{subcommand}' == 'upgrade'"
           shell:
             run: "echo \"#{NPM_OUTDATED_PACKAGES}\" | grep -v -E \"^'(#{NPM_IGNORE_PATTERN})'@latest$\" | tr '\n' ' '"
           save: NPM_OUTDATED_INSTALL_LIST
-      - ~:
+      - packman::npm::upgrade:
           when: "'@{subcommand}' == 'upgrade'"
           shell:
             run: "npm i #{NPM_OUTDATED_INSTALL_LIST}"
           catch: noop
-      - ~:
+      - packman::npm::audit:
           when: "'@{subcommand}' == 'audit'"
           shell:
             run: "npm audit --production"
           save: NPM_AUDIT
-      - ~:
+      - packman::npm::output-audit-result:
           when: "'@{subcommand}' == 'audit'"
           shell:
             run: "echo \"#{NPM_AUDIT}\" | grep -E \"^found ([0-9]*) vulnerabilit(?:ies|y)\" | sed -E \"s|^found ([0-9]*) vulnerabilities|\\1|\""

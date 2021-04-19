@@ -10,36 +10,51 @@ public:
           injectDir: src/version
       - install::build::binary:
           binary: semver-compare
-          build-dir: util/semver-compare
-          inject-dir: util/semver-compare
+          buildDir: util/semver-compare
+          injectDir: util/semver-compare
       - install::build::binary:
           binary: traffic-light
-          build-dir: util/traffic-light
-          inject-dir: util/traffic-light
+          buildDir: util/traffic-light
+          injectDir: util/traffic-light
 
 private:
   install::build::binary:
     description: "Install binary \"@{binary}\""
+    interpolate:
+      quote: none
     pipe:
-      - go::build:
-          interpolate:
-            - install::metadata::current::version
-            - install::metadata::current::commit
-            - install::metadata::current::@{binary}::checksum
-            - install::metadata::current::date
-          inherit:
-            - binary
-            - injectDir
-          flags: "-X 'pipedream/@{injectDir}/cmd.Version=@|0' -X 'pipedream/@{injectDir}/cmd.CommitHash=@|1' -X 'pipedream/@{injectDir}/cmd.RepoChecksum=@|2' -X 'pipedream/@{injectDir}/cmd.Date=@|3'"
-          catch:
-            install::build::binary::error-handler:
-              output:
-                text: "failed"
+      - install::build::run
       - install::build::output-results
+
+  install::build::run:
+    inherit:
+      - binary
+      - injectDir
+    interpolate:
+      quote: none
+    extract:
+      file: .metadata.current.yaml
+      values:
+        version:
+          - version
+        commit:
+          - commit
+        checksum:
+          - checksum
+          - "@{binary}"
+        date:
+          - date
+    flags: "-X 'pipedream/@{injectDir}/cmd.Version=@{version}' -X 'pipedream/@{injectDir}/cmd.CommitHash=@{commit}' -X 'pipedream/@{injectDir}/cmd.RepoChecksum=@{checksum}' -X 'pipedream/@{injectDir}/cmd.Date=@{date}'"
+    catch:
+      install::build::binary::error-handler:
+        output:
+          text: "failed"
 
   install::build::output-results:
     inherit:
       - binary
+    interpolate:
+      quote: none
     pipe:
       - install::build::binary::success:
           when: "'@!!' == ''"

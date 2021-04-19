@@ -4,27 +4,26 @@ version: 0.0.1
 public:
   install:
     description: Install
+#    sync: true
     each:
-      # set an appropriate install dir
-      - install::path::determine-install-dir
-      # verify that the install dir is in the path and output result
-      - install::path::verify-install-dir-in-path
       # collect metadata from the current state of the repo
       - install::metadata::current::collect
+      # verify that the install dir is in the path and output result
+      - install::path::verify-install-dir-in-path
       # build pipedream and the utility tool binaries and output result
       - install::build::all
-      # create a symlink in the install dir pointing to the built-in pipes directory and output result
-      - install::pipes::link
-      # collect metadata from the output of the installed binaries
-      - install::metadata::installed::collect
-      # compare current state of repo to installed metadata and output result
-      - install::binary::check-all
-      # check that there is a symlink to the built-in pipes in the install dir and output result
-      - install::pipes::check
-      # output a little call-to-action info message
-      - install::output::quick-start-message:
-          output:
-            text: "\nCheck out the Quick-Start Guide for some ideas on how to get started with PipeDream:\nhttps://github.com/Layer9Berlin/PipeDream/tree/main/docs/quick-start\n"
+#      # create a symlink in the install dir pointing to the built-in pipes directory and output result
+#      - install::pipes::link
+#      # collect metadata from the output of the installed binaries
+#      - install::metadata::installed::collect
+#      # compare current state of repo to installed metadata and output result
+#      - install::binary::check-all
+#      # check that there is a symlink to the built-in pipes in the install dir and output result
+#      - install::pipes::check
+#      # output a little call-to-action info message
+#      - install::output::quick-start-message:
+#          output:
+#            text: "\nCheck out the Quick-Start Guide for some ideas on how to get started with PipeDream:\nhttps://github.com/Layer9Berlin/PipeDream/tree/main/docs/quick-start\n"
 
   check-installation:
     description: Check installation

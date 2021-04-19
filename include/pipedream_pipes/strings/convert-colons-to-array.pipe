@@ -1,0 +1,7 @@
+---
+version: 0.0.1
+
+public:
+  strings::convert-colons-to-line-yaml-array:
+    shell:
+      run: "tr : '\n' | sed -E 's/^/- /g'"

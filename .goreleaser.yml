@@ -60,10 +60,10 @@ builds:
     binary: util/semver-compare
     ldflags:
       - -s -w
-      - -X github.com/Layer9Berlin/pipedream/src/version.Version={{ .Version }}
-      - -X github.com/Layer9Berlin/pipedream/src/version.CommitHash={{ .Commit }}
-      - -X github.com/Layer9Berlin/pipedream/src/version.Date={{ .Date }}
-      - -X github.com/Layer9Berlin/pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/util/semver-compare/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
   - id: traffic-light
     env:
       - CGO_ENABLED=0
@@ -74,10 +74,10 @@ builds:
     binary: util/traffic-light
     ldflags:
       - -s -w
-      - -X github.com/Layer9Berlin/pipedream/src/version.Version={{ .Version }}
-      - -X github.com/Layer9Berlin/pipedream/src/version.CommitHash={{ .Commit }}
-      - -X github.com/Layer9Berlin/pipedream/src/version.Date={{ .Date }}
-      - -X github.com/Layer9Berlin/pipedream/src/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.Version={{ .Version }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.CommitHash={{ .Commit }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.Date={{ .Date }}
+      - -X github.com/Layer9Berlin/pipedream/util/traffic-light/version.RepoChecksum={{ .Env.PIPEDREAM_INSTALL_SHASUM }}
 archives:
   - id: npm_archive
     builds:
@@ -128,8 +128,8 @@ brews:
 
     install: |
       bin.install "pipedream"
-      bin.install "util/semver-compare"
-      bin.install "util/traffic-light"
+      bin.install_symlink util/"semver-compare"
+      bin.install_symlink util/"traffic-light"
       include.install Dir["include/*"]
       ln_s("#{include}/pipedream_pipes", "#{bin}", force: true)
 

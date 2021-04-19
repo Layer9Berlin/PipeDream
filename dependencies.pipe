@@ -7,12 +7,11 @@ default:
 public:
   list:
     pipe:
-      - go-mod:
-          subcommand: list
+      - packman::go-mod::list
 
   outdated:
     pipe:
-      - go-mod:
+      - packman::go-mod::outdated:
           ignore-packages:
             - github.com/codahale/hdrhistogram
             - github.com/envoyproxy/protoc-gen-validate
@@ -23,11 +22,10 @@ public:
             - go.etcd.io/etcd
             - golang.org/x/exp
             - sourcegraph.com/sourcegraph/go-diff
-          subcommand: outdated
 
   upgrade:
     pipe:
-      - go-mod:
+      - packman::go-mod::upgrade:
           ignore-packages:
             - github.com/envoyproxy/protoc-gen-validate
             - github.com/codahale/hdrhistogram
@@ -45,4 +43,3 @@ public:
             - google.golang.org/grpc/naming
             - github.com/golang/lint
             - sourcegraph.com/sourcegraph/go-diff
-          subcommand: upgrade

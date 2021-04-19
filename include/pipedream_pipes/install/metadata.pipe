@@ -3,96 +3,61 @@ version: 0.0.1
 
 public:
   install::metadata::current::collect:
-    pipe:
-      - install::metadata::current::version:
-          shell:
-            run: "svu c"
-          output:
-            process: strings::remove-new-lines
-      - install::metadata::current::commit:
-          shell:
-            run: "git rev-parse HEAD"
-          output:
-            process: strings::remove-new-lines
-      - install::metadata::current::pipedream::checksum:
-          pipe:
-            - tar::shasum:
-                dirs: "cmd include src install.pipe"
-      - install::metadata::current::semver-compare::checksum:
-          pipe:
-            - tar::shasum:
-                dirs: "util/semver-compare"
-      - install::metadata::current::traffic-light::checksum:
-          pipe:
-            - tar::shasum:
-                dirs: "util/traffic-light"
-      - install::metadata::current::date:
-          shell:
-            run: "date"
-          output:
-            process: strings::remove-new-lines
-      - noop
+    collect:
+      file: .metadata.current.yaml
+      nested: true
+      values:
+        - install-path:
+            shell:
+              run: "echo \"$GOPATH/bin\""
+            output:
+              process: strings::remove-new-lines
+        - path-env-var:
+            pipe:
+              - env::load:
+                  var: PATH
+        - version:
+            shell:
+              run: "svu c"
+            output:
+              process: strings::remove-new-lines
+        - commit:
+            shell:
+              run: "git rev-parse HEAD"
+            output:
+              process: strings::remove-new-lines
+        - date:
+            shell:
+              run: "date"
+            output:
+              process: strings::remove-new-lines
+        - checksum:
+            collect:
+              values:
+                - pipedream:
+                    pipe:
+                      - tar::shasum:
+                          dirs: "cmd include src install.pipe"
+                - semver-compare:
+                    pipe:
+                      - tar::shasum:
+                          dirs: "util/semver-compare"
+                - traffic-light:
+                    pipe:
+                      - tar::shasum:
+                          dirs: "util/traffic-light"
 
   install::metadata::installed::collect:
-    each:
-      - install::metadata::installed::collect::pipedream:
-          pipe:
-            - install::metadata::pipedream::version:
-                shell:
-                  run: "pipedream version"
-                catch: install::metadata::command-not-found-handler
-            - install::metadata::extract-installed:
-                binary: pipedream
-      - install::metadata::installed::collect::traffic-light:
-          pipe:
-            - install::metadata::traffic-light::version:
-                shell:
-                  run: "traffic-light version"
-                catch: install::metadata::command-not-found-handler
-            - install::metadata::extract-installed:
-                binary: traffic-light
-      - install::metadata::installed::collect::semver-compare:
-          pipe:
-            - install::metadata::semver-compare::version:
-                shell:
-                  run: "semver-compare version"
-                catch: install::metadata::command-not-found-handler
-            - install::metadata::extract-installed:
-                binary: semver-compare
-
-private:
-  install::metadata::extract-installed:
-    interpolate:
-      quote: none
-    inherit:
-      - binary
-    each:
-      - install::metadata::extract-value:
-          key: "version"
-      - install::metadata::extract-value:
-          key: "commit"
-      - install::metadata::extract-value:
-          key: "checksum"
-      - install::metadata::extract-value:
-          key: "location"
-
-  install::metadata::command-not-found-handler:
-    when: "@!! =~ 'command not found'"
-
-  install::metadata::extract-value:
-    interpolate:
-      quote: none
-    inherit:
-      - key
-      - binary
-    pipe:
-      - install::metadata::extract-value::find-value:
-          shell:
-            run: "grep '@{key}: '"
-      - install::metadata::installed::@{binary}::@{key}:
-          description: Extract metadata for key @{key} from installed binary @{binary}
-          shell:
-            run: "sed 's/^.*@{key}: //'"
-          output:
-            process: strings::remove-new-lines
-      - noop
+    collect:
+      file: .metadata.installed.yaml
+      nested: true
+      values:
+        - pipedream:
+            shell:
+              run: "pipedream version || echo ''"
+        - traffic-light:
+            shell:
+              run: "traffic-light version || echo ''"
+        - semver-compare:
+            shell:
+              run: "semver-compare version || echo ''"

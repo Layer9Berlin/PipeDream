@@ -1,0 +1,12 @@
+---
+version: 0.0.1
+
+public:
+  strings::is-non-empty:
+    when: "'$!!' == ''"
+    output:
+      text: no
+    else:
+      strings::is-non-empty::positive-result:
+        output:
+          text: yes

@@ -35,6 +35,6 @@ func outputErrors(errors *multierror.Error, writer io.Writer) {
 		for _, err := range errors.Errors {
 			errorMessages = append(errorMessages, err.Error())
 		}
-		_, _ = fmt.Fprintln(writer, strings.Join(errorMessages, "\n"))
+		_, _ = fmt.Fprintln(writer, aurora.Red(strings.Join(errorMessages, "\n")))
 	}
 }

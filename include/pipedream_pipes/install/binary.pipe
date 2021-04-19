@@ -95,7 +95,7 @@ private:
           output:
             text: "current"
           else:
-            ~:
+            install::binary::compare::out-of-date:
               output:
                 text: "out of date"
       - util::traffic-light:

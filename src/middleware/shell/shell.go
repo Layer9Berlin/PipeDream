@@ -206,7 +206,11 @@ func (shellMiddleware Middleware) Apply(
 				if exitErr, ok := err.(*exec.ExitError); ok {
 					exitCode := exitErr.ExitCode()
 					run.ExitCode = &exitCode
-					run.Log.Error(fmt.Errorf("command exited with non-zero exit code: %w", exitErr))
+					run.Log.Warn(
+						fields.Middleware(shellMiddleware),
+						fields.Message("command exited with non-zero exit code"),
+						fields.Info(fmt.Errorf("command exited with non-zero exit code: %w", exitErr)),
+					)
 				} else {
 					run.Log.Error(err)
 				}

@@ -3,6 +3,7 @@ module github.com/Layer9Berlin/pipedream
 go 1.15
 
 require (
+	github.com/ghodss/yaml v1.0.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-uuid v1.0.1

@@ -60,17 +60,18 @@ private:
 
   packman::go-mod::list-all:
     pipe:
-      shell:
-        run: go list -u -m all
+      - ~:
+          shell:
+            run: go list -u -m all
 
   packman::go-mod::apply-ignores:
     pipe:
-      - ~:
+      - packman::go-mod::apply-ignores::packages:
           when: "@?{ignore-packages}"
           shell:
             run: "grep -v -F \"@{ignore-packages}\""
           catch: go-mod::catch-grep-error
-      - ~:
+      - packman::go-mod::apply-ignores::pattern:
           when: "@?{ignore-pattern}"
           shell:
             run: "grep -v -E \"@{ignore-pattern}\""
@@ -89,14 +90,14 @@ private:
   packman::go-mod::convert-upgradeable-to-yaml:
     pipe:
       - packman::go-mod::filter-upgradeable
-      - ~:
+      - packman::go-mod::convert-upgradeable-to-yaml::process:
           shell:
             run: "sed -E \"s/^([^ ]*) v?([^ ]*) \\[v?([^ ]*)\\]$/- pm: go\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n  latest: '\\3'\\\\\n/g\""
 
   packman::go-mod::convert-non-upgradeable-to-yaml:
     pipe:
       - packman::go-mod::filter-non-upgradeable
-      - ~:
+      - packman::go-mod::convert-non-upgradeable-to-yaml::process:
           shell:
             run: "sed -E \"s/^([^ ]*) v?([^ ]*)( \\[v)?([^ ]*)\\]?$/- pm: go\\\\\n  package: '\\1'\\\\\n  current: '\\2'\\\\\n/g\""
 
@@ -109,16 +110,14 @@ private:
 
   packman::go-mod::list-available-updates:
     pipe:
-      - ~:
+      - packman::go-mod::list-available-updates::semver-compare:
           shell:
             run: "semver-compare --yaml"
-      - ~:
-          shell:
-            args:
-              prefix: Go mod
-              red: major updates available
-              amber: minor updates available
-            run: traffic-light
+      - packman::go-mod::list-available-updates::output:
+          util::traffic-light:
+            prefix: Go mod
+            red: major updates available
+            amber: minor updates available
 
   packman::go-mod::compile-install-list:
     pipe:

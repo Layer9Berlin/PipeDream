@@ -23,7 +23,6 @@ private:
   util::traffic-light::command-not-found:
     interpolate:
       quote: none
-    when: "'@!!' =~ 'command not found'"
     pipe:
       - util::traffic-light::fallback::red:
           description: "Show red traffic light"

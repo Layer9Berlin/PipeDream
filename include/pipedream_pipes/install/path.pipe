@@ -2,24 +2,46 @@
 version: 0.0.1
 
 public:
-  install::path::determine-install-dir:
-    pipe:
-      - install::path::determine-install-dir::print-dir:
-          # TODO: do we need other options here?
-          shell:
-            run: "print \"$GOPATH/bin\""
-      # don't need any output
-      - noop
-
   # check that the install dir is in the PATH
   # so that binaries can be called from any directory
   install::path::verify-install-dir-in-path:
     pipe:
-      - install::path::verify-directory-in-path:
-          interpolate:
-            pipes:
-              - install::path::find
-          directory: "@|0"
+      - install::path::verify-install-dir-in-path::output-path
+      - install::path::verify-install-dir-in-path::find-path
+      - util::traffic-light:
+          prefix: "Install dir in PATH"
+          red: "^no"
+
+  install::path::verify-install-dir-in-path::output-path:
+    extract:
+      file: .metadata.current.yaml
+      values:
+        path:
+          - path-env-var
+    output:
+      text: "@{path}"
+      process: strings::convert-colons-to-line-breaks
+
+  install::path::verify-install-dir-in-path::find-path:
+    extract:
+      file: .metadata.current.yaml
+      values:
+        directory:
+          - install-path
+    shell:
+      run: "grep -x @{directory} || echo \"no\""
+    output:
+      process: strings::is-non-empty
+    catch:
+      install::path::verify-dir-in-path::catch:
+        output:
+          text: "n/a"
+    when: "@{directory} != ''"
+    else:
+      # fallback in case we have been passed an empty `dir` argument
+      install::path::verify-dir-in-path::fallback:
+        output:
+          text: "not found"
 
   # check that the passed `dir` is in the path
   # so that a binary located there can be called from anywhere on the system
@@ -57,3 +79,37 @@ public:
           prefix: "Install dir in PATH"
           red: "^no"
 
+#
+#    pipe:
+#      # fetch the PATH environment variable and separate entries by line break
+#      - env::load:
+#          var: PATH
+#          output:
+#            process: strings::convert-colons-to-line-breaks
+#      # check that there is a line corresponding to the install path
+#      - install::path::verify-dir-in-path::look-for-install-path:
+#          shell:
+#            run: "grep -x \"@{directory}\" || printf \"\""
+#          when: "@{directory} != ''"
+#          else:
+#            # fallback in case we have been passed an empty `dir` argument
+#            install::path::verify-dir-in-path::fallback:
+#              output:
+#                text: "n/a"
+#      # an empty result indicates no match, anything else is success
+#      # (we may have several matches)
+#      - install::path::verify-dir-in-path::process-result:
+#          switch:
+#            # "n/a" output from the `else` pipe will be kept as-is
+#            - pattern: "^n/a$"
+#              text: "n/a"
+#            # in any other case, empty output denotes failure to find a match
+#            - pattern: "^$"
+#              text: "no"
+#            # if the output is not empty and not "n/a", we assume that we have found a match
+#            - text: "yes"
+#      # show the result - red if "no", amber if "n/a", green if "yes"
+#      - util::traffic-light:
+#          prefix: "Install dir in PATH"
+#          red: "^no"
+#
