@@ -1,0 +1,9 @@
+checksum:
+  pipedream: 71d19f86a2c9e7bb34ab7c97e72c78fff2e3baa1
+  semver-compare: 490d90a43fea33f5493aa6e8243e09ba3ca55d11
+  traffic-light: af4764602a9d0be832b12cbcd5c012b130104e3f
+commit: 079f4be19c261f1f451674a7c3fe333b83de2e5e
+date: Mon Apr 19 14:43:45 CEST 2021
+install-path: /Users/wilhelmschuttelspeer/go/bin
+path-env-var: /usr/local/Cellar/go/1.15.7_1/libexec/bin:/Users/wilhelmschuttelspeer/go/bin:/Users/wilhelmschuttelspeer/.rvm/gems/ruby-2.7.2/bin:/Users/wilhelmschuttelspeer/.rvm/gems/ruby-2.7.2@global/bin:/Users/wilhelmschuttelspeer/.rvm/rubies/ruby-2.7.2/bin:/Users/wilhelmschuttelspeer/.nvm/versions/node/v14.15.0/bin:/Users/wilhelmschuttelspeer/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin:/Library/Apple/usr/bin:/Users/wilhelmschuttelspeer/go/src/github.com/Layer9Berlin/PipeDream/node_modules/.bin:/Users/wilhelmschuttelspeer/go/bin:/Users/wilhelmschuttelspeer/.rvm/bin
+version: v0.37.0

@@ -14,6 +14,8 @@ public:
           interpolate:
             pipes:
               - git::status::process
+          output:
+            text: "skipped"
           when: "@|0 !~ 'clean'"
       - publish::upload::report:
           shell:

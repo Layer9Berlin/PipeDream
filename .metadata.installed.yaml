@@ -1,0 +1,22 @@
+pipedream:
+  checksum: 8f7281c968ac508ae43f1f5ea4e4d7adae5ed02c
+  commit: 079f4be19c261f1f451674a7c3fe333b83de2e5e
+  date: 19 Apr 21 14:43 CEST
+  location: /Users/wilhelmschuttelspeer/.nvm/versions/node/v14.15.0/bin/pipedream
+  name: pipedream
+  version: 0.37.0
+  via: npm
+semver-compare:
+  checksum: 8f7281c968ac508ae43f1f5ea4e4d7adae5ed02c
+  commit: 079f4be19c261f1f451674a7c3fe333b83de2e5e
+  date: 19 Apr 21 14:43 CEST
+  location: /Users/wilhelmschuttelspeer/.nvm/versions/node/v14.15.0/bin/semver-compare
+  name: semver-compare
+  version: 0.37.0
+traffic-light:
+  checksum: 8f7281c968ac508ae43f1f5ea4e4d7adae5ed02c
+  commit: 079f4be19c261f1f451674a7c3fe333b83de2e5e
+  date: 19 Apr 21 14:43 CEST
+  location: /Users/wilhelmschuttelspeer/.nvm/versions/node/v14.15.0/bin/traffic-light
+  name: traffic-light
+  version: 0.37.0

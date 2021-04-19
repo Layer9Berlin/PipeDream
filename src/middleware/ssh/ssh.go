@@ -32,18 +32,16 @@ func (sshMiddleware Middleware) Apply(
 	next func(*pipeline.Run),
 	_ *middleware.ExecutionContext,
 ) {
-	arguments := struct {
-		Host *string
-	}{}
-	pipeline.ParseArgumentsIncludingParents(&arguments, "ssh", run)
+	var argument *string
+	pipeline.ParseArgumentsIncludingParents(&argument, "ssh", run)
 
-	if arguments.Host != nil {
+	if argument != nil {
 		run.Log.Debug(
 			fields.Symbol("👨‍💻"),
-			fields.Message(arguments.Host),
+			fields.Message(*argument),
 			fields.Middleware(sshMiddleware),
 		)
-		prefixWithSSHHost(run, *arguments.Host)
+		prefixWithSSHHost(run, *argument)
 	}
 
 	next(run)
