@@ -57,6 +57,7 @@ builds:
       - linux
       - windows
       - darwin
+    dir: util/semver-compare
     binary: util/semver-compare
     ldflags:
       - -s -w
@@ -71,6 +72,7 @@ builds:
       - linux
       - windows
       - darwin
+    dir: util/traffic-light
     binary: util/traffic-light
     ldflags:
       - -s -w
